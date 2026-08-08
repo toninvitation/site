@@ -84,8 +84,8 @@ nav a:hover{    /*Cor ao passar o rato nas palavras do menu*/
     display:grid;
     grid-template-columns:1fr 1fr;  /*2 colunas: uma para escrita e outra para a imagem inicial*/
     align-items:center; /*Centraliza as 2 counas*/
-    padding:93px 200px; /*Ajustar altura da seção ; Onde começa a linha, horizontalmente*/
-    gap: 300px; /*Ajustar a imagem horizontalmente*/
+    padding:50px 150px; /*Ajustar altura da seção ; Onde começa a linha, horizontalmente*/
+    gap: 100px; /*Ajustar a imagem horizontalmente*/
     background:#f9ebe1; /*Cor de fundo desta seção*/
 }
 
@@ -97,21 +97,23 @@ nav a:hover{    /*Cor ao passar o rato nas palavras do menu*/
 
 .Inicio h1{ /*Escrita 'Convites Digitais'*/
     font-family:'Cormorant Garamond', serif;
-    font-size:60px;
-    font-weight:500;
+    font-size:100px;
+    font-weight:600;
     line-height:1.2;   /*Distância entre linhas dos títulos*/
     color:#5b4038;
-    letter-spacing: 0.5px;
+    letter-spacing: 5.5px;
+    margin-right: 5px;
 }
 
 
 .Inicio span{
     display:block;
     font-family:'Allura', cursive;
-    font-size:90px;
+    font-size:120px;
     color:#D68588;
     font-weight:400;
-    margin-top:-10px;
+    margin-top:15px;
+    
 }
 
 
@@ -173,7 +175,7 @@ nav a:hover{    /*Cor ao passar o rato nas palavras do menu*/
 
 .Inicio-imagem img{
     width:100%;     /*a imagem ocupa menos espaço dentro da coluna.*/
-    max-width:240px;    /*impede que fique gigante em ecrãs muito grandes*/
+    max-width:2300px;    /*impede que fique gigante em ecrãs muito grandes*/
     border-radius:25px;
 }
 
