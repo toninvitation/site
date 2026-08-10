@@ -21,7 +21,7 @@ header{
     /*menu para esquerda x 1fr x menu para direita x botão de encomendar para direita*/
     grid-template-columns:300px 1fr 280px 120px;  /*Cria 4 colunas na mesma linha (Onde tem o menu, logo e o botão de encomendar e outro botão de encomedar, que só é visível quando o ecrã<900px)*/
     align-items:center;
-    padding:20px 140px; /*Altura do cabeçalho x Onde começa o cabeçalho(mais à direita/esquerda)*/
+    padding:20px 40px; /*Altura do cabeçalho x Onde começa o cabeçalho(mais à direita/esquerda)*/
     background:#f9ebe1;    /*Cor de fundo do cabeçalho*/
     border-bottom:2px solid #ead2db; /*Cor da linha que separa o cabeçalho e o corpo do site*/
 }
@@ -311,6 +311,19 @@ nav a:hover{    /*Cor ao passar o rato nas palavras do menu*/
         gap:25px;
         padding: 25px 0;
     }
+
+    .Inicio{
+        grid-template-columns:1fr;
+        padding:60px 30px;
+        gap:40px;
+    }
+
+    .vantagens-grid{
+        align-items:center;
+        grid-template-columns:1fr;
+        gap:35px;
+    }
+
 }
 
 
@@ -385,17 +398,17 @@ footer{
 
 .footer-conteudo{
 
-    max-width:1490px;
+    max-width:1500px;
 
     margin:auto;
 
-    padding:40px 150px;
+    padding:20px 20px;
 
     display:grid;
 
     grid-template-columns:2fr 1fr 1.3fr 1.4fr;
 
-    gap:70px;
+    gap:80px;  /*Distancia entre as colunas*/
 
 }
 
@@ -403,16 +416,16 @@ footer{
 
     width:190px;
 
-    margin-bottom:10px;
+    margin-bottom:20px;
 
 }
 
 .footer-col h3{
 
     font-family:'Cormorant Garamond', serif;
-    font-size:18px;
+    font-size:20px; /*Tamanho das letra dos títulos do footer*/
     color:#5b4038;
-    margin-bottom:16px;
+    margin-bottom:16px; /*Distancia entre o títulos e os subtítulos do footer*/
     font-weight:1000;
 
 }
@@ -421,9 +434,9 @@ footer{
 
     color:#6d5b55;
 
-    line-height:2;
+    line-height:2;  /*Dstância entres a linha da frase em baixo do logo no footer*/
 
-    font-size:13px;
+    font-size:13px; /*Tamanho da frase em baixo do logo do footer*/
 
 }
 
@@ -435,7 +448,7 @@ footer{
 
 .footer-col li{
 
-    margin-bottom:3px;
+    margin-bottom:5px;  /*Distância entre os elementos do menu do footer*/
 
 }
 
@@ -446,12 +459,13 @@ footer{
     text-decoration:none;
 
     transition:.3s;
+    font-size: 15px;
 
 }
 
 .footer-col a:hover{
 
-    color:#D68588;
+    color:#D68588;/*Cor ao selecionar um menu no footer*/
 
 }
 
@@ -459,9 +473,9 @@ footer{
 
     display:flex;
 
-    gap:18px;
+    gap:5px;
 
-    margin-top:20px;
+    margin-top:25px;    /*Distânia da frase aos incones abaixo do logo no footer*/
 
 }
 
@@ -471,21 +485,21 @@ footer{
 
 }
 
-.footer-redes svg{
+.footer-redes svg{  /*Tamanho dos ícones(20x20 - quadrado)*/
 
-    width:20px;
+    width:35px;
 
-    height:22px;
+    height:20px;
 
 }
 
 .footer-col p svg{
 
-    width:20px;
+    width:15px;
 
-    height:13px;
+    height:15px;  /*Distância entre a escrita e 'contactos' - coluna 3*/
 
-    margin-right:10px;
+    margin-right:20px; /*Distância dos ícones até escrita nos contactos*/
 
     color:#D68588;
 
@@ -499,21 +513,21 @@ footer{
 
     align-items:center;
 
-    gap:10px;
+    gap:10px;   /*Distância do ícone até a escrita no botão de whatsapp no footer*/
 
-    margin-top:30px;
+    margin-top:40px;
 
-    padding:10px 15px;
+    padding:10px 30px;
 
     background:#D68588;
 
-    color:white !important;
+    color:rgb(255, 255, 255) !important;
 
     border-radius:999px;
 
     text-decoration:none;
 
-    font-weight:600;
+    font-weight:400;
 
     transition:.3s;
 
@@ -521,20 +535,50 @@ footer{
 
 .footer-btn:hover{
 
-    background:#895562;
+    background:#895562; /*Cor ao selecionar botão de whasapp*/
 
 }
 
-.footer-bottom{
+.footer-bottom{   /*Parte dos direitos reservados*/
 
-    background:#e8b8be;
+    background:#6d5b55; /*Cor de fundo*/
 
-    color:white;
+    color:rgb(255, 255, 255);   /*Cor da escrita*/
 
-    text-align:center;
+    text-align:center;  /*Texto alinhado*/
 
-    padding:18px;
+    padding:5px;    /*Altura da seção*/
 
-    font-size:14px;
+    font-size:12px; /*Tamanho das letras*/
+
+}
+
+
+ @media (max-width:900px){
+
+    /* =========================
+       FOOTER - TELEMÓVEL/TABLET
+       ========================= */
+
+    .footer-conteudo{
+        grid-template-columns:1fr;
+        padding:30px 30px;
+        gap:40px;
+      
+    }
+
+    .footer-col{
+        width:100%;
+    }
+
+    .footer-col ul{
+        padding:0;
+    }
+
+    .footer-btn{
+        width:fit-content;
+        margin:25px auto 0;
+    }
+
 
 }
