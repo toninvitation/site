@@ -22,7 +22,7 @@ header{
     grid-template-columns:300px 1fr 280px 120px;  /*Cria 4 colunas na mesma linha (Onde tem o menu, logo e o botão de encomendar e outro botão de encomedar, que só é visível quando o ecrã<900px)*/
     align-items:center;
     padding:10px 30px; /*Altura do cabeçalho x Onde começa o cabeçalho(mais à direita/esquerda)*/
-    background:#c82c05;    /*Cor de fundo do cabeçalho*/
+    background:#f9ebe1;    /*Cor de fundo do cabeçalho*/
     border-bottom:2px solid #ead2db; /*Cor da linha que separa o cabeçalho e o corpo do site*/
 }
 
