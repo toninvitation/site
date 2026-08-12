@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.key === "Escape" && modal.classList.contains("open")) closeCustomizer();
   });
 
-  form?.addEventListener("submit", event => {
+  form?.addEventListener("submit", async event => {
     event.preventDefault();
 
     const email = fieldEmail.value.trim();
@@ -185,22 +185,36 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    formMessage.textContent =
-      `Pré-pedido registado nesta demonstração para ${escapeHtml(email)}.`;
+    const order = {
+      templateId: selectedTemplate.id,
+      color: selectedColor,
+      name: fieldName.value.trim() || selectedTemplate.defaultName,
+      date: fieldDate.value.trim() || selectedTemplate.defaultDate,
+      time: fieldTime.value.trim() || selectedTemplate.defaultTime,
+      place: fieldPlace.value.trim() || selectedTemplate.defaultPlace,
+      email
+    };
 
-    /*
-      FUTURO:
-      Aqui entra a ligação ao backend/pagamento.
-      O formulário poderá enviar:
-      - template escolhido
-      - cor
-      - nome
-      - data
-      - hora
-      - local
-      - e-mail
-      para um servidor/serviço de automação.
-    */
+    formMessage.textContent = "A preparar o pagamento...";
+
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(order)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || "Não foi possível iniciar o pagamento.");
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error(error);
+      formMessage.textContent = error.message || "Ocorreu um erro. Tente novamente.";
+    }
   });
 
   /* =========================
