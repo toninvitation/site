@@ -179,6 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
 
     const email = fieldEmail.value.trim();
+
     if (!email) {
       formMessage.textContent = "Indique o e-mail onde pretende receber o convite.";
       fieldEmail.focus();
@@ -195,64 +196,42 @@ document.addEventListener("DOMContentLoaded", () => {
       email
     };
 
-    formMessage.textContent = "A preparar o pagamento...";
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i data-lucide="loader-circle"></i> A preparar o seu convite...';
+    if (window.lucide) lucide.createIcons();
+
+    formMessage.textContent = "A confirmar pagamento e a preparar o envio...";
 
     try {
-      const response = await fetch("/api/create-checkout-session", {
+      // MODO DE TESTE: clicar aqui equivale a pagamento confirmado.
+      const response = await fetch("/api/confirm-payment-test", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order)
       });
 
       const data = await response.json();
 
-      if (!response.ok || !data.url) {
-        throw new Error(data.error || "Não foi possível iniciar o pagamento.");
+      if (!response.ok) {
+        throw new Error(data.error || "Não foi possível concluir o pedido.");
       }
 
-      window.location.href = data.url;
+      formMessage.textContent =
+        "Pagamento confirmado! O seu convite foi enviado para " + email + ".";
+
+      submitButton.innerHTML = '<i data-lucide="check"></i> Pedido concluído';
+      if (window.lucide) lucide.createIcons();
+
     } catch (error) {
       console.error(error);
-      formMessage.textContent = error.message || "Ocorreu um erro. Tente novamente.";
+      formMessage.textContent =
+        error.message || "Ocorreu um erro ao processar o pedido.";
+
+      submitButton.disabled = false;
+      submitButton.innerHTML =
+        '<i data-lucide="credit-card"></i> Confirmar pagamento';
+      if (window.lucide) lucide.createIcons();
     }
   });
 
-  /* =========================
-     CARROSSEL DE AVALIAÇÕES
-     ========================= */
-  const list = document.querySelector(".reviews-list");
-  const reviews = document.querySelectorAll(".review");
-  const prev = document.querySelector(".review-prev");
-  const next = document.querySelector(".review-next");
-  let current = 0;
-
-  function visibleReviews() {
-    return window.innerWidth <= 900 ? 1 : 3;
-  }
-
-  function updateReviews() {
-    if (!list || !reviews.length) return;
-    const visible = visibleReviews();
-    const max = Math.max(0, reviews.length - visible);
-    current = Math.min(current, max);
-    const step = 100 / visible;
-    list.style.transform = `translateX(-${current * step}%)`;
-  }
-
-  next?.addEventListener("click", () => {
-    const max = Math.max(0, reviews.length - visibleReviews());
-    current = current < max ? current + 1 : 0;
-    updateReviews();
-  });
-
-  prev?.addEventListener("click", () => {
-    const max = Math.max(0, reviews.length - visibleReviews());
-    current = current > 0 ? current - 1 : max;
-    updateReviews();
-  });
-
-  window.addEventListener("resize", updateReviews);
-
-  renderCatalog();
-  updateReviews();
-});
