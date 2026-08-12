@@ -1,126 +1,244 @@
-const menu = document.getElementById("menu");
-const botao = document.getElementById("menu-mobile");
+/* =========================================================
+   TONInvitation — INTERAÇÕES
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const menu = document.getElementById("menu");
+  const menuButton = document.getElementById("menu-mobile");
 
-botao.addEventListener("click", () => {
-    menu.classList.toggle("ativo");
-    botao.classList.toggle("aberto");
-});
+  menuButton?.addEventListener("click", () => {
+    const open = menu.classList.toggle("ativo");
+    menuButton.classList.toggle("aberto", open);
+    menuButton.setAttribute("aria-expanded", String(open));
+  });
 
-document.querySelectorAll("#menu a").forEach(link => {
-
+  document.querySelectorAll("#menu a").forEach(link => {
     link.addEventListener("click", () => {
-        menu.classList.remove("ativo");
-        botao.classList.remove("aberto");
+      menu.classList.remove("ativo");
+      menuButton?.classList.remove("aberto");
+      menuButton?.setAttribute("aria-expanded", "false");
+    });
+  });
+
+  /* =========================
+     CATÁLOGO
+     ========================= */
+  const grid = document.getElementById("catalog-grid");
+  const filterButtons = document.querySelectorAll(".filter-btn");
+
+  function renderCatalog(filter = "todos") {
+    if (!grid || typeof INVITATION_TEMPLATES === "undefined") return;
+
+    const items = INVITATION_TEMPLATES.filter(item =>
+      filter === "todos" || item.category === filter
+    );
+
+    grid.innerHTML = items.map(item => `
+      <article class="catalog-card">
+        <div class="catalog-image-wrap">
+          <img src="${item.image}" alt="${item.name}">
+          ${item.badge ? `<span class="catalog-badge">${item.badge}</span>` : ""}
+        </div>
+        <div class="catalog-info">
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+          <div class="catalog-actions">
+            <button class="btn btn-outline preview-template" data-template="${item.id}">
+              <i data-lucide="eye"></i> Ver
+            </button>
+            <button class="btn btn-primary customize-template" data-template="${item.id}">
+              Personalizar
+            </button>
+          </div>
+        </div>
+      </article>
+    `).join("");
+
+    lucide.createIcons();
+    attachCatalogButtons();
+  }
+
+  filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      filterButtons.forEach(b => b.classList.remove("active"));
+      button.classList.add("active");
+      renderCatalog(button.dataset.filter);
+    });
+  });
+
+  /* =========================
+     CUSTOMIZADOR
+     ========================= */
+  const modal = document.getElementById("customizer-modal");
+  const form = document.getElementById("customizer-form");
+  const preview = document.getElementById("invitation-preview");
+  const fieldName = document.getElementById("field-name");
+  const fieldDate = document.getElementById("field-date");
+  const fieldTime = document.getElementById("field-time");
+  const fieldPlace = document.getElementById("field-place");
+  const fieldEmail = document.getElementById("field-email");
+  const colorOptions = document.getElementById("color-options");
+  const formMessage = document.getElementById("form-message");
+
+  let selectedTemplate = null;
+  let selectedColor = "#d98ea2";
+
+  function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+  }
+
+  function openCustomizer(templateId) {
+    selectedTemplate = INVITATION_TEMPLATES.find(t => t.id === templateId) || INVITATION_TEMPLATES[0];
+    selectedColor = selectedTemplate.colors?.[0]?.value || "#d98ea2";
+
+    document.getElementById("customizer-title").textContent =
+      `Personalize: ${selectedTemplate.name}`;
+
+    buildColorOptions();
+    setPreviewDefaults();
+    formMessage.textContent = "";
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeCustomizer() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function buildColorOptions() {
+    colorOptions.innerHTML = (selectedTemplate.colors || []).map((color, index) => `
+      <button type="button"
+        class="color-choice ${index === 0 ? "active" : ""}"
+        title="${color.name}"
+        aria-label="${color.name}"
+        data-color="${color.value}"
+        style="background:${color.value}">
+      </button>
+    `).join("");
+
+    colorOptions.querySelectorAll(".color-choice").forEach(button => {
+      button.addEventListener("click", () => {
+        colorOptions.querySelectorAll(".color-choice").forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+        selectedColor = button.dataset.color;
+        updatePreview();
+      });
+    });
+  }
+
+  function setPreviewDefaults() {
+    fieldName.value = selectedTemplate.defaultName || "";
+    fieldDate.value = selectedTemplate.defaultDate || "";
+    fieldTime.value = selectedTemplate.defaultTime || "";
+    fieldPlace.value = selectedTemplate.defaultPlace || "";
+    fieldEmail.value = "";
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const name = fieldName.value.trim() || selectedTemplate.defaultName || "O seu evento";
+    const date = fieldDate.value.trim() || selectedTemplate.defaultDate || "Data da festa";
+    const time = fieldTime.value.trim() || selectedTemplate.defaultTime || "Hora";
+    const place = fieldPlace.value.trim() || selectedTemplate.defaultPlace || "Local da festa";
+
+    document.getElementById("preview-name").textContent = name;
+    document.getElementById("preview-date").textContent = date;
+    document.getElementById("preview-time").textContent = time;
+    document.getElementById("preview-place").textContent = place;
+
+    preview.style.setProperty("--preview-main", selectedColor);
+  }
+
+  [fieldName, fieldDate, fieldTime, fieldPlace].forEach(input => {
+    input.addEventListener("input", updatePreview);
+  });
+
+  function attachCatalogButtons() {
+    document.querySelectorAll(".customize-template").forEach(button => {
+      button.addEventListener("click", () => openCustomizer(button.dataset.template));
     });
 
-});
+    document.querySelectorAll(".preview-template").forEach(button => {
+      button.addEventListener("click", () => openCustomizer(button.dataset.template));
+    });
+  }
 
+  document.querySelectorAll("[data-close-modal]").forEach(element => {
+    element.addEventListener("click", closeCustomizer);
+  });
 
-/* ========================================= */
-/* CARROSSEL DE AVALIAÇÕES */
-/* ========================================= */
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("open")) closeCustomizer();
+  });
 
-const listaAvaliacoes = document.querySelector(".avaliacoes-lista");
-const avaliacoes = document.querySelectorAll(".avaliacao");
+  form?.addEventListener("submit", event => {
+    event.preventDefault();
 
-const botaoAnterior = document.querySelector(".avaliacao-prev");
-const botaoSeguinte = document.querySelector(".avaliacao-next");
-
-let avaliacaoAtual = 0;
-
-
-function obterQuantidadeVisivel(){
-
-    if(window.innerWidth <= 900){
-
-        return 1;
-
+    const email = fieldEmail.value.trim();
+    if (!email) {
+      formMessage.textContent = "Indique o e-mail onde pretende receber o convite.";
+      fieldEmail.focus();
+      return;
     }
 
-    return 3;
+    formMessage.textContent =
+      `Pré-pedido registado nesta demonstração para ${escapeHtml(email)}.`;
 
-}
+    /*
+      FUTURO:
+      Aqui entra a ligação ao backend/pagamento.
+      O formulário poderá enviar:
+      - template escolhido
+      - cor
+      - nome
+      - data
+      - hora
+      - local
+      - e-mail
+      para um servidor/serviço de automação.
+    */
+  });
 
+  /* =========================
+     CARROSSEL DE AVALIAÇÕES
+     ========================= */
+  const list = document.querySelector(".reviews-list");
+  const reviews = document.querySelectorAll(".review");
+  const prev = document.querySelector(".review-prev");
+  const next = document.querySelector(".review-next");
+  let current = 0;
 
-function atualizarAvaliacoes(){
+  function visibleReviews() {
+    return window.innerWidth <= 900 ? 1 : 3;
+  }
 
-    const quantidadeVisivel = obterQuantidadeVisivel();
+  function updateReviews() {
+    if (!list || !reviews.length) return;
+    const visible = visibleReviews();
+    const max = Math.max(0, reviews.length - visible);
+    current = Math.min(current, max);
+    const step = 100 / visible;
+    list.style.transform = `translateX(-${current * step}%)`;
+  }
 
-    const largura = 100 / quantidadeVisivel;
+  next?.addEventListener("click", () => {
+    const max = Math.max(0, reviews.length - visibleReviews());
+    current = current < max ? current + 1 : 0;
+    updateReviews();
+  });
 
-    listaAvaliacoes.style.transform =
-        `translateX(-${avaliacaoAtual * largura}%)`;
+  prev?.addEventListener("click", () => {
+    const max = Math.max(0, reviews.length - visibleReviews());
+    current = current > 0 ? current - 1 : max;
+    updateReviews();
+  });
 
-}
+  window.addEventListener("resize", updateReviews);
 
-
-botaoSeguinte.addEventListener("click", () => {
-
-    const quantidadeVisivel = obterQuantidadeVisivel();
-
-    const maximo =
-        avaliacoes.length - quantidadeVisivel;
-
-
-    if(avaliacaoAtual < maximo){
-
-        avaliacaoAtual++;
-
-    }else{
-
-        avaliacaoAtual = 0;
-
-    }
-
-
-    atualizarAvaliacoes();
-
+  renderCatalog();
+  updateReviews();
 });
-
-
-botaoAnterior.addEventListener("click", () => {
-
-    const quantidadeVisivel = obterQuantidadeVisivel();
-
-
-    const maximo =
-        avaliacoes.length - quantidadeVisivel;
-
-
-    if(avaliacaoAtual > 0){
-
-        avaliacaoAtual--;
-
-    }else{
-
-        avaliacaoAtual = maximo;
-
-    }
-
-
-    atualizarAvaliacoes();
-
-});
-
-
-window.addEventListener("resize", () => {
-
-    const quantidadeVisivel = obterQuantidadeVisivel();
-
-    const maximo =
-        avaliacoes.length - quantidadeVisivel;
-
-
-    if(avaliacaoAtual > maximo){
-
-        avaliacaoAtual = maximo;
-
-    }
-
-
-    atualizarAvaliacoes();
-
-});
-
-
-atualizarAvaliacoes();
