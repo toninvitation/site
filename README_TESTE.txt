@@ -1,20 +1,35 @@
-MODO DE TESTE — TONInvitation
+TONInvitation — versão corrigida
 
-Neste modo NÃO existe Stripe.
+O erro "Failed to fetch" acontece quando o navegador não consegue comunicar com
+o servidor. Esta versão corrige o servidor para Express 5 e mantém o catálogo.
 
-Ao clicar em "Confirmar pagamento":
-1. o sistema considera o pagamento confirmado;
-2. gera o convite em PNG;
-3. envia a imagem como anexo para o email preenchido.
+Para testar corretamente:
 
-Para testar:
-1. Instalar Node.js.
-2. Abrir o terminal nesta pasta.
-3. npm install
-4. Copiar .env.example para .env
-5. Colocar a RESEND_API_KEY.
-6. Configurar EMAIL_FROM.
-7. npm start
-8. Abrir http://localhost:3000
+1. Instala o Node.js.
+2. Abre o terminal DENTRO desta pasta.
+3. Executa:
+   npm install
 
-A chave do Resend fica apenas no servidor, nunca no HTML/JS.
+4. Cria um ficheiro chamado .env com:
+   PORT=3000
+   RESEND_API_KEY=re_xxxxxxxxx
+   EMAIL_FROM=TONInvitation <teu-email-ou-dominio-verificado>
+
+5. Executa:
+   npm start
+
+6. Só depois abre no navegador:
+   http://localhost:3000
+
+7. Escolhe um modelo -> Personalizar -> preencher dados ->
+   Confirmar pagamento.
+
+O clique é considerado pagamento confirmado e o servidor tenta gerar e enviar
+o PNG por e-mail.
+
+IMPORTANTE:
+- Não abras o index.html diretamente com duplo clique.
+- Não uses file:///...
+- Tens de abrir http://localhost:3000 enquanto o "npm start" estiver a correr.
+- Para o e-mail ser realmente enviado, RESEND_API_KEY e EMAIL_FROM têm de estar
+  configurados corretamente.

@@ -188,6 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const order = {
       templateId: selectedTemplate.id,
+      templateName: selectedTemplate.name,
       color: selectedColor,
       name: fieldName.value.trim() || selectedTemplate.defaultName,
       date: fieldDate.value.trim() || selectedTemplate.defaultDate,
@@ -198,13 +199,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = true;
-    submitButton.innerHTML = '<i data-lucide="loader-circle"></i> A preparar o seu convite...';
+    submitButton.innerHTML =
+      '<i data-lucide="loader-circle"></i> A confirmar...';
     if (window.lucide) lucide.createIcons();
 
-    formMessage.textContent = "A confirmar pagamento e a preparar o envio...";
+    formMessage.textContent = "A confirmar o pagamento...";
 
     try {
-      // MODO DE TESTE: clicar aqui equivale a pagamento confirmado.
+      // TESTE: este clique é considerado uma confirmação positiva do pagamento.
       const response = await fetch("/api/confirm-payment-test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -217,10 +219,17 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error(data.error || "Não foi possível concluir o pedido.");
       }
 
-      formMessage.textContent =
-        "Pagamento confirmado! O seu convite foi enviado para " + email + ".";
+      formMessage.innerHTML = `
+        <span class="payment-success">
+          <i data-lucide="circle-check"></i>
+          <strong>Pagamento efetuado com sucesso!</strong><br>
+          O seu convite está a ser preparado e será enviado para
+          <strong>${email}</strong>.
+        </span>
+      `;
 
-      submitButton.innerHTML = '<i data-lucide="check"></i> Pedido concluído';
+      submitButton.innerHTML =
+        '<i data-lucide="check-circle"></i> Pagamento confirmado';
       if (window.lucide) lucide.createIcons();
 
     } catch (error) {
@@ -235,3 +244,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  /* =========================
+     CARROSSEL DE AVALIAÇÕES
+     ========================= */
+  const list = document.querySelector(".reviews-list");
+  const reviews = document.querySelectorAll(".review");
+  const prev = document.querySelector(".review-prev");
+  const next = document.querySelector(".review-next");
+  let current = 0;
+
+  function visibleReviews() {
+    return window.innerWidth <= 900 ? 1 : 3;
+  }
+
+  function updateReviews() {
+    if (!list || !reviews.length) return;
+    const visible = visibleReviews();
+    const max = Math.max(0, reviews.length - visible);
+    current = Math.min(current, max);
+    const step = 100 / visible;
+    list.style.transform = `translateX(-${current * step}%)`;
+  }
+
+  next?.addEventListener("click", () => {
+    const max = Math.max(0, reviews.length - visibleReviews());
+    current = current < max ? current + 1 : 0;
+    updateReviews();
+  });
+
+  prev?.addEventListener("click", () => {
+    const max = Math.max(0, reviews.length - visibleReviews());
+    current = current > 0 ? current - 1 : max;
+    updateReviews();
+  });
+
+  window.addEventListener("resize", updateReviews);
+
+  renderCatalog();
+  updateReviews();
+});

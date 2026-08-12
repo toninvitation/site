@@ -29,7 +29,6 @@ function wrapText(text, maxChars = 18) {
   const words = String(text || "").trim().split(/\s+/);
   const lines = [];
   let line = "";
-
   for (const word of words) {
     const candidate = line ? `${line} ${word}` : word;
     if (candidate.length > maxChars && line) {
@@ -47,15 +46,13 @@ function generateInvitationSvg(order) {
   const main = order.color || "#d98ea2";
   const dark = "#604943";
   const bg = "#fff8f5";
-  const lines = wrapText(order.name);
-  const startY = 535 - (lines.length - 1) * 32;
+  const nameLines = wrapText(order.name);
+  const nameStart = 535 - (nameLines.length - 1) * 32;
 
-  const nameSvg = lines.map((line, i) => `
-    <text x="600" y="${startY + i * 64}"
-      text-anchor="middle"
-      font-family="Georgia, serif"
-      font-size="54"
-      font-style="italic"
+  const nameSvg = nameLines.map((line, i) => `
+    <text x="600" y="${nameStart + i * 64}"
+      text-anchor="middle" font-family="Georgia, serif"
+      font-size="54" font-style="italic"
       fill="${escapeXml(main)}">${escapeXml(line)}</text>
   `).join("");
 
@@ -66,38 +63,28 @@ function generateInvitationSvg(order) {
         fill="none" stroke="${escapeXml(main)}" stroke-width="2" opacity=".55"/>
   <rect x="65" y="65" width="1070" height="1470" rx="8"
         fill="none" stroke="${escapeXml(main)}" stroke-width="1" opacity=".35"/>
-
   <text x="600" y="250" text-anchor="middle"
         font-family="Georgia, serif" font-size="22"
         letter-spacing="8" fill="${escapeXml(main)}">CONVITE</text>
-
   <text x="600" y="325" text-anchor="middle"
         font-size="34" fill="${escapeXml(main)}">✦</text>
-
   ${nameSvg}
-
   <line x1="520" y1="690" x2="680" y2="690"
         stroke="${escapeXml(main)}" stroke-width="2"/>
-
   <text x="600" y="790" text-anchor="middle"
         font-family="Georgia, serif" font-size="31"
         fill="${escapeXml(dark)}">${escapeXml(order.date)}</text>
-
   <text x="600" y="845" text-anchor="middle"
         font-family="Georgia, serif" font-size="25"
         fill="${escapeXml(dark)}">${escapeXml(order.time)}</text>
-
   <text x="600" y="960" text-anchor="middle"
         font-family="Arial, sans-serif" font-size="15"
         letter-spacing="4" fill="${escapeXml(main)}">LOCAL</text>
-
   <text x="600" y="1015" text-anchor="middle"
         font-family="Georgia, serif" font-size="29"
         fill="${escapeXml(dark)}">${escapeXml(order.place)}</text>
-
   <text x="600" y="1300" text-anchor="middle"
         font-size="34" fill="${escapeXml(main)}">✦</text>
-
   <text x="600" y="1370" text-anchor="middle"
         font-family="Georgia, serif" font-size="16"
         fill="${escapeXml(dark)}">Com carinho, esperamos por si.</text>
@@ -105,17 +92,15 @@ function generateInvitationSvg(order) {
 }
 
 async function createInvitationPng(order) {
-  const svg = generateInvitationSvg(order);
-  return sharp(Buffer.from(svg)).png().toBuffer();
+  return sharp(Buffer.from(generateInvitationSvg(order))).png().toBuffer();
 }
 
 async function sendInvitationEmail(order, pngBuffer) {
   if (!process.env.RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY não está configurada no .env.");
+    throw new Error("Falta configurar RESEND_API_KEY no ficheiro .env.");
   }
-
   if (!process.env.EMAIL_FROM) {
-    throw new Error("EMAIL_FROM não está configurado no .env.");
+    throw new Error("Falta configurar EMAIL_FROM no ficheiro .env.");
   }
 
   const { data, error } = await resend.emails.send({
@@ -123,7 +108,7 @@ async function sendInvitationEmail(order, pngBuffer) {
     to: [order.email],
     subject: "O seu convite digital — TONInvitation",
     html: `
-      <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#604943">
+      <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#604943;line-height:1.7">
         <p>Muito obrigada pela sua compra,</p>
         <p>o seu convite encontra-se em anexo.</p>
       </div>
@@ -134,37 +119,27 @@ async function sendInvitationEmail(order, pngBuffer) {
     }]
   });
 
-  if (error) {
-    throw new Error(error.message || "Erro ao enviar o e-mail.");
-  }
-
+  if (error) throw new Error(error.message || "Erro ao enviar o e-mail.");
   return data;
 }
 
-/*
- * TESTE:
- * Clicar em "Confirmar pagamento" chama este endpoint.
- * Aqui assumimos que o pagamento já foi confirmado.
- */
+// Pagamento simulado: este clique equivale a pagamento confirmado.
 app.post("/api/confirm-payment-test", async (req, res) => {
   try {
-    const { templateId, color, name, date, time, place, email } = req.body;
+    const { templateId, templateName, color, name, date, time, place, email } = req.body;
 
     if (!templateId || !color || !name || !date || !time || !place || !email) {
-      return res.status(400).json({
-        error: "Preencha todos os campos do convite."
-      });
+      return res.status(400).json({ error: "Preencha todos os dados do convite." });
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({
-        error: "O e-mail indicado não é válido."
-      });
+      return res.status(400).json({ error: "O e-mail indicado não é válido." });
     }
 
     const order = {
       id: randomUUID(),
       templateId,
+      templateName,
       color,
       name,
       date,
@@ -174,31 +149,23 @@ app.post("/api/confirm-payment-test", async (req, res) => {
       paymentStatus: "paid"
     };
 
-    console.log("Pagamento de TESTE confirmado:", order);
-
-    // Gera a imagem do convite.
     const png = await createInvitationPng(order);
-
-    // Envia a imagem para o e-mail.
-    const emailResult = await sendInvitationEmail(order, png);
-
-    console.log("E-mail enviado:", emailResult?.id);
+    await sendInvitationEmail(order, png);
 
     return res.json({
       success: true,
       orderId: order.id,
       message: "Pagamento confirmado e convite enviado."
     });
-
   } catch (error) {
-    console.error("ERRO:", error);
+    console.error(error);
     return res.status(500).json({
       error: error.message || "Não foi possível enviar o convite."
     });
   }
 });
 
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
 });
 
