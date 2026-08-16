@@ -1,0 +1,475 @@
+/* =========================================================
+   TOY STORY — MODELO 1
+
+   O convite mantém sempre a proporção 1080x1920.
+   A imagem de fundo ocupa todo o canvas e não é cortada.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Cartões verticais
+   --------------------------------------------------------- */
+
+.invitation-image-portrait {
+  aspect-ratio: 1080 / 1920;
+  background: #fff;
+}
+
+.invitation-image-portrait img {
+  object-fit: contain !important;
+  background: #fff;
+}
+
+/* ---------------------------------------------------------
+   Janela de personalização
+   --------------------------------------------------------- */
+
+.customizer-toy-story {
+  width: min(1180px, 100%);
+  padding: 32px;
+}
+
+.customizer-toy-story .customizer-layout {
+  grid-template-columns: minmax(300px, 430px) minmax(360px, 1fr);
+  align-items: center;
+  gap: 55px;
+}
+
+.customizer-toy-story .customizer-form {
+  max-width: 430px;
+}
+
+/* ---------------------------------------------------------
+   Campos que aceitam Enter
+   --------------------------------------------------------- */
+
+.customizer-toy-story textarea {
+  min-height: 78px;
+  resize: vertical;
+  border: 1px solid #e7d8d2;
+  border-radius: 10px;
+  padding: 11px 13px;
+  line-height: 1.45;
+  font-family: Poppins, sans-serif;
+}
+
+/* ---------------------------------------------------------
+   Pré-visualização no telemóvel
+   --------------------------------------------------------- */
+
+.customizer-toy-story .preview-area {
+  min-height: 560px;
+  justify-content: center;
+}
+
+.phone-mockup {
+  position: relative;
+  width: min(390px, 100%);
+  padding: 17px 13px 20px;
+  border-radius: 46px;
+  background: #171717;
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 2px #333;
+}
+
+.phone-screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 34px;
+  background: #000;
+  line-height: 0;
+}
+
+/*
+  Este é o verdadeiro canvas do convite.
+  A proporção nunca muda: 1080 / 1920.
+*/
+
+.invitation-canvas {
+  container-type: inline-size;
+  width: 100%;
+  aspect-ratio: 1080 / 1920;
+  position: relative;
+  overflow: hidden;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.invitation-canvas::before,
+.invitation-canvas::after {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------
+   Camadas de texto do Toy Story
+   --------------------------------------------------------- */
+
+/* Nome, idade e ANOS usam Sigmar One. */
+.invitation-text-layer.name,
+.invitation-text-layer.number,
+.invitation-text-layer.anos {
+  font-family: "Sigmar One", sans-serif !important;
+}
+
+/* Os restantes textos usam Horta. */
+.invitation-text-layer:not(.name):not(.number):not(.anos) {
+  font-family: "HortaRegular", Horta, sans-serif !important;
+}
+
+.invitation-text-layer.other-info {
+  white-space: pre-wrap;
+}
+
+
+.invitation-text-layer {
+  position: absolute;
+  z-index: 5;
+  display: block;
+  width: max-content;
+  height: auto;
+  max-width: none;
+  box-sizing: border-box;
+  padding: 0;
+  white-space: pre-wrap;
+  overflow: visible;
+  overflow-wrap: normal;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transform-origin: center;
+}
+
+.invitation-text-layer.is-dragging {
+  cursor: grabbing;
+}
+
+.invitation-text-layer.name {
+  font-family: "Sigmar One", sans-serif;
+  font-weight: 700 !important;
+  color: #ffc000 !important;
+  text-transform: uppercase;
+  text-shadow: 0.55cqw 0.65cqw 0 #00538b !important;
+}
+
+.invitation-text-layer.number {
+  font-family: Oswald, sans-serif;
+  font-weight: 700 !important;
+}
+
+.invitation-text-layer.anos,
+.invitation-text-layer.yellow {
+  font-weight: 700 !important;
+  color: #ffc000 !important;
+}
+
+.invitation-text-layer.small-white {
+  text-transform: uppercase;
+  font-weight: 700 !important;
+  color: #f0f0f0 !important;
+}
+
+.invitation-text-layer.blue {
+  text-transform: uppercase;
+  font-weight: 700 !important;
+  color: #07588c !important;
+}
+
+.invitation-text-layer.red {
+  font-weight: 700 !important;
+  color: #f0f0f0 !important;
+}
+
+/* ---------------------------------------------------------
+   Frases editáveis
+   --------------------------------------------------------- */
+
+.editable-phrases {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #eadbd5;
+  border-radius: 14px;
+  background: #fffaf8;
+}
+
+.editable-phrases > .field-help {
+  margin-top: -6px;
+}
+
+.field-help {
+  display: block;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--brown-soft);
+}
+
+.editable-phrases textarea,
+.editable-phrases input {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------
+   Outras informações
+   --------------------------------------------------------- */
+
+.other-info-color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.other-info-color {
+  width: 46px !important;
+  height: 34px;
+  padding: 2px !important;
+  border: 1px solid #e1d5d0 !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  background: #fff;
+}
+
+.watermark-note {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--brown-soft);
+}
+
+.watermark-note strong {
+  color: var(--brown);
+}
+
+/* A janela só fecha pelo X; clicar fora não a fecha. */
+.modal-backdrop {
+  cursor: default;
+}
+/* ---------------------------------------------------------
+   Elementos do mockup
+   --------------------------------------------------------- */
+
+.phone-speaker {
+  position: absolute;
+  z-index: 10;
+  top: 8px;
+  left: 50%;
+  width: 76px;
+  height: 18px;
+  transform: translateX(-50%);
+  border-radius: 0 0 12px 12px;
+  background: #050505;
+}
+
+.phone-home-indicator {
+  position: absolute;
+  z-index: 10;
+  bottom: 7px;
+  left: 50%;
+  width: 95px;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 99px;
+  background: #eee;
+}
+
+.phone-side-button {
+  position: absolute;
+  left: -3px;
+  width: 4px;
+  border-radius: 3px;
+  background: #2b2b2b;
+}
+
+.phone-side-button-1 {
+  top: 110px;
+  height: 55px;
+}
+
+.phone-side-button-2 {
+  top: 180px;
+  height: 38px;
+}
+
+.preview-note {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--brown-soft);
+}
+
+
+/* ---------------------------------------------------------
+   FERRAMENTAS DE EDIÇÃO
+   --------------------------------------------------------- */
+
+.editor-toolbar {
+  width: min(390px, 100%);
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.history-controls,
+.size-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.editor-button {
+  min-height: 36px;
+  padding: 7px 13px;
+  border: 1px solid #e4d7d2;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--brown);
+  cursor: pointer;
+  font-size: 11px;
+  transition: .2s ease;
+}
+
+.editor-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #c9b4ab;
+}
+
+.editor-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.editor-button-default {
+  background: #f7eee9;
+  font-weight: 600;
+}
+
+.size-controls {
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #eadbd5;
+  border-radius: 12px;
+  background: #fffaf8;
+}
+
+.selected-layer-label {
+  min-width: 0;
+  flex: 1;
+  font-size: 11px;
+  color: var(--brown-soft);
+  text-align: left;
+}
+
+.size-buttons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.size-button {
+  width: 36px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.selected-layer-size {
+  min-width: 46px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--brown);
+  font-weight: 600;
+}
+
+/* A camada selecionada recebe apenas uma indicação visual. */
+.invitation-text-layer.is-selected {
+  outline: 1px dashed rgba(255, 255, 255, .9);
+  outline-offset: 4px;
+}
+
+.invitation-text-layer.is-empty {
+  min-width: 12px;
+  min-height: 12px;
+}
+
+/* ---------------------------------------------------------
+   Fallback para modelos antigos
+   --------------------------------------------------------- */
+
+.legacy-preview-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+}
+
+.legacy-preview-content .preview-name {
+  font-family: Allura, cursive;
+  font-size: 48px;
+  line-height: 1.1;
+  margin: 15px 0;
+  color: var(--preview-main);
+}
+
+.legacy-preview-content .preview-ornament {
+  color: var(--preview-main);
+  font-size: 22px;
+}
+
+.legacy-preview-content .preview-small {
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--preview-main);
+}
+
+.legacy-preview-content .preview-divider {
+  width: 55px;
+  height: 1px;
+  background: var(--preview-main);
+  margin: 5px 0 15px;
+}
+
+.legacy-preview-content .preview-place-label {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--preview-main);
+  margin-top: 20px;
+}
+
+/* ---------------------------------------------------------
+   Responsivo
+   --------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .customizer-toy-story .customizer-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .customizer-toy-story .customizer-form {
+    max-width: none;
+  }
+
+  .customizer-toy-story .preview-area {
+    order: -1;
+    min-height: auto;
+  }
+
+  .phone-mockup {
+    width: min(330px, 80vw);
+  }
+}
