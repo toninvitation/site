@@ -44,7 +44,7 @@ button,input {
   align-items:center;
   gap:28px;
   padding:10px 30px;
-  background:rgba(249,235,225,.96);
+  background:#f9ebe1f5;
   border-bottom:1px solid var(--line)
 }
 /* Regra de estilo: .logo img. */
@@ -172,7 +172,7 @@ button,input {
   box-shadow:0 25px 60px #5b403833
 }
 /* Regra de estilo: .hero-card-decoration. */
-.hero-card-decoration {
+.hero-card-decoration { /*Página inicial*/
   position:absolute;
   width:370px;
   height:440px;
@@ -181,7 +181,7 @@ button,input {
   background:#fff7f4
 }
 /* Regra de estilo: .hero-badge. */
-.hero-badge {
+.hero-badge { /*Bolinha inicial 'personalise ao seu gosto'*/
   position:absolute;
   right:3%;
   bottom:4%;
@@ -195,22 +195,7 @@ button,input {
   text-align:center;
   font-size:10px
 }
-/* Regra de estilo: .benefits. */
-.benefits {
-  padding:55px 6%;
-  background:#fef3ed
-}
-/* Regra de estilo: .section-heading. */
-.section-heading {
-  text-align:center;
-  max-width:800px;
-  margin:0 auto 55px
-}
-/* Regra de estilo: .section-heading h2. */
-.section-heading h2 {
-  font-size:52px;
-  font-weight:400
-}
+
 /* Regra de estilo: .eyebrow. */
 .eyebrow {
   display:inline-block;
@@ -220,30 +205,17 @@ button,input {
   font-weight:600;
   margin-bottom:12px
 }
-/* Regra de estilo: .title-decoration. */
-.title-decoration {
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:20px
+
+
+/*--------------------Secção 2 - As vantagens----------------------------
+-------------------------------------------------------------------------*/
+
+/* Regra de estilo: .benefits. */
+.benefits { /*Segunda secção*/
+  padding:50px 5%;  /*onde começa à esquerda x % de espaço vazio à mostra*/
+  background:#fff7f4 /*Cor de fundo deste secção*/
 }
-/* Regra de estilo: .title-decoration span. */
-.title-decoration span {
-  width:55px;
-  height:1px;
-  background:#e8a1a8
-}
-/* Regra de estilo: .title-decoration b. */
-.title-decoration b {
-  color:var(--pink-soft)
-}
-/* Regra de estilo: .section-heading p. */
-.section-heading p {
-  color:var(--brown-soft);
-  font-size:14px;
-  line-height:1.8;
-  margin-top:18px
-}
+
 /* Regra de estilo: .benefits-grid. */
 .benefits-grid {
   display:grid;
@@ -252,6 +224,7 @@ button,input {
   max-width:1400px;
   margin:auto
 }
+
 /* Regra de estilo: .benefits-grid article. */
 .benefits-grid article {
   text-align:center
@@ -260,23 +233,67 @@ button,input {
 .benefits-grid svg {
   width:36px;
   color:var(--pink-soft);
-  margin-bottom:15px
+  margin-bottom:15px  /*Distânia dos ícones às frases dos benefícios*/
 }
 /* Regra de estilo: .benefits-grid h3. */
 .benefits-grid h3 {
-  font-size:21px;
-  margin-bottom:8px
+  font-size:21px; /*Tamanho de letras dos títulos dos benefícios*/
+  margin-bottom:8px /*DistÂncia dos títulos às mini frases*/
 }
 /* Regra de estilo: .benefits-grid p / .customization-promo p / .steps-grid p. */
 .benefits-grid p,.customization-promo p,.steps-grid p {
-  font-size:12px;
+  font-size:12px; /*Tamanho de letra das mini frases dos benefícios*/
   color:var(--brown-soft);
-  line-height:1.7
+  line-height:1.7 /*Distância entre as linhas das mini frases*/
 }
+/*-------------------------Fim - Secção2 - Vantaagens--------------------
+-------------------------------------------------------------------------*/
+
+
+
+/* Regra de estilo: .section-heading. */
+.section-heading {
+  text-align:center;
+  max-width:800px;  /*Largura máxima da frase to título de secção*/
+  margin:0 auto 50px  /*Distância estre a frase em cima e as coisas do poruqê escolher convite digital no toninvitation*/
+}
+/* Regra de estilo: .section-heading h2. */
+.section-heading h2 {
+  font-size:40px; /*Tamanho de letra do título da secção 2*/
+  font-weight:00 /*O quão bold é*/
+}
+
+/* Regra de estilo: .title-decoration. */
+.title-decoration {
+  display:flex;
+  justify-content:center;
+  gap:10px; /*Distância entre os traços entre o coração*/
+  margin-top:20px /*Distância do título 'Catálogo' até as opções*/
+}
+/* Regra de estilo: .title-decoration span. */
+.title-decoration span {
+  width:550px;  /*Tamanho dos traços*/
+  height:2px;  /*Espessura dos traços*/
+  background:#e8a1a8/*Cor dos traços*/
+}
+/* Regra de estilo: .title-decoration b. */
+.title-decoration b {
+  color:var(--pink-soft)
+}
+/* Regra de estilo: .section-heading p. */
+.section-heading p {
+  color:var(--brown-soft);
+  font-size:14px; /*Tamanho de letra da frase 'clique numa categoria...'*/
+  line-height:1.8;
+  margin-top:15px/*Distância da frase até os traços em cima*/
+}
+
+/*--------------------Secção 3 - quadrado dos modelos---------------------
+-------------------------------------------------------------------------*/
 /* Regra de estilo: .catalog-section. */
-.catalog-section {
-  padding:90px 5%;
-  background:var(--cream-light)
+.catalog-section {  
+  padding:90px 5%;  /*Onde começa a seção dos catálogos x quanto espaço vazio à mostra*/ 
+  background:#f9ebe1f5  /*Cor de fundo desta secção*/
 }
 /* Regra de estilo: .category-grid. */
 .category-grid {
@@ -288,16 +305,16 @@ button,input {
 }
 /* Regra de estilo: .category-card. */
 .category-card {
-  background:#fff;
-  border-radius:18px;
+  background:#fff7f4; /*Cor de fundo dos botões dos difenrentes estilos de catácolo*/
+  border-radius:20px;
   overflow:hidden;
   text-decoration:none;
-  box-shadow:0 8px 20px #78504614;
+  box-shadow:0 8px 20px #c52a0314;
   transition:.3s
 }
 /* Regra de estilo: .category-card:hover. */
 .category-card:hover {
-  transform:translateY(-6px)
+  transform:translateY(-20px) /*Ao passar o rato em cima, o quanto mexe/muda de posição*/
 }
 /* Regra de estilo: .category-image-wrap. */
 .category-image-wrap {
@@ -306,7 +323,7 @@ button,input {
   overflow:hidden
 }
 /* Regra de estilo: .category-image-wrap img. */
-.category-image-wrap img {
+.category-image-wrap img {/*O quanto as imagens ocupam no restangulo*/
   width:100%;
   height:100%;
   object-fit:cover
@@ -316,12 +333,12 @@ button,input {
   position:absolute;
   left:12px;
   right:12px;
-  bottom:12px;
+  bottom:5px;
   background:#fffffff2;
-  padding:10px 14px;
+  padding:10px 14px;/*Medidas do retangulo que diz 'ver modelo'*/
   border-radius:999px;
   color:var(--pink-dark);
-  font-size:11px;
+  font-size:15px;
   display:flex;
   justify-content:space-between;
   opacity:0;
@@ -334,23 +351,26 @@ button,input {
 /* Regra de estilo: .category-info. */
 .category-info {
   text-align:center;
-  padding:18px 12px
+  padding:10px 5px
 }
 /* Regra de estilo: .category-info h3. */
 .category-info h3 {
-  font-size:24px;
+  font-size:22px;
   color:var(--pink-dark);
-  font-weight:500
+  font-weight:700
 }
 /* Regra de estilo: .category-info p. */
 .category-info p {
-  font-size:11px;
+  font-size:10px;
   color:var(--brown-soft);
-  margin-top:5px
-}
+  margin-top:5px}
+/*-------------------Fim - Secção 3 - quadrado dos modelos---------------
+-------------------------------------------------------------------------*/
+
+
 /* Regra de estilo: .customization-promo. */
 .customization-promo {
-  padding:65px 9%;
+  padding:65px 9%;  /*Tamanho da secção 4*/
   display:flex;
   align-items:center;
   justify-content:space-between;
