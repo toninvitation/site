@@ -1,3 +1,4 @@
+<!-- Página de modelos: mostra os convites de um tema e abre o personalizador. -->
 <!DOCTYPE html>
 <html lang="pt">
   <head>
@@ -78,7 +79,6 @@
         </button>
 
         <div class="customizer-head">
-          <span class="eyebrow">PERSONALIZAÇÃO</span>
           <h2 id="customizer-title">Personalize o seu convite</h2>
           <p>
             Preencha os dados e veja o convite atualizado em tempo real.
@@ -91,13 +91,13 @@
                ----------------------------------------------- -->
           <form id="customizer-form" class="customizer-form">
             <label>
-              Nome / título
+              Nome
               <textarea
                 id="field-name"
                 maxlength="45"
                 rows="2"
                 placeholder="Ex.: João"
-              ></textarea>
+              ></textarea>Aniversariante
             </label>
 
             <label>
@@ -130,17 +130,17 @@
             </label>
 
             <label>
-              Morada / local
+              Morada / Local
               <textarea
                 id="field-place"
                 maxlength="80"
                 rows="2"
                 placeholder="Ex.: Rua Luís de Camões 4"
-              ></textarea>
+              ></textarea> Local da festa
             </label>
 
             <div class="editable-phrases">
-              <span class="form-label">Frases do convite</span>
+              <span class="form-label">Frases no convite</span>
               <p class="field-help">Estas frases aparecem como no modelo, mas pode alterá-las ou apagá-las.</p>
 
               <label>
@@ -166,7 +166,7 @@ NESSA AVENTURA!</textarea>
             </div>
 
             <label>
-              Outras informações
+              Outras informações da festa
               <textarea
                 id="field-other-info"
                 maxlength="180"
@@ -175,16 +175,10 @@ NESSA AVENTURA!</textarea>
               ></textarea>
               <small class="field-help">Esta frase também pode ser arrastada e redimensionada no convite.</small>
 
-              <span class="other-info-color-row">
-                <span class="form-label">Cor da frase</span>
-                <input
-                  id="field-other-info-color"
-                  class="other-info-color"
-                  type="color"
-                  value="#07588c"
-                  title="Escolher a cor das outras informações"
-                >
-              </span>
+              <small class="field-help">
+                Para escolher a cor, selecione a escrita no convite e use o seletor
+                <strong>Cor da escrita</strong> junto aos controlos de edição.
+              </small>
             </label>
 
             <label>
@@ -194,7 +188,7 @@ NESSA AVENTURA!</textarea>
                 type="email"
                 required
               >
-              <small class="watermark-note">A imagem final enviada para o seu e-mail será <strong>sem marca d'água</strong>.</small>
+              <small class="watermark-note">A imagem final enviada para o seu e-mail será <strong>sem a marca d'água</strong>.</small>
             </label>
 
             <button
@@ -254,11 +248,24 @@ NESSA AVENTURA!</textarea>
 
               <div class="size-controls">
                 <span id="selected-layer-label" class="selected-layer-label">Selecione um texto</span>
+
                 <div class="size-buttons">
                   <button type="button" id="decrease-size" class="editor-button size-button" title="Diminuir tamanho">−</button>
                   <span id="selected-layer-size" class="selected-layer-size">—</span>
                   <button type="button" id="increase-size" class="editor-button size-button" title="Aumentar tamanho">+</button>
                 </div>
+
+                <label class="selected-layer-color-control">
+                  <span>Cor da escrita</span>
+                  <input
+                    id="selected-layer-color"
+                    class="other-info-color"
+                    type="color"
+                    value="#07588c"
+                    title="Escolher a cor da escrita selecionada"
+                    disabled
+                  >
+                </label>
               </div>
             </div>
           </div>

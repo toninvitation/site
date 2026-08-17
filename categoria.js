@@ -1,4 +1,9 @@
 /* =========================================================
+   TONInvitation — PÁGINA DE CATEGORIA
+   Mostra temas ou convites e controla o personalizador antigo.
+   ========================================================= */
+
+/* =========================================================
    PÁGINA DE CATEGORIA
    - Mostra temas (ex.: Infantil -> Toy Story)
    - Mostra diretamente os convites nas categorias sem temas

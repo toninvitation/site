@@ -1,47 +1,44 @@
 /* =========================================================
-   TOY STORY — MODELO 1
+TOY STORY — MODELO 1
 
-   O convite mantém sempre a proporção 1080x1920.
-   A imagem de fundo ocupa todo o canvas e não é cortada.
-   ========================================================= */
-
+O convite mantém sempre a proporção 1080x1920.
+A imagem de fundo ocupa todo o canvas e não é cortada.
+========================================================= */
 /* ---------------------------------------------------------
-   Cartões verticais
-   --------------------------------------------------------- */
-
+Cartões verticais
+--------------------------------------------------------- */
+/* Regra de estilo: .invitation-image-portrait. */
 .invitation-image-portrait {
   aspect-ratio: 1080 / 1920;
-  background: #fff;
+  background: #13c03b;
 }
-
+/* Regra de estilo: .invitation-image-portrait img. */
 .invitation-image-portrait img {
   object-fit: contain !important;
-  background: #fff;
+  background: #ffffff;
 }
-
 /* ---------------------------------------------------------
-   Janela de personalização
-   --------------------------------------------------------- */
-
+Janela de personalização
+--------------------------------------------------------- */
+/* Regra de estilo: .customizer-toy-story. */
 .customizer-toy-story {
-  width: min(1180px, 100%);
+  width: min(1000px, 100%); /*Tamanho horizontal da janela de personalização*/
   padding: 32px;
 }
-
+/* Regra de estilo: .customizer-toy-story .customizer-layout. */
 .customizer-toy-story .customizer-layout {
   grid-template-columns: minmax(300px, 430px) minmax(360px, 1fr);
   align-items: center;
-  gap: 55px;
+  gap: 35px; /*Distancia do formulário de personalização até o mockup*/
 }
-
+/* Regra de estilo: .customizer-toy-story .customizer-form. */
 .customizer-toy-story .customizer-form {
-  max-width: 430px;
+  max-width: 400px;  /*Tamanho horizontal do formulário*/
 }
-
 /* ---------------------------------------------------------
-   Campos que aceitam Enter
-   --------------------------------------------------------- */
-
+Campos que aceitam Enter
+--------------------------------------------------------- */
+/* Regra de estilo: .customizer-toy-story textarea. */
 .customizer-toy-story textarea {
   min-height: 78px;
   resize: vertical;
@@ -51,27 +48,26 @@
   line-height: 1.45;
   font-family: Poppins, sans-serif;
 }
-
 /* ---------------------------------------------------------
-   Pré-visualização no telemóvel
-   --------------------------------------------------------- */
-
+Pré-visualização no telemóvel
+--------------------------------------------------------- */
+/* Regra de estilo: .customizer-toy-story .preview-area. */
 .customizer-toy-story .preview-area {
   min-height: 560px;
   justify-content: center;
 }
-
+/* Regra de estilo: .phone-mockup. */
 .phone-mockup {
   position: relative;
-  width: min(390px, 100%);
-  padding: 17px 13px 20px;
-  border-radius: 46px;
+  width: min(500px, 100%);  /*Escala do mockup*/
+  padding: 12px 10px 15px;  /*Distancia parte preta até a imgem (cima, lados, baixo)*/
+  border-radius: 40px;
   background: #171717;
   box-shadow:
     0 28px 70px rgba(0, 0, 0, 0.28),
     inset 0 0 0 2px #333;
 }
-
+/* Regra de estilo: .phone-screen. */
 .phone-screen {
   position: relative;
   overflow: hidden;
@@ -79,12 +75,11 @@
   background: #000;
   line-height: 0;
 }
-
 /*
-  Este é o verdadeiro canvas do convite.
-  A proporção nunca muda: 1080 / 1920.
+Este é o verdadeiro canvas do convite.
+A proporção nunca muda: 1080 / 1920.
 */
-
+/* Regra de estilo: .invitation-canvas. */
 .invitation-canvas {
   container-type: inline-size;
   width: 100%;
@@ -100,33 +95,34 @@
   padding: 0 !important;
   display: block !important;
 }
-
+/* Regra de estilo: .invitation-canvas::before / 
+.invitation-canvas::after. */
 .invitation-canvas::before,
 .invitation-canvas::after {
   display: none !important;
 }
-
 /* ---------------------------------------------------------
-   Camadas de texto do Toy Story
-   --------------------------------------------------------- */
-
+Camadas de texto do Toy Story
+--------------------------------------------------------- */
 /* Nome, idade e ANOS usam Sigmar One. */
+/* Regra de estilo: .invitation-text-layer.name / 
+.invitation-text-layer.number / 
+.invitation-text-layer.anos. */
 .invitation-text-layer.name,
 .invitation-text-layer.number,
 .invitation-text-layer.anos {
   font-family: "Sigmar One", sans-serif !important;
 }
-
 /* Os restantes textos usam Horta. */
+/* Regra de estilo: .invitation-text-layer:not(.name):not(.number):not(.anos). */
 .invitation-text-layer:not(.name):not(.number):not(.anos) {
   font-family: "HortaRegular", Horta, sans-serif !important;
 }
-
+/* Regra de estilo: .invitation-text-layer.other-info. */
 .invitation-text-layer.other-info {
   white-space: pre-wrap;
 }
-
-
+/* Regra de estilo: .invitation-text-layer. */
 .invitation-text-layer {
   position: absolute;
   z-index: 5;
@@ -145,51 +141,51 @@
   user-select: none;
   transform-origin: center;
 }
-
+/* Regra de estilo: .invitation-text-layer.is-dragging. */
 .invitation-text-layer.is-dragging {
   cursor: grabbing;
 }
-
+/* Regra de estilo: .invitation-text-layer.name. */
 .invitation-text-layer.name {
   font-family: "Sigmar One", sans-serif;
   font-weight: 700 !important;
-  color: #ffc000 !important;
+  color: #ffc000;
   text-transform: uppercase;
   text-shadow: 0.55cqw 0.65cqw 0 #00538b !important;
 }
-
+/* Regra de estilo: .invitation-text-layer.number. */
 .invitation-text-layer.number {
   font-family: Oswald, sans-serif;
   font-weight: 700 !important;
 }
-
+/* Regra de estilo: .invitation-text-layer.anos / 
+.invitation-text-layer.yellow. */
 .invitation-text-layer.anos,
 .invitation-text-layer.yellow {
   font-weight: 700 !important;
-  color: #ffc000 !important;
+  color: #ffc000;
 }
-
+/* Regra de estilo: .invitation-text-layer.small-white. */
 .invitation-text-layer.small-white {
   text-transform: uppercase;
   font-weight: 700 !important;
-  color: #f0f0f0 !important;
+  color: #f0f0f0;
 }
-
+/* Regra de estilo: .invitation-text-layer.blue. */
 .invitation-text-layer.blue {
   text-transform: uppercase;
   font-weight: 700 !important;
-  color: #07588c !important;
+  color: #07588c;
 }
-
+/* Regra de estilo: .invitation-text-layer.red. */
 .invitation-text-layer.red {
   font-weight: 700 !important;
-  color: #f0f0f0 !important;
+  color: #f0f0f0;
 }
-
 /* ---------------------------------------------------------
-   Frases editáveis
-   --------------------------------------------------------- */
-
+Frases editáveis
+--------------------------------------------------------- */
+/* Regra de estilo: .editable-phrases. */
 .editable-phrases {
   display: grid;
   gap: 12px;
@@ -198,27 +194,27 @@
   border-radius: 14px;
   background: #fffaf8;
 }
-
+/* Regra de estilo: .editable-phrases   .field-help. */
 .editable-phrases > .field-help {
   margin-top: -6px;
 }
-
+/* Regra de estilo: .field-help. */
 .field-help {
   display: block;
   font-size: 10px;
   line-height: 1.5;
   color: var(--brown-soft);
 }
-
+/* Regra de estilo: .editable-phrases textarea / 
+.editable-phrases input. */
 .editable-phrases textarea,
 .editable-phrases input {
   width: 100%;
 }
-
 /* ---------------------------------------------------------
-   Outras informações
-   --------------------------------------------------------- */
-
+Outras informações
+--------------------------------------------------------- */
+/* Regra de estilo: .other-info-color-row. */
 .other-info-color-row {
   display: flex;
   align-items: center;
@@ -226,7 +222,7 @@
   gap: 12px;
   margin-top: 6px;
 }
-
+/* Regra de estilo: .other-info-color. */
 .other-info-color {
   width: 46px !important;
   height: 34px;
@@ -236,7 +232,7 @@
   cursor: pointer;
   background: #fff;
 }
-
+/* Regra de estilo: .watermark-note. */
 .watermark-note {
   display: block;
   margin-top: 5px;
@@ -244,19 +240,19 @@
   line-height: 1.5;
   color: var(--brown-soft);
 }
-
+/* Regra de estilo: .watermark-note strong. */
 .watermark-note strong {
   color: var(--brown);
 }
-
 /* A janela só fecha pelo X; clicar fora não a fecha. */
+/* Regra de estilo: .modal-backdrop. */
 .modal-backdrop {
   cursor: default;
 }
 /* ---------------------------------------------------------
-   Elementos do mockup
-   --------------------------------------------------------- */
-
+Elementos do mockup
+--------------------------------------------------------- */
+/* Regra de estilo: .phone-speaker. */
 .phone-speaker {
   position: absolute;
   z-index: 10;
@@ -268,7 +264,7 @@
   border-radius: 0 0 12px 12px;
   background: #050505;
 }
-
+/* Regra de estilo: .phone-home-indicator. */
 .phone-home-indicator {
   position: absolute;
   z-index: 10;
@@ -280,7 +276,7 @@
   border-radius: 99px;
   background: #eee;
 }
-
+/* Regra de estilo: .phone-side-button. */
 .phone-side-button {
   position: absolute;
   left: -3px;
@@ -288,36 +284,35 @@
   border-radius: 3px;
   background: #2b2b2b;
 }
-
+/* Regra de estilo: .phone-side-button-1. */
 .phone-side-button-1 {
   top: 110px;
   height: 55px;
 }
-
+/* Regra de estilo: .phone-side-button-2. */
 .phone-side-button-2 {
   top: 180px;
   height: 38px;
 }
-
+/* Regra de estilo: .preview-note. */
 .preview-note {
   margin-top: 14px;
   text-align: center;
   font-size: 11px;
   color: var(--brown-soft);
 }
-
-
 /* ---------------------------------------------------------
-   FERRAMENTAS DE EDIÇÃO
-   --------------------------------------------------------- */
-
+FERRAMENTAS DE EDIÇÃO
+--------------------------------------------------------- */
+/* Regra de estilo: .editor-toolbar. */
 .editor-toolbar {
   width: min(390px, 100%);
   margin-top: 16px;
   display: grid;
   gap: 10px;
 }
-
+/* Regra de estilo: .history-controls / 
+.size-controls. */
 .history-controls,
 .size-controls {
   display: flex;
@@ -326,7 +321,7 @@
   gap: 8px;
   flex-wrap: wrap;
 }
-
+/* Regra de estilo: .editor-button. */
 .editor-button {
   min-height: 36px;
   padding: 7px 13px;
@@ -338,23 +333,23 @@
   font-size: 11px;
   transition: .2s ease;
 }
-
+/* Regra de estilo: .editor-button:hover:not(:disabled). */
 .editor-button:hover:not(:disabled) {
   transform: translateY(-1px);
   border-color: #c9b4ab;
 }
-
+/* Regra de estilo: .editor-button:disabled. */
 .editor-button:disabled {
   opacity: .45;
   cursor: not-allowed;
   transform: none;
 }
-
+/* Regra de estilo: .editor-button-default. */
 .editor-button-default {
   background: #f7eee9;
   font-weight: 600;
 }
-
+/* Regra de estilo: .size-controls. */
 .size-controls {
   justify-content: space-between;
   padding: 10px 12px;
@@ -362,7 +357,7 @@
   border-radius: 12px;
   background: #fffaf8;
 }
-
+/* Regra de estilo: .selected-layer-label. */
 .selected-layer-label {
   min-width: 0;
   flex: 1;
@@ -370,20 +365,20 @@
   color: var(--brown-soft);
   text-align: left;
 }
-
+/* Regra de estilo: .size-buttons. */
 .size-buttons {
   display: flex;
   align-items: center;
   gap: 7px;
 }
-
+/* Regra de estilo: .size-button. */
 .size-button {
   width: 36px;
   padding: 0;
   font-size: 20px;
   line-height: 1;
 }
-
+/* Regra de estilo: .selected-layer-size. */
 .selected-layer-size {
   min-width: 46px;
   text-align: center;
@@ -391,22 +386,21 @@
   color: var(--brown);
   font-weight: 600;
 }
-
 /* A camada selecionada recebe apenas uma indicação visual. */
+/* Regra de estilo: .invitation-text-layer.is-selected. */
 .invitation-text-layer.is-selected {
   outline: 1px dashed rgba(255, 255, 255, .9);
   outline-offset: 4px;
 }
-
+/* Regra de estilo: .invitation-text-layer.is-empty. */
 .invitation-text-layer.is-empty {
   min-width: 12px;
   min-height: 12px;
 }
-
 /* ---------------------------------------------------------
-   Fallback para modelos antigos
-   --------------------------------------------------------- */
-
+Fallback para modelos antigos
+--------------------------------------------------------- */
+/* Regra de estilo: .legacy-preview-content. */
 .legacy-preview-content {
   position: absolute;
   inset: 0;
@@ -417,7 +411,7 @@
   text-align: center;
   padding: 30px;
 }
-
+/* Regra de estilo: .legacy-preview-content .preview-name. */
 .legacy-preview-content .preview-name {
   font-family: Allura, cursive;
   font-size: 48px;
@@ -425,51 +419,198 @@
   margin: 15px 0;
   color: var(--preview-main);
 }
-
+/* Regra de estilo: .legacy-preview-content .preview-ornament. */
 .legacy-preview-content .preview-ornament {
   color: var(--preview-main);
   font-size: 22px;
 }
-
+/* Regra de estilo: .legacy-preview-content .preview-small. */
 .legacy-preview-content .preview-small {
   font-size: 9px;
   letter-spacing: 4px;
   color: var(--preview-main);
 }
-
+/* Regra de estilo: .legacy-preview-content .preview-divider. */
 .legacy-preview-content .preview-divider {
   width: 55px;
   height: 1px;
   background: var(--preview-main);
   margin: 5px 0 15px;
 }
-
+/* Regra de estilo: .legacy-preview-content .preview-place-label. */
 .legacy-preview-content .preview-place-label {
   font-size: 8px;
   letter-spacing: 2px;
   color: var(--preview-main);
   margin-top: 20px;
 }
-
 /* ---------------------------------------------------------
-   Responsivo
-   --------------------------------------------------------- */
-
+Responsivo
+--------------------------------------------------------- */
+/* Regra de estilo: @media (max-width: 900px). */
 @media (max-width: 900px) {
+  /* Regra de estilo: .customizer-toy-story .customizer-layout. */
   .customizer-toy-story .customizer-layout {
     grid-template-columns: 1fr;
   }
-
+  /* Regra de estilo: .customizer-toy-story .customizer-form. */
   .customizer-toy-story .customizer-form {
     max-width: none;
   }
-
+  /* Regra de estilo: .customizer-toy-story .preview-area. */
   .customizer-toy-story .preview-area {
     order: -1;
     min-height: auto;
   }
-
+  /* Regra de estilo: .phone-mockup. */
   .phone-mockup {
     width: min(330px, 80vw);
+  }
+}
+/* =========================================================
+RESPONSIVIDADE — PERSONALIZADOR TOY STORY
+========================================================= */
+/* Regra de estilo: .editor-toolbar. */
+.editor-toolbar {
+  width: min(100%, 430px);
+}
+/* Regra de estilo: .size-controls. */
+.size-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+/* Regra de estilo: .selected-layer-color-control. */
+.selected-layer-color-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--brown-soft);
+}
+/* Regra de estilo: .selected-layer-color-control .other-info-color. */
+.selected-layer-color-control .other-info-color {
+  width: 42px !important;
+  height: 32px;
+}
+/* Regra de estilo: @media (max-width: 900px). */
+@media (max-width: 900px) {
+  /* Regra de estilo: .customizer-toy-story. */
+  .customizer-toy-story {
+    padding: 24px;
+  }
+  /* Regra de estilo: .customizer-toy-story .customizer-layout. */
+  .customizer-toy-story .customizer-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  /* Regra de estilo: .customizer-toy-story .customizer-form. */
+  .customizer-toy-story .customizer-form {
+    max-width: none;
+  }
+  /* Regra de estilo: .customizer-toy-story .preview-area. */
+  .customizer-toy-story .preview-area {
+    min-height: auto;
+  }
+  /* Regra de estilo: .phone-mockup. */
+  .phone-mockup {
+    width: min(235px, 62vw);
+  }
+  /* Regra de estilo: .preview-note. */
+  .preview-note {
+    max-width: 390px;
+    padding: 0 8px;
+    text-align: center;
+  }
+}
+/* Regra de estilo: @media (max-width: 600px). */
+@media (max-width: 600px) {
+  /* Regra de estilo: .customizer-toy-story. */
+  .customizer-toy-story {
+    padding: 18px 12px 16px;
+  }
+  /* Regra de estilo: .customizer-toy-story .customizer-head h2. */
+  .customizer-toy-story .customizer-head h2 {
+    font-size: 30px;
+  }
+  /* Regra de estilo: .customizer-toy-story .customizer-form. */
+  .customizer-toy-story .customizer-form {
+    gap: 12px;
+  }
+  /* Regra de estilo: .customizer-toy-story textarea / 
+  .customizer-toy-story .customizer-form input. */
+  .customizer-toy-story textarea,
+  .customizer-toy-story .customizer-form input {
+    font-size: 16px;
+  }
+  /* Regra de estilo: .phone-mockup. */
+  .phone-mockup {
+    width: min(210px, 58vw);
+    padding: 9px 7px 12px;
+    border-radius: 28px;
+  }
+  /* Regra de estilo: .phone-screen. */
+  .phone-screen {
+    border-radius: 21px;
+  }
+  /* Regra de estilo: .phone-speaker. */
+  .phone-speaker {
+    width: 46px;
+    height: 11px;
+    top: 5px;
+  }
+  /* Regra de estilo: .phone-home-indicator. */
+  .phone-home-indicator {
+    width: 58px;
+    height: 3px;
+    bottom: 4px;
+  }
+  /* Regra de estilo: .phone-side-button-1. */
+  .phone-side-button-1 {
+    top: 62px;
+    height: 34px;
+  }
+  /* Regra de estilo: .phone-side-button-2. */
+  .phone-side-button-2 {
+    top: 105px;
+    height: 26px;
+  }
+  /* Regra de estilo: .editor-toolbar. */
+  .editor-toolbar {
+    width: 100%;
+  }
+  /* Regra de estilo: .history-controls / 
+  .size-buttons. */
+  .history-controls,
+  .size-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  /* Regra de estilo: .size-controls. */
+  .size-controls {
+    gap: 8px;
+  }
+  /* Regra de estilo: .selected-layer-label. */
+  .selected-layer-label {
+    width: 100%;
+    text-align: center;
+  }
+  /* Regra de estilo: .selected-layer-color-control. */
+  .selected-layer-color-control {
+    justify-content: center;
+  }
+}
+/* Regra de estilo: @media (max-width: 380px). */
+@media (max-width: 380px) {
+  /* Regra de estilo: .phone-mockup. */
+  .phone-mockup {
+    width: min(195px, 60vw);
+  }
+  /* Regra de estilo: .customizer-toy-story .customizer-head h2. */
+  .customizer-toy-story .customizer-head h2 {
+    font-size: 27px;
   }
 }

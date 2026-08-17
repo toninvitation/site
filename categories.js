@@ -1,4 +1,10 @@
 /* =========================================================
+   TONInvitation — CATEGORIAS
+   Este ficheiro contém os dados das categorias e dos temas.
+   Para adicionar uma categoria, cria um novo objeto nesta lista.
+   ========================================================= */
+
+/* =========================================================
    CATEGORIAS E TEMAS DO CATÁLOGO
    ========================================================= */
 

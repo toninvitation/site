@@ -1,4 +1,9 @@
 /* =========================================================
+   TONInvitation — PÁGINA DE MODELOS E PERSONALIZADOR
+   Mostra os modelos de um tema e controla o editor Toy Story.
+   ========================================================= */
+
+/* =========================================================
    PÁGINA DE MODELOS / PERSONALIZADOR
 
    Toy Story 1:
@@ -17,6 +22,7 @@
 let selectedTemplate = null;
 let layerPositions = {};
 let layerSizes = {};
+let layerColors = {};
 let selectedLayerIndex = null;
 
 /* Histórico de alterações. */
@@ -168,6 +174,7 @@ document.querySelector(".modal-close[data-close-modal]")?.addEventListener(
 function resetEditorState() {
   layerPositions = {};
   layerSizes = {};
+  layerColors = {};
   selectedLayerIndex = null;
 
   (selectedTemplate.textLayers || []).forEach((layer, index) => {
@@ -177,6 +184,9 @@ function resetEditorState() {
     };
 
     layerSizes[index] = layer.size;
+    layerColors[index] = layer.field === "otherInfo"
+      ? (selectedTemplate.defaultOtherInfoColor || layer.color || "#07588c")
+      : (layer.color || "#07588c");
   });
 
   history = [];
@@ -220,9 +230,6 @@ function fillDefaultFields() {
   document.getElementById("field-other-info").value =
     selectedTemplate.defaultOtherInfo || "";
 
-  document.getElementById("field-other-info-color").value =
-    selectedTemplate.defaultOtherInfoColor || "#07588c";
-
   document.getElementById("field-email").value = "";
   document.getElementById("form-message").textContent = "";
 }
@@ -242,8 +249,7 @@ function getEditableFieldIds() {
     "field-faz",
     "field-anos",
     "field-end",
-    "field-other-info",
-    "field-other-info-color"
+    "field-other-info"
   ];
 }
 
@@ -257,7 +263,8 @@ function captureState() {
   return {
     fields,
     positions: cloneObject(layerPositions),
-    sizes: cloneObject(layerSizes)
+    sizes: cloneObject(layerSizes),
+    colors: cloneObject(layerColors)
   };
 }
 
@@ -299,6 +306,7 @@ function restoreState(state) {
 
   layerPositions = cloneObject(state.positions);
   layerSizes = cloneObject(state.sizes);
+  layerColors = cloneObject(state.colors || {});
 
   restoringHistory = false;
 
@@ -341,6 +349,7 @@ function resetToDefault() {
 
   layerPositions = cloneObject(defaultState.positions);
   layerSizes = cloneObject(defaultState.sizes);
+  layerColors = cloneObject(defaultState.colors);
   selectedLayerIndex = null;
 
   restoringHistory = false;
@@ -363,11 +372,10 @@ function buildDefaultState() {
   fields["field-anos"] = selectedTemplate.defaultAnos || "";
   fields["field-end"] = selectedTemplate.defaultEnd || "";
   fields["field-other-info"] = selectedTemplate.defaultOtherInfo || "";
-  fields["field-other-info-color"] =
-    selectedTemplate.defaultOtherInfoColor || "#07588c";
 
   const positions = {};
   const sizes = {};
+  const colors = {};
 
   (selectedTemplate.textLayers || []).forEach((layer, index) => {
     positions[index] = {
@@ -376,12 +384,16 @@ function buildDefaultState() {
     };
 
     sizes[index] = layer.size;
+    colors[index] = layer.field === "otherInfo"
+      ? (selectedTemplate.defaultOtherInfoColor || layer.color || "#07588c")
+      : (layer.color || "#07588c");
   });
 
   return {
     fields,
     positions,
-    sizes
+    sizes,
+    colors
   };
 }
 
@@ -410,6 +422,10 @@ function setupEditorControls() {
 
   document.getElementById("increase-size")?.addEventListener("click", () => {
     changeSelectedLayerSize(0.5);
+  });
+
+  document.getElementById("selected-layer-color")?.addEventListener("input", event => {
+    changeSelectedLayerColor(event.target.value);
   });
 }
 
@@ -449,12 +465,17 @@ function changeSelectedLayerSize(delta) {
 function updateSelectedLayerControls() {
   const label = document.getElementById("selected-layer-label");
   const sizeLabel = document.getElementById("selected-layer-size");
+  const colorInput = document.getElementById("selected-layer-color");
   const decrease = document.getElementById("decrease-size");
   const increase = document.getElementById("increase-size");
 
   if (selectedLayerIndex === null || !selectedTemplate?.textLayers?.[selectedLayerIndex]) {
     if (label) label.textContent = "Selecione um texto";
     if (sizeLabel) sizeLabel.textContent = "—";
+    if (colorInput) {
+      colorInput.value = "#07588c";
+      colorInput.disabled = true;
+    }
     if (decrease) decrease.disabled = true;
     if (increase) increase.disabled = true;
     return;
@@ -462,11 +483,25 @@ function updateSelectedLayerControls() {
 
   const layer = selectedTemplate.textLayers[selectedLayerIndex];
   const size = layerSizes[selectedLayerIndex] ?? layer.size;
+  const color = layerColors[selectedLayerIndex] || layer.color || "#07588c";
 
   if (label) label.textContent = layer.label || getLayerLabel(layer);
   if (sizeLabel) sizeLabel.textContent = `${Number(size).toFixed(1)}%`;
+  if (colorInput) {
+    colorInput.value = color;
+    colorInput.disabled = false;
+  }
   if (decrease) decrease.disabled = size <= 1;
   if (increase) increase.disabled = size >= 30;
+}
+
+function changeSelectedLayerColor(color) {
+  if (selectedLayerIndex === null) return;
+
+  layerColors[selectedLayerIndex] = color;
+  updatePreview();
+  pushHistory();
+  updateSelectedLayerControls();
 }
 
 function getLayerLabel(layer) {
@@ -533,9 +568,7 @@ function renderLayeredInvitation(preview) {
     element.style.left = `${position.x}%`;
     element.style.top = `${position.y}%`;
     element.style.fontSize = `${size}cqw`;
-    const layerColor = layer.field === "otherInfo"
-      ? getFieldValue("otherInfoColor", layer.color || "#07588c")
-      : layer.color || "#fff";
+    const layerColor = layerColors[index] || layer.color || "#07588c";
 
     element.style.color = layerColor;
     element.style.fontFamily = layer.font || "HortaRegular, Horta, sans-serif";
@@ -710,11 +743,31 @@ function getFieldValue(field, fallback = "") {
     faz: "field-faz",
     anos: "field-anos",
     end: "field-end",
-    otherInfo: "field-other-info",
-    otherInfoColor: "field-other-info-color"
+    otherInfo: "field-other-info"
   };
 
   return document.getElementById(map[field])?.value ?? fallback ?? "";
+}
+
+/* =========================================================
+   COR DAS CAMADAS
+   ========================================================= */
+
+function getOtherInfoColor() {
+  const otherInfoIndex = (selectedTemplate?.textLayers || []).findIndex(
+    layer => layer.field === "otherInfo"
+  );
+
+  if (otherInfoIndex < 0) {
+    return selectedTemplate?.defaultOtherInfoColor || "#07588c";
+  }
+
+  return (
+    layerColors[otherInfoIndex] ||
+    selectedTemplate.defaultOtherInfoColor ||
+    selectedTemplate.textLayers[otherInfoIndex].color ||
+    "#07588c"
+  );
 }
 
 /* =========================================================
@@ -731,8 +784,7 @@ function getFieldValue(field, fallback = "") {
   "field-faz",
   "field-anos",
   "field-end",
-  "field-other-info",
-  "field-other-info-color"
+  "field-other-info"
 ].forEach(id => {
   document.getElementById(id)?.addEventListener("input", () => {
     updatePreview();
@@ -778,12 +830,10 @@ function setupCustomizer() {
       anos: getFieldValue("anos", selectedTemplate.defaultAnos),
       end: getFieldValue("end", selectedTemplate.defaultEnd),
       otherInfo: getFieldValue("otherInfo", selectedTemplate.defaultOtherInfo),
-      otherInfoColor: getFieldValue(
-        "otherInfoColor",
-        selectedTemplate.defaultOtherInfoColor
-      ),
+      otherInfoColor: getOtherInfoColor(),
       positions: cloneObject(layerPositions),
       sizes: cloneObject(layerSizes),
+      colors: cloneObject(layerColors),
       email
     };
 
