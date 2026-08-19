@@ -1,163 +1,39 @@
+<!-- Página automática de categoria. -->
 <!DOCTYPE html>
 <html lang="pt">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width,initial-scale=1.0" name="viewport"/>
-  <title>
-   Categoria — TONInvitation
-  </title>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&amp;family=Cormorant+Garamond:wght@300;400;500;600;700&amp;family=Poppins:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
-  <script src="https://unpkg.com/lucide@latest">
-  </script>
-  <link href="style.css" rel="stylesheet"/>
-  <link href="categoria.css" rel="stylesheet"/>
- </head>
- <body>
-  <!-- CABEÇALHO -->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Categoria — TONInvitation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="style.css" rel="stylesheet">
+  <link href="categoria.css" rel="stylesheet">
+</head>
+<body>
   <header class="site-header">
-   <a class="logo" href="index.html">
-    <img alt="TONInvitation" src="Images/logo_pt.png"/>
-   </a>
-   <nav class="main-nav" id="menu">
-    <ul>
-     <li>
-      <a href="index.html">
-       Início
-      </a>
-     </li>
-     <li>
-      <a href="index.html#catalogo">
-       Catálogo
-      </a>
-     </li>
-     <li>
-      <a href="index.html#como-funciona">
-       Como funciona
-      </a>
-     </li>
-     <li>
-      <a href="index.html#contactos">
-       Contactos
-      </a>
-     </li>
-    </ul>
-   </nav>
-   <a class="btn btn-primary header-contact" href="https://wa.link/jy0xch" target="_blank">
-    Contactar
-   </a>
-   <button class="menu-mobile" id="menu-mobile">
-    <span>
-    </span>
-    <span>
-    </span>
-    <span>
-    </span>
-   </button>
+    <a class="logo" href="index.html"><img alt="TONInvitation" src="Images/logo_pt.png"></a>
+    <nav class="main-nav" id="menu">
+      <ul>
+        <li><a href="index.html">Início</a></li>
+        <li><a href="index.html#catalogo">Catálogo</a></li>
+        <li><a href="index.html#como-funciona">Como funciona</a></li>
+        <li><a href="index.html#contactos">Contactos</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary header-contact" href="https://wa.link/jy0xch" target="_blank">Contactar</a>
+    <button class="menu-mobile" id="menu-mobile" aria-label="Abrir menu"><span></span><span></span><span></span></button>
   </header>
-  <!-- CONTEÚDO DA CATEGORIA -->
+
   <main class="category-page">
-   <a class="back-link" href="index.html#catalogo">
-    <i data-lucide="arrow-left">
-    </i>
-    Voltar ao catálogo
-   </a>
-   <div id="category-header">
-   </div>
-   <div id="category-content">
-   </div>
+    <a class="back-link" href="index.html#catalogo"><i data-lucide="arrow-left"></i>Voltar</a>
+    <div id="category-header"></div>
+    <div id="category-content"></div>
+    <p data-catalog-error class="form-message"></p>
   </main>
-  <!-- PERSONALIZADOR DOS MODELOS SEM CAMADAS -->
-  <div aria-hidden="true" class="modal" id="customizer-modal">
-   <div class="modal-backdrop" data-close-modal="">
-   </div>
-   <div class="customizer">
-    <button class="modal-close" data-close-modal="">
-     ×
-    </button>
-    <div class="customizer-head">
-     <span class="eyebrow">
-      PERSONALIZAÇÃO
-     </span>
-     <h2 id="customizer-title">
-      Personalize o seu convite
-     </h2>
-     <p>
-      Preencha os dados, escolha a cor e confirme o pagamento.
-     </p>
-    </div>
-    <div class="customizer-layout">
-     <form class="customizer-form" id="customizer-form">
-      <label>
-       Nome / título
-       <input id="field-name" maxlength="45" type="text"/>
-      </label>
-      <label>
-       Data
-       <input id="field-date" maxlength="35" type="text"/>
-      </label>
-      <label>
-       Hora
-       <input id="field-time" maxlength="15" type="text"/>
-      </label>
-      <label>
-       Local
-       <input id="field-place" maxlength="40" type="text"/>
-      </label>
-      <label>
-       E-mail para entrega
-       <input id="field-email" required="" type="email"/>
-      </label>
-      <div>
-       <span class="form-label">
-        Escolha a cor
-       </span>
-       <div class="color-options" id="color-options">
-       </div>
-      </div>
-      <button class="btn btn-primary btn-large full-width" type="submit">
-        Confirmar pagamento
-      </button>
-      <p class="form-message" id="form-message">
-      </p>
-     </form>
-     <div class="preview-area">
-      <div class="invitation-preview" id="invitation-preview">
-       <div class="preview-ornament">
-        ✦
-       </div>
-       <div class="preview-small">
-        CONVITE
-       </div>
-       <div class="preview-name" id="preview-name">
-       </div>
-       <div class="preview-divider">
-       </div>
-       <div id="preview-date">
-       </div>
-       <div id="preview-time">
-       </div>
-       <div class="preview-place-label">
-        LOCAL
-       </div>
-       <div id="preview-place">
-       </div>
-       <div class="preview-ornament bottom">
-        ✦
-       </div>
-      </div>
-     </div>
-    </div>
-   </div>
-  </div>
-  <!-- JAVASCRIPT -->
-  <script src="categories.js">
-  </script>
-  <script src="templates.js">
-  </script>
-  <script src="categoria.js">
-  </script>
-  <script>
-   lucide.createIcons();
-  </script>
- </body>
+
+  <script src="categories.js"></script>
+  <script src="categoria.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
 </html>

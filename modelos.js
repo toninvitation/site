@@ -1,17 +1,8 @@
 /* =========================================================
-   PÁGINA DE MODELOS / PERSONALIZADOR
+   TONInvitation — MODELOS E PERSONALIZADOR AUTOMÁTICO
 
-   Toy Story 1:
-   - a imagem completa aparece no cartão do modelo;
-   - a imagem "_com.png" é o fundo do convite;
-   - os textos são camadas independentes;
-   - cada camada pode ser arrastada e redimensionada;
-   - existe histórico para voltar/avançar alterações;
-   - "Default" repõe textos, posições e tamanhos originais.
-   ========================================================= */
-
-/* =========================================================
-   ESTADO GLOBAL DO PERSONALIZADOR
+   Todos os modelos vêm de /api/catalog.
+   O personalizador é o mesmo para todos os convites.
    ========================================================= */
 
 let selectedTemplate = null;
@@ -19,25 +10,22 @@ let layerPositions = {};
 let layerSizes = {};
 let layerColors = {};
 let selectedLayerIndex = null;
-
-/* Histórico de alterações. */
 let history = [];
 let historyIndex = -1;
 let restoringHistory = false;
 
-/* =========================================================
-   INICIALIZAÇÃO DA PÁGINA
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
+/* Inicializa a página dos modelos. */
+function initializeModelsPage() {
   const params = new URLSearchParams(location.search);
   const categoryId = params.get("categoria") || "infantil";
   const themeId = params.get("tema") || "";
+  const modelId = params.get("modelo") || "";
+  const themeModels = INVITATION_THEMES[themeId] || [];
+  const items = modelId
+    ? INVITATION_TEMPLATES.filter(item => item.id === modelId)
+    : themeModels;
 
-  const theme = (INVITATION_THEMES[categoryId] || []).find(
-    item => item.id === themeId
-  );
-
+  const themeName = themeModels[0]?.themeName || prettifyClientName(themeId);
   const backLink = document.getElementById("back-link");
   const header = document.getElementById("models-header");
   const grid = document.getElementById("models-grid");
@@ -46,8 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   header.innerHTML = `
     <div class="category-page-title">
-      <span class="eyebrow">${theme?.name || "CONVITES"}</span>
-      <h1>${theme?.name || "Convites"}</h1>
+      <span class="eyebrow">${escapeHtml(themeName)}</span>
+      <h1>${escapeHtml(themeName)}</h1>
       <div class="title-decoration">
         <span></span>
         <b>♥</b>
@@ -57,16 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
 
-  const items = INVITATION_TEMPLATES.filter(
-    item => item.category === categoryId && item.theme === themeId
-  );
-
   grid.innerHTML = items.length
     ? items.map(createInvitationCard).join("")
     : `
       <div class="empty-category">
         <h2>Ainda não há convites neste tema</h2>
-        <p>Adiciona o novo convite ao templates.js.</p>
+        <p>Coloca as imagens do novo convite na pasta do tema.</p>
       </div>
     `;
 
@@ -80,29 +64,27 @@ document.addEventListener("DOMContentLoaded", () => {
       openCustomizer(button.dataset.template);
     });
   });
-});
+}
 
-/* =========================================================
-   CARTÃO DO MODELO
-   ========================================================= */
-
+/* Cria um cartão para cada modelo encontrado automaticamente. */
 function createInvitationCard(template) {
   return `
     <article class="invitation-card">
       <div class="invitation-image invitation-image-portrait">
         <img
           src="${template.image}"
-          onerror="this.src='${template.fallbackImage}'"
-          alt="${template.name}"
+          onerror="this.src='${template.fallbackImage || "Images/infantil.jpg"}'"
+          alt="${escapeHtml(template.name)}"
         >
       </div>
-
       <div class="invitation-info">
-        <h3>${template.name}</h3>
-        <p>${template.description}</p>
+        <h3>${escapeHtml(template.name)}</h3>
+        <p>${escapeHtml(template.description || "")}</p>
+        <p class="template-price">€ ${Number(template.priceEUR || 5).toFixed(2)}</p>
         <button
           class="btn btn-primary customize-template"
           data-template="${template.id}"
+          type="button"
         >
           Personalizar
         </button>
@@ -111,10 +93,7 @@ function createInvitationCard(template) {
   `;
 }
 
-/* =========================================================
-   MENU MOBILE
-   ========================================================= */
-
+/* Configura o menu mobile. */
 function setupMenu() {
   const menu = document.getElementById("menu");
   const mobileButton = document.getElementById("menu-mobile");
@@ -125,14 +104,9 @@ function setupMenu() {
   });
 }
 
-/* =========================================================
-   ABRIR / FECHAR PERSONALIZADOR
-   ========================================================= */
-
+/* Abre o personalizador. */
 function openCustomizer(id) {
-  selectedTemplate = INVITATION_TEMPLATES.find(
-    template => template.id === id
-  );
+  selectedTemplate = INVITATION_TEMPLATES.find(template => template.id === id);
 
   if (!selectedTemplate) return;
 
@@ -149,23 +123,34 @@ function openCustomizer(id) {
   updateSelectedLayerControls();
 }
 
+/* Fecha apenas quando o X for usado. */
 function closeCustomizer() {
   const modal = document.getElementById("customizer-modal");
-
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
 }
 
-document.querySelector(".modal-close[data-close-modal]")?.addEventListener(
-  "click",
-  closeCustomizer
-);
+document.querySelector(".modal-close[data-close-modal]")?.addEventListener("click", closeCustomizer);
 
-/* =========================================================
-   ESTADO DEFAULT
-   ========================================================= */
+/* Preenche os campos com os valores definidos para o modelo. */
+function fillDefaultFields() {
+  document.getElementById("customizer-title").textContent = `Personalize: ${selectedTemplate.name}`;
+  document.getElementById("field-name").value = selectedTemplate.defaultName || "";
+  document.getElementById("field-age").value = selectedTemplate.defaultAge || "";
+  document.getElementById("field-date").value = selectedTemplate.defaultDate || "";
+  document.getElementById("field-time").value = selectedTemplate.defaultTime || "";
+  document.getElementById("field-place").value = selectedTemplate.defaultPlace || "";
+  document.getElementById("field-adventure").value = selectedTemplate.defaultAdventure || "";
+  document.getElementById("field-faz").value = selectedTemplate.defaultFaz || "";
+  document.getElementById("field-anos").value = selectedTemplate.defaultAnos || "";
+  document.getElementById("field-end").value = selectedTemplate.defaultEnd || "";
+  document.getElementById("field-other-info").value = selectedTemplate.defaultOtherInfo || "";
+  document.getElementById("field-email").value = "";
+  document.getElementById("form-message").textContent = "";
+}
 
+/* Repõe posições, tamanhos e cores do modelo. */
 function resetEditorState() {
   layerPositions = {};
   layerSizes = {};
@@ -173,66 +158,18 @@ function resetEditorState() {
   selectedLayerIndex = null;
 
   (selectedTemplate.textLayers || []).forEach((layer, index) => {
-    layerPositions[index] = {
-      x: layer.x,
-      y: layer.y
-    };
-
+    layerPositions[index] = { x: layer.x, y: layer.y };
     layerSizes[index] = layer.size;
-    layerColors[index] = layer.field === "otherInfo"
-      ? (selectedTemplate.defaultOtherInfoColor || layer.color || "#07588c")
-      : (layer.color || "#07588c");
+    layerColors[index] = layer.color || "#07588c";
   });
 
   history = [];
   historyIndex = -1;
   restoringHistory = false;
-
   pushHistory();
 }
 
-function fillDefaultFields() {
-  document.getElementById("customizer-title").textContent =
-    `Personalize: ${selectedTemplate.name}`;
-
-  document.getElementById("field-name").value =
-    selectedTemplate.defaultName || "";
-
-  document.getElementById("field-age").value =
-    selectedTemplate.defaultAge || "";
-
-  document.getElementById("field-date").value =
-    selectedTemplate.defaultDate || "";
-
-  document.getElementById("field-time").value =
-    selectedTemplate.defaultTime || "";
-
-  document.getElementById("field-place").value =
-    selectedTemplate.defaultPlace || "";
-
-  document.getElementById("field-adventure").value =
-    selectedTemplate.defaultAdventure || "";
-
-  document.getElementById("field-faz").value =
-    selectedTemplate.defaultFaz || "";
-
-  document.getElementById("field-anos").value =
-    selectedTemplate.defaultAnos || "";
-
-  document.getElementById("field-end").value =
-    selectedTemplate.defaultEnd || "";
-
-  document.getElementById("field-other-info").value =
-    selectedTemplate.defaultOtherInfo || "";
-
-  document.getElementById("field-email").value = "";
-  document.getElementById("form-message").textContent = "";
-}
-
-/* =========================================================
-   HISTÓRICO: VOLTAR / AVANÇAR
-   ========================================================= */
-
+/* Obtém os campos editáveis. */
 function getEditableFieldIds() {
   return [
     "field-name",
@@ -248,6 +185,7 @@ function getEditableFieldIds() {
   ];
 }
 
+/* Guarda o estado atual para undo/redo. */
 function captureState() {
   const fields = {};
 
@@ -263,32 +201,32 @@ function captureState() {
   };
 }
 
+/* Faz uma cópia profunda simples de um objeto. */
 function cloneObject(object) {
   return JSON.parse(JSON.stringify(object || {}));
 }
 
-function statesAreEqual(a, b) {
-  return JSON.stringify(a) === JSON.stringify(b);
+/* Compara dois estados. */
+function statesAreEqual(first, second) {
+  return JSON.stringify(first) === JSON.stringify(second);
 }
 
+/* Adiciona uma alteração ao histórico. */
 function pushHistory() {
   if (!selectedTemplate || restoringHistory) return;
 
   const nextState = captureState();
   const currentState = history[historyIndex];
 
-  if (currentState && statesAreEqual(currentState, nextState)) {
-    return;
-  }
+  if (currentState && statesAreEqual(currentState, nextState)) return;
 
-  /* Uma nova alteração depois de "voltar" elimina o ramo de redo. */
   history = history.slice(0, historyIndex + 1);
   history.push(nextState);
   historyIndex = history.length - 1;
-
   updateHistoryButtons();
 }
 
+/* Repõe um estado anterior. */
 function restoreState(state) {
   if (!state) return;
 
@@ -301,8 +239,7 @@ function restoreState(state) {
 
   layerPositions = cloneObject(state.positions);
   layerSizes = cloneObject(state.sizes);
-  layerColors = cloneObject(state.colors || {});
-
+  layerColors = cloneObject(state.colors);
   restoringHistory = false;
 
   updatePreview();
@@ -310,88 +247,66 @@ function restoreState(state) {
   updateHistoryButtons();
 }
 
+/* Volta à alteração anterior. */
 function undoChange() {
   if (historyIndex <= 0) return;
-
   historyIndex -= 1;
   restoreState(history[historyIndex]);
 }
 
+/* Avança para a alteração seguinte. */
 function redoChange() {
   if (historyIndex >= history.length - 1) return;
-
   historyIndex += 1;
   restoreState(history[historyIndex]);
 }
 
+/* Repõe todos os campos e camadas no estado original. */
 function resetToDefault() {
   if (!selectedTemplate) return;
 
-  /*
-    O default é exatamente o estado inicial definido no templates.js:
-    textos, posições e tamanhos.
-  */
   const defaultState = buildDefaultState();
 
   if (statesAreEqual(captureState(), defaultState)) return;
 
-  restoringHistory = true;
-
-  Object.entries(defaultState.fields).forEach(([id, value]) => {
-    const input = document.getElementById(id);
-    if (input) input.value = value;
-  });
-
-  layerPositions = cloneObject(defaultState.positions);
-  layerSizes = cloneObject(defaultState.sizes);
-  layerColors = cloneObject(defaultState.colors);
-  selectedLayerIndex = null;
-
-  restoringHistory = false;
-
+  restoreState(defaultState);
   pushHistory();
-  updatePreview();
-  updateSelectedLayerControls();
 }
 
+/* Cria o estado original do modelo. */
 function buildDefaultState() {
   const fields = {};
 
-  fields["field-name"] = selectedTemplate.defaultName || "";
-  fields["field-age"] = selectedTemplate.defaultAge || "";
-  fields["field-date"] = selectedTemplate.defaultDate || "";
-  fields["field-time"] = selectedTemplate.defaultTime || "";
-  fields["field-place"] = selectedTemplate.defaultPlace || "";
-  fields["field-adventure"] = selectedTemplate.defaultAdventure || "";
-  fields["field-faz"] = selectedTemplate.defaultFaz || "";
-  fields["field-anos"] = selectedTemplate.defaultAnos || "";
-  fields["field-end"] = selectedTemplate.defaultEnd || "";
-  fields["field-other-info"] = selectedTemplate.defaultOtherInfo || "";
+  getEditableFieldIds().forEach(id => {
+    const fieldMap = {
+      "field-name": "defaultName",
+      "field-age": "defaultAge",
+      "field-date": "defaultDate",
+      "field-time": "defaultTime",
+      "field-place": "defaultPlace",
+      "field-adventure": "defaultAdventure",
+      "field-faz": "defaultFaz",
+      "field-anos": "defaultAnos",
+      "field-end": "defaultEnd",
+      "field-other-info": "defaultOtherInfo"
+    };
+    fields[id] = selectedTemplate[fieldMap[id]] || "";
+  });
 
   const positions = {};
   const sizes = {};
   const colors = {};
 
   (selectedTemplate.textLayers || []).forEach((layer, index) => {
-    positions[index] = {
-      x: layer.x,
-      y: layer.y
-    };
-
+    positions[index] = { x: layer.x, y: layer.y };
     sizes[index] = layer.size;
-    colors[index] = layer.field === "otherInfo"
-      ? (selectedTemplate.defaultOtherInfoColor || layer.color || "#07588c")
-      : (layer.color || "#07588c");
+    colors[index] = layer.color || "#07588c";
   });
 
-  return {
-    fields,
-    positions,
-    sizes,
-    colors
-  };
+  return { fields, positions, sizes, colors };
 }
 
+/* Atualiza o estado visual dos botões de histórico. */
 function updateHistoryButtons() {
   const undo = document.getElementById("undo-button");
   const redo = document.getElementById("redo-button");
@@ -399,13 +314,10 @@ function updateHistoryButtons() {
 
   if (undo) undo.disabled = historyIndex <= 0;
   if (redo) redo.disabled = historyIndex >= history.length - 1;
-  if (reset) reset.disabled = statesAreEqual(captureState(), buildDefaultState());
+  if (reset) reset.disabled = !selectedTemplate || statesAreEqual(captureState(), buildDefaultState());
 }
 
-/* =========================================================
-   FERRAMENTAS DE TAMANHO
-   ========================================================= */
-
+/* Configura os controlos do editor. */
 function setupEditorControls() {
   document.getElementById("undo-button")?.addEventListener("click", undoChange);
   document.getElementById("redo-button")?.addEventListener("click", redoChange);
@@ -424,12 +336,14 @@ function setupEditorControls() {
   });
 }
 
+/* Seleciona uma camada de texto. */
 function selectLayer(index) {
   selectedLayerIndex = index;
   updateSelectedLayerControls();
   updateLayerSelectionVisuals();
 }
 
+/* Atualiza a indicação da camada selecionada. */
 function updateLayerSelectionVisuals() {
   document.querySelectorAll(".invitation-text-layer").forEach(element => {
     const index = Number(element.dataset.layerIndex);
@@ -437,6 +351,7 @@ function updateLayerSelectionVisuals() {
   });
 }
 
+/* Aumenta ou diminui o tamanho da camada selecionada. */
 function changeSelectedLayerSize(delta) {
   if (selectedLayerIndex === null) return;
 
@@ -451,12 +366,12 @@ function changeSelectedLayerSize(delta) {
   if (nextSize === currentSize) return;
 
   layerSizes[selectedLayerIndex] = Number(nextSize.toFixed(1));
-
-  pushHistory();
   updatePreview();
+  pushHistory();
   selectLayer(selectedLayerIndex);
 }
 
+/* Atualiza os controlos do texto selecionado. */
 function updateSelectedLayerControls() {
   const label = document.getElementById("selected-layer-label");
   const sizeLabel = document.getElementById("selected-layer-size");
@@ -490,15 +405,16 @@ function updateSelectedLayerControls() {
   if (increase) increase.disabled = size >= 30;
 }
 
+/* Altera a cor da camada selecionada. */
 function changeSelectedLayerColor(color) {
   if (selectedLayerIndex === null) return;
-
   layerColors[selectedLayerIndex] = color;
   updatePreview();
   pushHistory();
   updateSelectedLayerControls();
 }
 
+/* Obtém um nome legível para uma camada. */
 function getLayerLabel(layer) {
   const labels = {
     name: "Nome",
@@ -509,47 +425,32 @@ function getLayerLabel(layer) {
     "date-month": "Mês",
     "date-day": "Dia",
     "weekday-time": "Dia e hora",
-    "place-label": "Título do local",
     place: "Morada",
-    end: "Frase final"
+    end: "Frase final",
+    otherInfo: "Outras informações"
   };
 
   return labels[layer.field] || "Texto";
 }
 
-/* =========================================================
-   PRÉ-VISUALIZAÇÃO
-   ========================================================= */
-
+/* Atualiza a imagem e as camadas no mockup. */
 function updatePreview() {
   if (!selectedTemplate) return;
 
   const preview = document.getElementById("invitation-preview");
-  const isLayered = Array.isArray(selectedTemplate.textLayers);
-
   preview.innerHTML = "";
   preview.style.backgroundImage = selectedTemplate.previewImage
     ? `url("${selectedTemplate.previewImage}")`
     : "none";
-  preview.style.backgroundColor = selectedTemplate.previewImage
-    ? "#fff"
-    : "#fff7f4";
+  preview.style.backgroundColor = "#fff";
 
-  if (isLayered) {
-    renderLayeredInvitation(preview);
-  } else {
-    renderLegacyInvitation(preview);
-  }
-
+  renderLayeredInvitation(preview);
   updateSelectedLayerControls();
 }
 
-/* =========================================================
-   DESENHO DAS CAMADAS
-   ========================================================= */
-
+/* Desenha todas as camadas de texto. */
 function renderLayeredInvitation(preview) {
-  selectedTemplate.textLayers.forEach((layer, index) => {
+  (selectedTemplate.textLayers || []).forEach((layer, index) => {
     const element = document.createElement("div");
     const position = layerPositions[index] || { x: layer.x, y: layer.y };
     const size = layerSizes[index] ?? layer.size;
@@ -559,13 +460,10 @@ function renderLayeredInvitation(preview) {
     element.dataset.field = layer.field || "";
     element.dataset.layerIndex = index;
     element.textContent = value;
-
     element.style.left = `${position.x}%`;
     element.style.top = `${position.y}%`;
     element.style.fontSize = `${size}cqw`;
-    const layerColor = layerColors[index] || layer.color || "#07588c";
-
-    element.style.color = layerColor;
+    element.style.color = layerColors[index] || layer.color || "#07588c";
     element.style.fontFamily = layer.font || "HortaRegular, Horta, sans-serif";
     element.style.fontWeight = layer.weight || "700";
     element.style.lineHeight = layer.lineHeight || "1";
@@ -574,23 +472,17 @@ function renderLayeredInvitation(preview) {
     element.style.letterSpacing = layer.letterSpacing || "normal";
     element.style.transform = `translate(-50%, -50%) rotate(${layer.rotate || 0}deg)`;
 
-    if (!value) {
-      element.classList.add("is-empty");
-    }
+    if (!value) element.classList.add("is-empty");
 
     element.addEventListener("pointerdown", startDraggingLayer);
     element.addEventListener("click", () => selectLayer(index));
-
     preview.appendChild(element);
   });
 
   updateLayerSelectionVisuals();
 }
 
-/* =========================================================
-   ARRASTAR TEXTO
-   ========================================================= */
-
+/* Permite arrastar uma camada sem impor uma área fixa. */
 function startDraggingLayer(event) {
   const layer = event.currentTarget;
   const preview = document.getElementById("invitation-preview");
@@ -605,29 +497,20 @@ function startDraggingLayer(event) {
 
   const startX = event.clientX;
   const startY = event.clientY;
-  const startPosition = {
-    ...(layerPositions[index] || { x: 50, y: 50 })
-  };
-
+  const startPosition = { ...(layerPositions[index] || { x: 50, y: 50 }) };
   let moved = false;
 
-  function move(eventMove) {
+  function move(moveEvent) {
     const rect = preview.getBoundingClientRect();
-    const deltaX = ((eventMove.clientX - startX) / rect.width) * 100;
-    const deltaY = ((eventMove.clientY - startY) / rect.height) * 100;
+    const deltaX = ((moveEvent.clientX - startX) / rect.width) * 100;
+    const deltaY = ((moveEvent.clientY - startY) / rect.height) * 100;
 
-    if (Math.abs(deltaX) > 0.05 || Math.abs(deltaY) > 0.05) {
-      moved = true;
-    }
+    if (Math.abs(deltaX) > 0.05 || Math.abs(deltaY) > 0.05) moved = true;
 
     const nextX = startPosition.x + deltaX;
     const nextY = startPosition.y + deltaY;
 
-    layerPositions[index] = {
-      x: nextX,
-      y: nextY
-    };
-
+    layerPositions[index] = { x: nextX, y: nextY };
     layer.style.left = `${nextX}%`;
     layer.style.top = `${nextY}%`;
   }
@@ -639,10 +522,7 @@ function startDraggingLayer(event) {
     layer.removeEventListener("pointerup", end);
     layer.removeEventListener("pointercancel", end);
 
-    if (moved) {
-      pushHistory();
-    }
-
+    if (moved) pushHistory();
     updateHistoryButtons();
   }
 
@@ -651,14 +531,9 @@ function startDraggingLayer(event) {
   layer.addEventListener("pointercancel", end);
 }
 
-/* =========================================================
-   VALORES DAS CAMADAS
-   ========================================================= */
-
+/* Obtém o valor atual de uma camada. */
 function getLayerValue(layer) {
-  if (layer.value !== undefined && !layer.field) {
-    return layer.value;
-  }
+  if (layer.value !== undefined && !layer.field) return layer.value;
 
   if (layer.field === "date-month") {
     return formatSelectedDate(getFieldValue("date", "")).month;
@@ -682,39 +557,20 @@ function getLayerValue(layer) {
   return getFieldValue(layer.field, layer.fallback);
 }
 
-/* =========================================================
-   DATA ESCOLHIDA NO CALENDÁRIO
-   ========================================================= */
-
+/* Converte a data escolhida no calendário para os textos do convite. */
 function formatSelectedDate(value) {
-  if (!value) {
-    return {
-      day: "",
-      month: "",
-      weekday: ""
-    };
-  }
+  if (!value) return { day: "", month: "", weekday: "" };
 
   const parts = String(value).split("-").map(Number);
 
   if (parts.length !== 3 || parts.some(Number.isNaN)) {
-    return {
-      day: "",
-      month: "",
-      weekday: ""
-    };
+    return { day: "", month: "", weekday: "" };
   }
 
   const [year, month, day] = parts;
   const date = new Date(year, month - 1, day);
-
-  const weekday = new Intl.DateTimeFormat("pt-PT", {
-    weekday: "long"
-  }).format(date);
-
-  const monthName = new Intl.DateTimeFormat("pt-PT", {
-    month: "long"
-  }).format(date);
+  const weekday = new Intl.DateTimeFormat("pt-PT", { weekday: "long" }).format(date);
+  const monthName = new Intl.DateTimeFormat("pt-PT", { month: "long" }).format(date);
 
   return {
     day: String(day),
@@ -723,10 +579,7 @@ function formatSelectedDate(value) {
   };
 }
 
-/* =========================================================
-   LEITURA DOS CAMPOS
-   ========================================================= */
-
+/* Liga nomes de campos aos inputs do formulário. */
 function getFieldValue(field, fallback = "") {
   const map = {
     name: "field-name",
@@ -744,99 +597,40 @@ function getFieldValue(field, fallback = "") {
   return document.getElementById(map[field])?.value ?? fallback ?? "";
 }
 
-/* =========================================================
-   COR DAS CAMADAS
-   ========================================================= */
-
-function getOtherInfoColor() {
-  const otherInfoIndex = (selectedTemplate?.textLayers || []).findIndex(
-    layer => layer.field === "otherInfo"
-  );
-
-  if (otherInfoIndex < 0) {
-    return selectedTemplate?.defaultOtherInfoColor || "#07588c";
-  }
-
-  return (
-    layerColors[otherInfoIndex] ||
-    selectedTemplate.defaultOtherInfoColor ||
-    selectedTemplate.textLayers[otherInfoIndex].color ||
-    "#07588c"
-  );
-}
-
-/* =========================================================
-   EVENTOS DOS CAMPOS
-   ========================================================= */
-
-[
-  "field-name",
-  "field-age",
-  "field-date",
-  "field-time",
-  "field-place",
-  "field-adventure",
-  "field-faz",
-  "field-anos",
-  "field-end",
-  "field-other-info"
-].forEach(id => {
+/* Regista alterações feitas nos campos. */
+getEditableFieldIds().forEach(id => {
   document.getElementById(id)?.addEventListener("input", () => {
     updatePreview();
     pushHistory();
   });
 });
 
-/* =========================================================
-   ENVIO / CONFIRMAÇÃO DO PEDIDO
-   ========================================================= */
-
+/* Configura a criação do pedido. */
 function setupCustomizer() {
-  /* Localiza o formulário principal do personalizador. */
   const form = document.getElementById("customizer-form");
+  if (!form) return;
 
-  /* Interrompe a configuração se a página não tiver formulário. */
-  if (!form) {
-    return;
-  }
-
-  /* Trata a criação de um novo pedido. */
   form.addEventListener("submit", async event => {
-    /* Impede o envio tradicional do formulário. */
     event.preventDefault();
 
-    /* Lê os elementos usados durante o processo. */
-    const emailInput = document.getElementById("field-email");
+    const email = document.getElementById("field-email").value.trim();
     const message = document.getElementById("form-message");
-    const submitButton = form.querySelector("button[type=submit]");
-    const paymentPanel = document.getElementById("test-payment-panel");
-    const paymentLink = document.getElementById("test-payment-link");
-    const orderIdElement = document.getElementById("test-order-id");
-    const paymentStatus = document.getElementById("test-payment-status");
+    const button = event.currentTarget.querySelector("button[type=submit]");
 
-    /* Limpa mensagens anteriores. */
-    message.textContent = "";
-    paymentStatus.textContent = "";
-
-    /* Obtém o e-mail introduzido pelo cliente. */
-    const email = emailInput.value.trim();
-
-    /* Impede a criação do pedido sem e-mail. */
     if (!email) {
       message.textContent = "Indique o e-mail onde pretende receber o convite.";
-      emailInput.focus();
       return;
     }
 
-    /* Obtém a informação calculada da data escolhida. */
     const selectedDate = getFieldValue("date", "");
     const dateInfo = formatSelectedDate(selectedDate);
+    const overlay = createTextOverlayDataUrl();
 
-    /* Monta todos os dados necessários para identificar o pedido. */
     const order = {
       templateId: selectedTemplate.id,
       templateName: selectedTemplate.name,
-      previewImage: selectedTemplate.previewImage || "",
+      previewImage: selectedTemplate.previewImage,
+      textOverlayDataUrl: overlay,
       name: getFieldValue("name", selectedTemplate.defaultName),
       age: getFieldValue("age", selectedTemplate.defaultAge),
       date: selectedDate,
@@ -854,293 +648,97 @@ function setupCustomizer() {
       email
     };
 
-    /* Desativa o botão enquanto o convite é preparado. */
-    submitButton.disabled = true;
-    submitButton.textContent = "A preparar o pedido...";
+    button.disabled = true;
+    button.textContent = "A criar pedido...";
 
     try {
-      /*
-        Gera uma camada PNG transparente com apenas os textos personalizados.
-        O servidor junta esta camada à imagem privada sem marca d'água.
-        O ficheiro final continua sempre com 1080x1920 px.
-      */
-      const textOverlayDataUrl = await renderFinalInvitationToPng();
-
-      /* Envia o pedido e a imagem final para o backend. */
       const response = await fetch("/api/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          ...order,
-          textOverlayDataUrl
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order)
       });
 
-      /* Lê a resposta do servidor. */
       const data = await response.json();
 
-      /* Mostra o erro devolvido pelo servidor. */
       if (!response.ok) {
         throw new Error(data.error || "Não foi possível criar o pedido.");
       }
 
-      /* Mostra o Order ID criado pelo servidor. */
-      orderIdElement.textContent = `Order ID: ${data.orderId}`;
-
-      /* Cria o link para a página que simula a plataforma de pagamento. */
-      paymentLink.href = `/test-payment.html?orderId=${encodeURIComponent(data.orderId)}`;
-
-      /* Mostra a área de pagamento de teste. */
-      paymentPanel.hidden = false;
-
-      /* Informa o cliente sobre o passo seguinte. */
-      paymentStatus.textContent =
-        "O pedido foi criado. Abra o pagamento de teste para confirmar o pagamento.";
-
-      /* Atualiza o botão principal. */
-      submitButton.textContent = "Pedido criado";
-
-      /* Mostra uma mensagem geral de sucesso. */
-      message.textContent =
-        "O seu pedido foi criado. O próximo passo é confirmar o pagamento.";
+      message.innerHTML = `
+        Pedido criado: <strong>${escapeHtml(data.orderId)}</strong>.<br>
+        <a href="${data.testPaymentUrl}">Abrir pagamento de teste</a>
+      `;
+      button.textContent = "Pedido criado";
     } catch (error) {
-      /* Mostra qualquer erro ocorrido durante a criação do pedido. */
       message.textContent = error.message;
-      submitButton.disabled = false;
-      submitButton.textContent = "Criar pedido";
+      button.disabled = false;
+      button.textContent = "Confirmar pagamento";
     }
   });
 }
 
-/* =========================================================
-   GERAÇÃO DO PNG FINAL
-   ========================================================= */
-
-async function renderFinalInvitationToPng() {
-  /* Define a resolução real exigida para todos os convites. */
-  const CANVAS_WIDTH = 1080;
-  const CANVAS_HEIGHT = 1920;
-
-  /* Cria o canvas que vai receber o convite final. */
+/* Cria uma camada PNG transparente com os textos personalizados. */
+function createTextOverlayDataUrl() {
   const canvas = document.createElement("canvas");
-  canvas.width = CANVAS_WIDTH;
-  canvas.height = CANVAS_HEIGHT;
-
-  /* Obtém o contexto 2D usado para desenhar a imagem e os textos. */
+  canvas.width = 1080;
+  canvas.height = 1920;
   const context = canvas.getContext("2d");
 
-  /* Aguarda o carregamento das fontes antes de desenhar o texto. */
-  if (document.fonts?.ready) {
-    await document.fonts.ready;
-  }
-
-  /*
-    IMPORTANTE: não desenhamos aqui a imagem com marca d'água.
-    Este canvas fica transparente e contém apenas os textos personalizados.
-    O servidor aplica esta camada sobre ToyStory1_sem.png, que está na pasta
-    privada do repositório e nunca é exposta diretamente ao cliente.
-  */
-
-  /* Desenha cada camada de texto no mesmo sistema de coordenadas do editor. */
-  selectedTemplate.textLayers.forEach((layer, index) => {
-    /* Obtém o texto atualmente escolhido pelo cliente. */
+  (selectedTemplate.textLayers || []).forEach((layer, index) => {
     const value = getLayerValue(layer);
+    if (!value) return;
 
-    /* Ignora camadas vazias. */
-    if (!value) {
-      return;
-    }
-
-    /* Obtém a posição atual da camada. */
-    const position = layerPositions[index] || {
-      x: layer.x,
-      y: layer.y
-    };
-
-    /* Obtém o tamanho atual da camada. */
+    const position = layerPositions[index] || { x: layer.x, y: layer.y };
     const size = layerSizes[index] ?? layer.size;
-
-    /* Obtém a cor atual da camada. */
-    const color = layerColors[index] || layer.color || "#07588c";
-
-    /* Converte a percentagem de tamanho para pixels na resolução final. */
-    const fontSize = (Number(size) / 100) * CANVAS_WIDTH;
-
-    /* Converte a posição percentual para pixels. */
-    const x = (Number(position.x) / 100) * CANVAS_WIDTH;
-    const y = (Number(position.y) / 100) * CANVAS_HEIGHT;
-
-    /* Obtém o nome da fonte configurada para a camada. */
     const fontFamily = layer.font || "HortaRegular, Horta, sans-serif";
+    const pixelSize = size / 100 * 1080;
 
-    /* Obtém o peso da fonte configurado para a camada. */
-    const fontWeight = layer.weight || "700";
-
-    /* Configura a fonte no canvas. */
-    context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-
-    /* Mantém o mesmo alinhamento utilizado no editor. */
+    context.save();
+    context.translate(position.x / 100 * 1080, position.y / 100 * 1920);
+    context.rotate((layer.rotate || 0) * Math.PI / 180);
+    context.font = `${layer.weight || 700} ${pixelSize}px ${fontFamily}`;
+    context.fillStyle = layerColors[index] || layer.color || "#07588c";
     context.textAlign = layer.align || "center";
     context.textBaseline = "middle";
 
-    /* Aplica a cor escolhida pelo cliente. */
-    context.fillStyle = color;
+    if (layer.shadow) {
+      context.shadowColor = "#00538b";
+      context.shadowOffsetX = pixelSize * 0.04;
+      context.shadowOffsetY = pixelSize * 0.05;
+      context.shadowBlur = 0;
+    }
 
-    /* Guarda o estado antes de aplicar rotação e sombra. */
-    context.save();
+    const lines = String(value).split("\n");
+    const lineHeight = pixelSize * Number(layer.lineHeight || 1);
+    const startOffset = -(lines.length - 1) * lineHeight / 2;
 
-    /* Move o ponto de desenho para o centro da camada. */
-    context.translate(x, y);
-
-    /* Aplica a rotação configurada para a camada. */
-    context.rotate(((layer.rotate || 0) * Math.PI) / 180);
-
-    /* Aplica a sombra quando a camada tiver uma sombra configurada. */
-    applyCanvasShadow(context, layer.shadow, CANVAS_WIDTH);
-
-    /* Converte o texto para maiúsculas quando o CSS original o faria. */
-    const text = shouldUppercaseLayer(layer)
-      ? String(value).toUpperCase()
-      : String(value);
-
-    /* Obtém a altura entre linhas. */
-    const lineHeight = fontSize * Number(layer.lineHeight || 1);
-
-    /* Divide o texto pelas quebras de linha introduzidas pelo cliente. */
-    const lines = text.split("\n");
-
-    /* Calcula o deslocamento vertical para centrar várias linhas. */
-    const totalHeight = lineHeight * lines.length;
-    const firstLineY = -(totalHeight - lineHeight) / 2;
-
-    /* Desenha todas as linhas da camada. */
     lines.forEach((line, lineIndex) => {
-      context.fillText(
-        line,
-        0,
-        firstLineY + lineIndex * lineHeight
-      );
+      context.fillText(line, 0, startOffset + lineIndex * lineHeight);
     });
 
-    /* Restaura o estado anterior do canvas. */
     context.restore();
   });
 
-  /*
-    Converte a camada transparente para PNG.
-    O servidor acrescenta depois a imagem privada sem marca d'água.
-  */
   return canvas.toDataURL("image/png");
 }
 
-/* =========================================================
-   CARREGAMENTO DE IMAGENS PARA O CANVAS
-   ========================================================= */
-
-function loadImage(source) {
-  /* Devolve uma Promise para podermos aguardar a imagem. */
-  return new Promise((resolve, reject) => {
-    /* Cria o elemento de imagem temporário. */
-    const image = new Image();
-
-    /* Resolve a Promise quando a imagem estiver pronta. */
-    image.onload = () => resolve(image);
-
-    /* Rejeita a Promise quando a imagem não puder ser carregada. */
-    image.onerror = () => {
-      reject(new Error("Não foi possível carregar a imagem de fundo do convite."));
-    };
-
-    /* Define o caminho da imagem. */
-    image.src = source;
-  });
+/* Mostra um texto legível para o tema. */
+function prettifyClientName(value) {
+  return String(value || "Convites")
+    .replace(/^[^-]+-/, "")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, letter => letter.toUpperCase());
 }
 
-/* =========================================================
-   SOMBRA DO TEXTO NO PNG FINAL
-   ========================================================= */
-
-function applyCanvasShadow(context, shadowValue, canvasWidth) {
-  /* Remove qualquer sombra anterior. */
-  context.shadowBlur = 0;
-  context.shadowOffsetX = 0;
-  context.shadowOffsetY = 0;
-  context.shadowColor = "transparent";
-
-  /* Não faz nada quando a camada não tem sombra. */
-  if (!shadowValue) {
-    return;
-  }
-
-  /* Tenta interpretar o formato usado pelo CSS atual. */
-  const match = String(shadowValue).match(
-    /(-?[0-9.]+)cqw\s+(-?[0-9.]+)cqw\s+0\s+(#[0-9a-fA-F]+)/
-  );
-
-  /* Sai se a sombra tiver um formato que não reconhecemos. */
-  if (!match) {
-    return;
-  }
-
-  /* Converte os valores cqw para pixels da resolução final. */
-  context.shadowOffsetX = Number(match[1]) * canvasWidth / 100;
-  context.shadowOffsetY = Number(match[2]) * canvasWidth / 100;
-  context.shadowBlur = 0;
-  context.shadowColor = match[3];
-}
-
-/* =========================================================
-   TRANSFORMAÇÃO PARA MAIÚSCULAS
-   ========================================================= */
-
-function shouldUppercaseLayer(layer) {
-  /* Obtém as classes visuais da camada. */
-  const classes = String(layer.className || "");
-
-  /* Estas classes têm text-transform: uppercase no CSS do convite. */
-  return [
-    "name",
-    "small-white",
-    "blue",
-    "yellow"
-  ].some(className => classes.split(" ").includes(className));
-}
-
-/* =========================================================
-   FALLBACK PARA MODELOS ANTIGOS
-   ========================================================= */
-
-function renderLegacyInvitation(preview) {
-  const fallback = document.createElement("div");
-  fallback.className = "legacy-preview-content";
-
-  fallback.innerHTML = `
-    <div class="preview-ornament">✦</div>
-    <div class="preview-small">CONVITE</div>
-    <div class="preview-name">
-      ${escapeHtml(getFieldValue("name", ""))}
-    </div>
-    <div class="preview-divider"></div>
-    <div>${escapeHtml(getFieldValue("date", ""))}</div>
-    <div>${escapeHtml(getFieldValue("time", ""))}</div>
-    <div class="preview-place-label">LOCAL</div>
-    <div>${escapeHtml(getFieldValue("place", ""))}</div>
-  `;
-
-  preview.appendChild(fallback);
-}
-
-/* =========================================================
-   SEGURANÇA BÁSICA PARA TEXTO INSERIDO NO HTML
-   ========================================================= */
-
+/* Escapa texto antes de o inserir em HTML. */
 function escapeHtml(value) {
-  return String(value)
+  return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+/* Inicializa quando o catálogo estiver carregado. */
+window.addEventListener("toninvitation:catalog-ready", initializeModelsPage);

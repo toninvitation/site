@@ -1,0 +1,6 @@
+/* Preço apresentado nos cartões dos convites. */
+.template-price {
+  margin: 8px 0 12px;
+  font-weight: 600;
+  color: var(--pink-dark);
+}

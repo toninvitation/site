@@ -1,15 +1,15 @@
 /* =========================================================
-   PÁGINA DE CATEGORIA
-   - Mostra temas (ex.: Infantil -> Toy Story)
-   - Mostra diretamente os convites nas categorias sem temas
-   - Mantém o personalizador dos modelos antigos
+   TONInvitation — PÁGINA DE CATEGORIA
+
+   Os temas e convites são carregados automaticamente pelo servidor.
+   Não é necessário adicionar novos convites a este ficheiro.
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+/* Inicializa a página da categoria. */
+function initializeCategoryPage() {
   const params = new URLSearchParams(location.search);
   const categoryId = params.get("categoria") || "infantil";
   const category = INVITATION_CATEGORIES.find(item => item.id === categoryId);
-
   const header = document.getElementById("category-header");
   const content = document.getElementById("category-content");
 
@@ -21,67 +21,78 @@ document.addEventListener("DOMContentLoaded", () => {
   header.innerHTML = `
     <div class="category-page-title">
       <span class="eyebrow">CATÁLOGO</span>
-      <h1>${category.name}</h1>
+      <h1>${escapeHtml(category.name)}</h1>
       <div class="title-decoration">
         <span></span>
         <b>♥</b>
         <span></span>
       </div>
-      <p>${category.description}</p>
+      <p>${escapeHtml(category.description)}</p>
     </div>
   `;
 
-  /*
-    Categorias com temas:
-    Infantil -> Toy Story -> modelos.html
-  */
   if (category.type === "themes") {
-    const themes = INVITATION_THEMES[categoryId] || [];
-
-    content.innerHTML = `
-      <div class="page-intro">
-        <h2>Escolha o tema</h2>
-        <p>Entre num tema para ver os diferentes convites.</p>
-      </div>
-
-      <div class="theme-grid">
-        ${themes.map(theme => themeCard(theme, categoryId)).join("")}
-      </div>
-    `;
+    renderThemeCategory(content, categoryId);
   } else {
-    /*
-      Categorias sem temas mostram os convites diretamente.
-    */
-    const items = INVITATION_TEMPLATES.filter(
-      item => item.category === categoryId && !item.theme
-    );
-
-    content.innerHTML = `
-      <div class="page-intro">
-        <h2>Escolha o seu convite</h2>
-        <p>Personalize o modelo que mais gostar.</p>
-      </div>
-
-      <div class="invitation-grid">
-        ${items.map(invitationCard).join("")}
-      </div>
-    `;
+    renderDirectCategory(content, categoryId);
   }
 
   lucide.createIcons();
-  setupMenu();
-  setupCustomizer();
-  attachCustomizerButtons();
-});
+  setupCategoryMenu();
+}
 
-/* =========================================================
-   CARTÕES
-   ========================================================= */
+/* Mostra os temas encontrados dentro da pasta da categoria. */
+function renderThemeCategory(content, categoryId) {
+  const themes = Object.values(INVITATION_THEMES)
+    .filter(models => models.some(model => model.category === categoryId))
+    .map(models => models[0].themeId)
+    .filter((themeId, index, list) => list.indexOf(themeId) === index)
+    .map(themeId => {
+      const models = INVITATION_THEMES[themeId] || [];
+      return {
+        id: themeId,
+        name: models[0]?.themeName || getThemeName(themeId),
+        image: models[0]?.themeImage || models[0]?.image || "Images/infantil.jpg",
+        description: models[0]?.themeDescription || `Convites com o tema ${getThemeName(themeId)}.`
+      };
+    });
 
+  content.innerHTML = `
+    <div class="page-intro">
+      <h2>Escolha o tema</h2>
+      <p>Entre num tema para ver os diferentes convites.</p>
+    </div>
+    <div class="theme-grid">
+      ${themes.map(theme => themeCard(theme, categoryId)).join("")}
+    </div>
+  `;
+}
+
+/* Obtém o nome legível de um tema a partir do seu identificador. */
+function getThemeName(themeId) {
+  const model = INVITATION_THEMES[themeId]?.[0];
+  return model?.themeName || themeId.replace(`${model?.category || ""}-`, "");
+}
+
+/* Mostra modelos diretamente quando a categoria não tem temas. */
+function renderDirectCategory(content, categoryId) {
+  const items = INVITATION_TEMPLATES.filter(
+    item => item.category === categoryId && !item.themeId
+  );
+
+  content.innerHTML = `
+    <div class="page-intro">
+      <h2>Escolha o seu convite</h2>
+      <p>Personalize o modelo que mais gostar.</p>
+    </div>
+    <div class="invitation-grid">
+      ${items.map(invitationCard).join("")}
+    </div>
+  `;
+}
+
+/* Cria o cartão visual de um tema. */
 function themeCard(theme, categoryId) {
-  const alternateImages = theme.alternateImages || [];
-  const fallback = theme.fallbackImage || "Images/infantil.jpg";
-
   return `
     <a
       class="theme-card"
@@ -90,45 +101,47 @@ function themeCard(theme, categoryId) {
       <div class="theme-image theme-image-portrait">
         <img
           src="${theme.image}"
-          alt="${theme.name}"
-          data-alternates='${JSON.stringify(alternateImages)}'
-          data-fallback="${fallback}"
-          onerror="handleThemeImageError(this)"
+          alt="${escapeHtml(theme.name)}"
+          onerror="this.src='Images/infantil.jpg'"
         >
       </div>
-
       <div class="theme-info">
-        <h3>${theme.name}</h3>
-        <p>${theme.description}</p>
+        <h3>${escapeHtml(theme.name)}</h3>
+        <p>${escapeHtml(theme.description)}</p>
         <span>Ver convites →</span>
       </div>
     </a>
   `;
 }
 
-/*
-  Se a capa principal do Toy Story tiver outro nome, tentamos a
-  segunda opção antes de usar a imagem genérica da categoria.
-*/
-function handleThemeImageError(image) {
-  const alternates = JSON.parse(image.dataset.alternates || "[]");
-  const currentIndex = Number(image.dataset.alternateIndex || 0);
-
-  if (currentIndex < alternates.length) {
-    image.dataset.alternateIndex = String(currentIndex + 1);
-    image.src = alternates[currentIndex];
-    return;
-  }
-
-  image.onerror = null;
-  image.src = image.dataset.fallback || "Images/infantil.jpg";
+/* Cria cartões para categorias sem subtemas. */
+function invitationCard(template) {
+  return `
+    <article class="invitation-card">
+      <div class="invitation-image invitation-image-portrait">
+        <img
+          src="${template.image}"
+          alt="${escapeHtml(template.name)}"
+          onerror="this.src='${template.fallbackImage || "Images/imagem_inicio.png"}'"
+        >
+      </div>
+      <div class="invitation-info">
+        <h3>${escapeHtml(template.name)}</h3>
+        <p>${escapeHtml(template.description || "")}</p>
+        <button
+          class="btn btn-primary"
+          type="button"
+          onclick="window.location.href='modelos.html?categoria=${encodeURIComponent(template.category)}&modelo=${encodeURIComponent(template.id)}'"
+        >
+          Personalizar
+        </button>
+      </div>
+    </article>
+  `;
 }
 
-/* =========================================================
-   MENU
-   ========================================================= */
-
-function setupMenu() {
+/* Configura o menu mobile da página. */
+function setupCategoryMenu() {
   const menu = document.getElementById("menu");
   const mobileButton = document.getElementById("menu-mobile");
 
@@ -138,187 +151,15 @@ function setupMenu() {
   });
 }
 
-/* =========================================================
-   PERSONALIZADOR DOS MODELOS ANTIGOS
-   ========================================================= */
-
-let selectedTemplate = null;
-let selectedColor = "#d98ea2";
-
-function attachCustomizerButtons() {
-  document.querySelectorAll(".customize-template").forEach(button => {
-    button.addEventListener("click", () => {
-      openCustomizer(button.dataset.template);
-    });
-  });
-}
-
-function openCustomizer(id) {
-  selectedTemplate = INVITATION_TEMPLATES.find(template => template.id === id);
-
-  if (!selectedTemplate) return;
-
-  selectedColor = selectedTemplate.colors?.[0]?.value || "#d98ea2";
-
-  document.getElementById("customizer-title").textContent =
-    `Personalize: ${selectedTemplate.name}`;
-
-  document.getElementById("field-name").value = selectedTemplate.defaultName || "";
-  document.getElementById("field-date").value = selectedTemplate.defaultDate || "";
-  document.getElementById("field-time").value = selectedTemplate.defaultTime || "";
-  document.getElementById("field-place").value = selectedTemplate.defaultPlace || "";
-  document.getElementById("field-email").value = "";
-  document.getElementById("form-message").textContent = "";
-
-  buildColors();
-  updatePreview();
-
-  const modal = document.getElementById("customizer-modal");
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-}
-
-function closeCustomizer() {
-  const modal = document.getElementById("customizer-modal");
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
-}
-
-document.querySelectorAll("[data-close-modal]").forEach(element => {
-  element.addEventListener("click", closeCustomizer);
-});
-
-function buildColors() {
-  const box = document.getElementById("color-options");
-  const colors = selectedTemplate?.colors || [];
-
-  box.innerHTML = colors.map((color, index) => `
-    <button
-      type="button"
-      class="color-choice ${index === 0 ? "active" : ""}"
-      data-color="${color.value}"
-      style="background:${color.value}"
-      title="${color.name}"
-      aria-label="${color.name}"
-    ></button>
-  `).join("");
-
-  box.querySelectorAll("button").forEach(button => {
-    button.addEventListener("click", () => {
-      box.querySelectorAll("button").forEach(item => {
-        item.classList.remove("active");
-      });
-
-      button.classList.add("active");
-      selectedColor = button.dataset.color;
-      updatePreview();
-    });
-  });
-}
-
-function updatePreview() {
-  if (!selectedTemplate) return;
-
-  document.getElementById("preview-name").textContent =
-    document.getElementById("field-name").value || selectedTemplate.defaultName;
-
-  document.getElementById("preview-date").textContent =
-    document.getElementById("field-date").value || selectedTemplate.defaultDate;
-
-  document.getElementById("preview-time").textContent =
-    document.getElementById("field-time").value || selectedTemplate.defaultTime;
-
-  document.getElementById("preview-place").textContent =
-    document.getElementById("field-place").value || selectedTemplate.defaultPlace;
-
-  document
-    .getElementById("invitation-preview")
-    .style.setProperty("--preview-main", selectedColor);
-}
-
-["name", "date", "time", "place"].forEach(field => {
-  document.getElementById(`field-${field}`)?.addEventListener("input", updatePreview);
-});
-
-function setupCustomizer() {
-  const form = document.getElementById("customizer-form");
-
-  if (!form) return;
-
-  form.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    const email = document.getElementById("field-email").value.trim();
-    const message = document.getElementById("form-message");
-    const button = event.currentTarget.querySelector("button[type=submit]");
-
-    if (!email) {
-      message.textContent = "Indique o e-mail onde pretende receber o convite.";
-      return;
-    }
-
-    const order = {
-      templateId: selectedTemplate.id,
-      templateName: selectedTemplate.name,
-      color: selectedColor,
-      name: document.getElementById("field-name").value || selectedTemplate.defaultName,
-      date: document.getElementById("field-date").value || selectedTemplate.defaultDate,
-      time: document.getElementById("field-time").value || selectedTemplate.defaultTime,
-      place: document.getElementById("field-place").value || selectedTemplate.defaultPlace,
-      email
-    };
-
-    button.disabled = true;
-    button.textContent = "A confirmar...";
-
-    try {
-      const response = await fetch("/api/confirm-payment-test", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(order)
-      });
-
-      const text = await response.text();
-      let data;
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(
-          "Abra o site em http://localhost:3000 e mantenha o servidor ligado."
-        );
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error || "Não foi possível concluir o pedido.");
-      }
-
-      message.innerHTML = `
-        <span class="payment-success">
-          <strong>Pagamento efetuado com sucesso!</strong><br>
-          O seu convite está a ser preparado e será enviado para
-          <strong>${escapeHtml(email)}</strong>.
-        </span>
-      `;
-
-      button.textContent = "Pagamento confirmado";
-    } catch (error) {
-      message.textContent = error.message;
-      button.disabled = false;
-      button.textContent = "Confirmar pagamento";
-    }
-  });
-}
-
+/* Escapa texto antes de o colocar em HTML. */
 function escapeHtml(value) {
-  return String(value)
+  return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+/* Inicializa quando o catálogo automático estiver pronto. */
+window.addEventListener("toninvitation:catalog-ready", initializeCategoryPage);

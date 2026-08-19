@@ -1,90 +1,62 @@
 /* =========================================================
-   CATEGORIAS E TEMAS DO CATÁLOGO
+   TONInvitation — CATÁLOGO AUTOMÁTICO
+
+   Este ficheiro NÃO contém a lista manual dos convites.
+   O servidor lê a pasta Categorias e envia automaticamente
+   categorias, temas e modelos para o navegador.
+
+   Para adicionar um novo convite:
+   1. Cria a pasta do modelo.
+   2. Coloca as imagens com os sufixos esperados.
+   3. Reinicia o servidor.
+
+   Nenhum código do catálogo precisa de ser alterado.
    ========================================================= */
 
-const INVITATION_CATEGORIES = [
-  {
-    id: "infantil",
-    name: "Infantil",
-    image: "Images/infantil.jpg",
-    description: "Temas divertidos para festas dos mais pequenos.",
-    type: "themes"
-  },
-  {
-    id: "casamentos",
-    name: "Casamentos",
-    image: "Images/casamentos.jpg",
-    description: "Convites românticos e elegantes para o grande dia.",
-    type: "invitations"
-  },
-  {
-    id: "adultos",
-    name: "Adultos",
-    image: "Images/adultos.jpg",
-    description: "Aniversários e celebrações para adultos.",
-    type: "invitations"
-  },
-  {
-    id: "cha-bebe",
-    name: "Chá de Bebé",
-    image: "Images/cha_bebe.jpg",
-    description: "Modelos delicados para celebrar a chegada do bebé.",
-    type: "invitations"
-  },
-  {
-    id: "batizados",
-    name: "Batizados",
-    image: "Images/batizados.jpg",
-    description: "Convites delicados para um momento especial.",
-    type: "invitations"
-  },
-  {
-    id: "formaturas",
-    name: "Formaturas",
-    image: "Images/formaturas.jpg",
-    description: "Modelos para celebrar uma grande conquista.",
-    type: "invitations"
-  },
-  {
-    id: "outros-eventos",
-    name: "Outros Eventos",
-    image: "Images/outros eventos.jpg",
-    description: "Outras ocasiões especiais.",
-    type: "invitations"
-  }
-];
+/* Guarda as categorias descobertas pelo servidor. */
+let INVITATION_CATEGORIES = [];
 
-/*
-  Cada tema aponta para a imagem que representa a coleção.
+/* Guarda os temas descobertos pelo servidor. */
+let INVITATION_THEMES = {};
 
-  Para o Toy Story aceitamos os dois nomes mais prováveis da capa.
-  A primeira opção é a que deve existir na tua pasta; a segunda é
-  usada automaticamente se o primeiro nome não for encontrado.
-*/
-const INVITATION_THEMES = {
-  infantil: [
-    {
-      id: "cars",
-      name: "Cars",
-      image: "Images/infantil.jpg",
-      description: "Convites para fãs de Cars.",
-      folder: "Cars"
-    },
-    {
-      id: "kpop-demon-hunters",
-      name: "K-Pop Demon Hunters",
-      image: "Images/infantil.jpg",
-      description: "Convites com o tema K-Pop Demon Hunters.",
-      folder: "K-Pop Demon Hunters"
-    },
-    {
-      id: "toy-story",
-      name: "Toy Story",
-      image: "Categorias/Infantil/Toy Story/Toy Story1/Toy Story_capa.png",
-      alternateImages: "Categorias/Infantil/Toy Story/Toy Story1/Toy Story_capa.png",
-      fallbackImage: "Images/infantil.jpg",
-      description: "Convites com o tema Toy Story.",
-      folder: "Toy Story"
+/* Guarda os modelos descobertos pelo servidor. */
+let INVITATION_TEMPLATES = [];
+
+/* Indica se o catálogo já foi carregado. */
+let catalogReady = false;
+
+/* Carrega o catálogo automático a partir do servidor. */
+async function loadAutomaticCatalog() {
+  try {
+    const response = await fetch("/api/catalog", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Não foi possível carregar o catálogo.");
     }
-  ]
-};
+
+    const catalog = await response.json();
+
+    INVITATION_CATEGORIES = catalog.categories || [];
+    INVITATION_THEMES = catalog.themes || {};
+    INVITATION_TEMPLATES = catalog.templates || [];
+    catalogReady = true;
+
+    /* Informa todas as páginas de que os dados já estão disponíveis. */
+    window.dispatchEvent(
+      new CustomEvent("toninvitation:catalog-ready")
+    );
+  } catch (error) {
+    console.error("Erro ao carregar o catálogo automático:", error);
+
+    /* Mostra uma mensagem simples caso o servidor não esteja ligado. */
+    document.querySelectorAll("[data-catalog-error]").forEach(element => {
+      element.textContent =
+        "Não foi possível carregar os convites. Confirme que o servidor está ligado.";
+    });
+  }
+}
+
+/* Inicia o carregamento do catálogo. */
+loadAutomaticCatalog();

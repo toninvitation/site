@@ -49,7 +49,7 @@ const ROOT_DIRECTORY = __dirname;
 const ORDERS_DIRECTORY = path.join(ROOT_DIRECTORY, "data", "orders");
 
 /* Define o tamanho máximo permitido para pedidos JSON. */
-const JSON_LIMIT = "30mb";
+const JSON_LIMIT = "25mb";
 
 /* Permite receber JSON enviado pelo personalizador. */
 app.use(express.json({ limit: JSON_LIMIT }));
@@ -168,7 +168,7 @@ function validateOrderInput(input) {
 
   /* Verifica o e-mail do cliente. */
   if (!input.email || !/^\S+@\S+\.\S+$/.test(input.email)) {
-    return "Insira um e-mail válido.";
+    return "Indica um e-mail válido.";
   }
 
   /* Verifica se foi enviada a camada transparente com os textos. */
@@ -618,6 +618,297 @@ app.get("/api/orders/:orderId", (request, response) => {
     createdAt: order.createdAt,
     paidAt: order.paidAt || null
   });
+});
+
+
+
+/* =========================================================
+   CATÁLOGO AUTOMÁTICO A PARTIR DAS PASTAS
+   ========================================================= */
+
+/* Converte um nome de pasta num identificador estável para o navegador. */
+function createCatalogId(...parts) {
+  return parts
+    .join("-")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/* Cria uma URL pública segura a partir de partes de caminho. */
+function createPublicCategoryPath(...parts) {
+  return ["Categorias", ...parts].join("/");
+}
+
+/* Procura um ficheiro dentro de uma pasta sem depender de maiúsculas/minúsculas. */
+function findFileCaseInsensitive(directory, predicate) {
+  if (!fs.existsSync(directory)) {
+    return null;
+  }
+
+  const entries = fs.readdirSync(directory, { withFileTypes: true });
+  const file = entries.find(entry => entry.isFile() && predicate(entry.name));
+
+  return file ? file.name : null;
+}
+
+/* Procura a imagem com um sufixo específico. */
+function findImageBySuffix(directory, suffix) {
+  return findFileCaseInsensitive(
+    directory,
+    fileName => new RegExp(`${suffix}\\.(png|jpg|jpeg|webp)$`, "i").test(fileName)
+  );
+}
+
+/* Converte o nome de uma pasta de modelo num nome apresentado ao cliente. */
+function prettifyModelName(folderName) {
+  return String(folderName || "Convite")
+    .replace(/[-_]+/g, " ")
+    .replace(/([a-z])([0-9])/gi, "$1 $2")
+    .trim();
+}
+
+/* Cria camadas de texto genéricas para novos modelos. */
+function createDefaultTextLayers() {
+  return [
+    { field: "name", x: 50, y: 18, size: 10, font: "Sigmar One, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "faz", x: 50, y: 28, size: 6, font: "HortaRegular, Horta, sans-serif", color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "age", x: 50, y: 38, size: 15, font: "Sigmar One, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.85, align: "center" },
+    { field: "anos", x: 50, y: 46, size: 6, font: "Sigmar One, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "adventure", x: 50, y: 55, size: 5, font: "HortaRegular, Horta, sans-serif", color: "#07588c", weight: 700, lineHeight: 0.95, align: "center" },
+    { field: "date-month", x: 38, y: 64, size: 4, font: "HortaRegular, Horta, sans-serif", color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "date-day", x: 38, y: 70, size: 8, font: "HortaRegular, Horta, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.85, align: "center" },
+    { field: "weekday-time", x: 67, y: 64, size: 3.5, font: "HortaRegular, Horta, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
+    { value: "LOCAL", className: "small-white place-label", x: 67, y: 69, size: 3.5, font: "HortaRegular, Horta, sans-serif", color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "place", x: 67, y: 73, size: 2.5, font: "HortaRegular, Horta, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.95, align: "center" },
+    { field: "end", x: 50, y: 81, size: 5, font: "HortaRegular, Horta, sans-serif", color: "#07588c", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "otherInfo", x: 50, y: 89, size: 3.5, font: "HortaRegular, Horta, sans-serif", color: "#07588c", weight: 600, lineHeight: 1, align: "center" }
+  ];
+}
+
+/* Lê um eventual config.json opcional sem obrigar o utilizador a criá-lo. */
+function readOptionalModelConfig(modelDirectory) {
+  const configPath = path.join(modelDirectory, "config.json");
+
+  if (!fs.existsSync(configPath)) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(configPath, "utf8"));
+  } catch (error) {
+    console.warn(`Configuração inválida ignorada: ${configPath}`);
+    return {};
+  }
+}
+
+/* Descobre automaticamente todos os modelos existentes dentro de um tema. */
+function discoverThemeModels(categoryFolderName, themeFolderName, themeDirectory) {
+  const models = [];
+  const entries = fs.readdirSync(themeDirectory, { withFileTypes: true });
+
+  entries
+    .filter(entry => entry.isDirectory())
+    .forEach(modelEntry => {
+      const modelDirectory = path.join(themeDirectory, modelEntry.name);
+      const completeFile = findImageBySuffix(modelDirectory, "_completo");
+      const publicFile = findImageBySuffix(modelDirectory, "_com");
+
+      if (!completeFile && !publicFile) {
+        return;
+      }
+
+      const config = readOptionalModelConfig(modelDirectory);
+      const modelId = createCatalogId(categoryFolderName, themeFolderName, modelEntry.name);
+      const previewFile = publicFile || completeFile;
+
+      models.push({
+        id: modelId,
+        name: config.name || prettifyModelName(modelEntry.name),
+        category: createCatalogId(categoryFolderName),
+        theme: themeFolderName ? createCatalogId(categoryFolderName, themeFolderName) : null,
+        themeId: themeFolderName ? createCatalogId(categoryFolderName, themeFolderName) : null,
+        themeName: themeFolderName || null,
+        image: createPublicCategoryPath(
+          categoryFolderName,
+          themeFolderName,
+          modelEntry.name,
+          completeFile || previewFile
+        ),
+        previewImage: createPublicCategoryPath(
+          categoryFolderName,
+          themeFolderName,
+          modelEntry.name,
+          previewFile
+        ),
+        fallbackImage: "Images/infantil.jpg",
+        description: config.description || `Convite personalizado — ${prettifyModelName(modelEntry.name)}.`,
+        priceEUR: Number(config.priceEUR || 5),
+        defaultName: config.defaultName || "João",
+        defaultAge: config.defaultAge || "3",
+        defaultDate: config.defaultDate || "2026-05-10",
+        defaultTime: config.defaultTime || "15H",
+        defaultPlace: config.defaultPlace || "Local da festa",
+        defaultAdventure: config.defaultAdventure || "VEM PARTICIPAR\nNESSA AVENTURA!",
+        defaultFaz: config.defaultFaz || "FAZ",
+        defaultAnos: config.defaultAnos || "ANOS",
+        defaultEnd: config.defaultEnd || "ESPERAMOS POR TI!",
+        defaultOtherInfo: config.defaultOtherInfo || "",
+        defaultOtherInfoColor: config.defaultOtherInfoColor || "#07588c",
+        textLayers: Array.isArray(config.textLayers)
+          ? config.textLayers
+          : createDefaultTextLayers()
+      });
+    });
+
+  return models;
+}
+
+/* Descobre automaticamente categorias, temas e modelos da pasta Categorias. */
+function discoverCatalog() {
+  const categoriesDirectory = path.join(ROOT_DIRECTORY, "Categorias");
+
+  if (!fs.existsSync(categoriesDirectory)) {
+    return {
+      categories: [],
+      themes: {},
+      templates: []
+    };
+  }
+
+  const categoryImageMap = {
+    "Adultos": "Images/adultos.jpg",
+    "Infantil": "Images/infantil.jpg",
+    "Outros": "Images/outros eventos.jpg",
+    "Batizados": "Images/batizados.jpg",
+    "Chá de bebé": "Images/cha_bebe.jpg",
+    "Casamentos": "Images/casamentos.jpg",
+    "Formaturas": "Images/formaturas.jpg"
+  };
+
+  const categoryDescriptionMap = {
+    "Adultos": "Aniversários e celebrações para adultos.",
+    "Infantil": "Temas divertidos para festas dos mais pequenos.",
+    "Outros": "Convites para outras ocasiões especiais.",
+    "Batizados": "Convites delicados para um momento especial.",
+    "Chá de bebé": "Modelos delicados para celebrar a chegada do bebé.",
+    "Casamentos": "Convites românticos e elegantes para o grande dia.",
+    "Formaturas": "Modelos para celebrar uma grande conquista."
+  };
+
+  const categories = [];
+  const themes = {};
+  const templates = [];
+  const categoryEntries = fs.readdirSync(categoriesDirectory, { withFileTypes: true });
+
+  categoryEntries
+    .filter(entry => entry.isDirectory())
+    .forEach(categoryEntry => {
+      const categoryName = categoryEntry.name;
+      const categoryId = createCatalogId(categoryName);
+      const categoryDirectory = path.join(categoriesDirectory, categoryName);
+      const childDirectories = fs
+        .readdirSync(categoryDirectory, { withFileTypes: true })
+        .filter(entry => entry.isDirectory());
+
+      const themeList = [];
+      const directModels = discoverThemeModels(
+        categoryName,
+        "",
+        categoryDirectory
+      );
+
+      childDirectories.forEach(childEntry => {
+        const childDirectory = path.join(categoryDirectory, childEntry.name);
+        const nestedDirectories = fs
+          .readdirSync(childDirectory, { withFileTypes: true })
+          .filter(entry => entry.isDirectory());
+
+        const nestedModels = discoverThemeModels(
+          categoryName,
+          childEntry.name,
+          childDirectory
+        );
+
+        if (nestedModels.length > 0) {
+          const themeId = createCatalogId(categoryName, childEntry.name);
+          const coverFile =
+            findFileCaseInsensitive(
+              childDirectory,
+              fileName => /_capa\.(png|jpg|jpeg|webp)$/i.test(fileName)
+            ) ||
+            findImageBySuffix(childDirectory, "_capa");
+
+          const firstModel = nestedModels[0];
+          const themeImage = coverFile
+            ? createPublicCategoryPath(categoryName, childEntry.name, coverFile)
+            : firstModel.image;
+
+          nestedModels.forEach(model => {
+            model.themeImage = themeImage;
+            model.themeDescription = `Convites com o tema ${childEntry.name}.`;
+          });
+
+          themeList.push({
+            id: themeId,
+            name: childEntry.name,
+            image: themeImage,
+            description: `Convites com o tema ${childEntry.name}.`,
+            folder: childEntry.name
+          });
+
+          themes[themeId] = nestedModels;
+          templates.push(...nestedModels);
+          return;
+        }
+
+      });
+
+      if (themeList.length > 0) {
+        categories.push({
+          id: categoryId,
+          name: categoryName,
+          image: categoryImageMap[categoryName] || "Images/imagem_inicio.png",
+          description: categoryDescriptionMap[categoryName] || "Convites digitais personalizados.",
+          type: "themes"
+        });
+        return;
+      }
+
+      const modelsInCategory = directModels.length > 0
+        ? directModels
+        : discoverThemeModels(categoryName, "", categoryDirectory);
+
+      categories.push({
+        id: categoryId,
+        name: categoryName,
+        image: categoryImageMap[categoryName] || "Images/imagem_inicio.png",
+        description: categoryDescriptionMap[categoryName] || "Convites digitais personalizados.",
+        type: "invitations"
+      });
+
+      templates.push(...modelsInCategory);
+    });
+
+  return {
+    categories,
+    themes,
+    templates
+  };
+}
+
+/* Entrega ao navegador apenas o catálogo público. */
+app.get("/api/catalog", (request, response) => {
+  try {
+    return response.json(discoverCatalog());
+  } catch (error) {
+    console.error("Erro ao construir catálogo automático:", error);
+    return response.status(500).json({
+      error: "Não foi possível carregar o catálogo."
+    });
+  }
 });
 
 /* =========================================================

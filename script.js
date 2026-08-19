@@ -1,27 +1,24 @@
 /* =========================================================
-   SCRIPT DA PÁGINA INICIAL
-   - Menu mobile
-   - Grelha de categorias
-   - Carrossel de avaliações
+   TONInvitation — PÁGINA INICIAL
+   Controla o menu mobile, categorias e avaliações.
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
-  /* -------------------------
-     Menu mobile
-     ------------------------- */
+/* Inicializa a página depois de o catálogo automático estar disponível. */
+function initializeHomePage() {
+  /* Obtém os elementos do menu mobile. */
   const menu = document.getElementById("menu");
   const mobileButton = document.getElementById("menu-mobile");
 
+  /* Abre e fecha o menu em dispositivos pequenos. */
   mobileButton?.addEventListener("click", () => {
     const open = menu.classList.toggle("ativo");
     mobileButton.classList.toggle("aberto", open);
   });
 
-  /* -------------------------
-     Grelha de categorias
-     ------------------------- */
+  /* Obtém a grelha de categorias. */
   const grid = document.getElementById("category-grid");
 
+  /* Preenche automaticamente a grelha com as categorias encontradas. */
   if (grid) {
     grid.innerHTML = INVITATION_CATEGORIES.map(category => `
       <a
@@ -39,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <i data-lucide="arrow-right"></i>
           </div>
         </div>
-
         <div class="category-info">
           <h3>${category.name}</h3>
           <p>${category.description}</p>
@@ -48,16 +44,20 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
+  /* Atualiza os ícones depois de criar os cartões. */
   lucide.createIcons();
 
-  /* -------------------------
-     Carrossel de avaliações
-     ------------------------- */
+  /* Configura o carrossel de avaliações. */
+  setupReviewsCarousel();
+}
+
+/* Configura o carrossel de avaliações. */
+function setupReviewsCarousel() {
   const list = document.querySelector(".reviews-list");
   const reviews = document.querySelectorAll(".review");
   let current = 0;
 
-  const visibleReviews = () => (window.innerWidth <= 900 ? 1 : 3);
+  const visibleReviews = () => window.innerWidth <= 900 ? 1 : 3;
 
   function updateReviews() {
     if (!list) return;
@@ -83,4 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("resize", updateReviews);
   updateReviews();
-});
+}
+
+/* Inicializa quando o catálogo automático estiver pronto. */
+window.addEventListener("toninvitation:catalog-ready", initializeHomePage);
