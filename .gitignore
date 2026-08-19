@@ -1,0 +1,12 @@
+# Dependências instaladas pelo npm.
+node_modules/
+
+# Variáveis privadas de ambiente.
+.env
+
+# Pedidos e ficheiros gerados durante os testes.
+data/orders/
+
+# Ficheiros temporários do sistema.
+.DS_Store
+Thumbs.db

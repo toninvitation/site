@@ -1,9 +1,4 @@
 /* =========================================================
-   TONInvitation — PÁGINA DE MODELOS E PERSONALIZADOR
-   Mostra os modelos de um tema e controla o editor Toy Story.
-   ========================================================= */
-
-/* =========================================================
    PÁGINA DE MODELOS / PERSONALIZADOR
 
    Toy Story 1:
@@ -797,28 +792,51 @@ function getOtherInfoColor() {
    ========================================================= */
 
 function setupCustomizer() {
+  /* Localiza o formulário principal do personalizador. */
   const form = document.getElementById("customizer-form");
 
-  if (!form) return;
+  /* Interrompe a configuração se a página não tiver formulário. */
+  if (!form) {
+    return;
+  }
 
+  /* Trata a criação de um novo pedido. */
   form.addEventListener("submit", async event => {
+    /* Impede o envio tradicional do formulário. */
     event.preventDefault();
 
-    const email = document.getElementById("field-email").value.trim();
+    /* Lê os elementos usados durante o processo. */
+    const emailInput = document.getElementById("field-email");
     const message = document.getElementById("form-message");
-    const button = event.currentTarget.querySelector("button[type=submit]");
+    const submitButton = form.querySelector("button[type=submit]");
+    const paymentPanel = document.getElementById("test-payment-panel");
+    const paymentLink = document.getElementById("test-payment-link");
+    const orderIdElement = document.getElementById("test-order-id");
+    const paymentStatus = document.getElementById("test-payment-status");
 
+    /* Limpa mensagens anteriores. */
+    message.textContent = "";
+    paymentStatus.textContent = "";
+
+    /* Obtém o e-mail introduzido pelo cliente. */
+    const email = emailInput.value.trim();
+
+    /* Impede a criação do pedido sem e-mail. */
     if (!email) {
       message.textContent = "Indique o e-mail onde pretende receber o convite.";
+      emailInput.focus();
       return;
     }
 
+    /* Obtém a informação calculada da data escolhida. */
     const selectedDate = getFieldValue("date", "");
     const dateInfo = formatSelectedDate(selectedDate);
 
+    /* Monta todos os dados necessários para identificar o pedido. */
     const order = {
       templateId: selectedTemplate.id,
       templateName: selectedTemplate.name,
+      previewImage: selectedTemplate.previewImage || "",
       name: getFieldValue("name", selectedTemplate.defaultName),
       age: getFieldValue("age", selectedTemplate.defaultAge),
       date: selectedDate,
@@ -830,57 +848,264 @@ function setupCustomizer() {
       anos: getFieldValue("anos", selectedTemplate.defaultAnos),
       end: getFieldValue("end", selectedTemplate.defaultEnd),
       otherInfo: getFieldValue("otherInfo", selectedTemplate.defaultOtherInfo),
-      otherInfoColor: getOtherInfoColor(),
       positions: cloneObject(layerPositions),
       sizes: cloneObject(layerSizes),
       colors: cloneObject(layerColors),
       email
     };
 
-    button.disabled = true;
-    button.textContent = "A confirmar...";
+    /* Desativa o botão enquanto o convite é preparado. */
+    submitButton.disabled = true;
+    submitButton.textContent = "A preparar o pedido...";
 
     try {
-      const response = await fetch("/api/confirm-payment-test", {
+      /*
+        Gera uma camada PNG transparente com apenas os textos personalizados.
+        O servidor junta esta camada à imagem privada sem marca d'água.
+        O ficheiro final continua sempre com 1080x1920 px.
+      */
+      const textOverlayDataUrl = await renderFinalInvitationToPng();
+
+      /* Envia o pedido e a imagem final para o backend. */
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(order)
+        body: JSON.stringify({
+          ...order,
+          textOverlayDataUrl
+        })
       });
 
-      const text = await response.text();
-      let data;
+      /* Lê a resposta do servidor. */
+      const data = await response.json();
 
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(
-          "Abra o site em http://localhost:3000 e mantenha o servidor ligado."
-        );
-      }
-
+      /* Mostra o erro devolvido pelo servidor. */
       if (!response.ok) {
-        throw new Error(
-          data.error || "Não foi possível concluir o pedido."
-        );
+        throw new Error(data.error || "Não foi possível criar o pedido.");
       }
 
-      message.innerHTML = `
-        <span class="payment-success">
-          <strong>Pagamento efetuado com sucesso!</strong><br>
-          O seu convite está a ser preparado e será enviado para
-          <strong>${escapeHtml(email)}</strong>.
-        </span>
-      `;
+      /* Mostra o Order ID criado pelo servidor. */
+      orderIdElement.textContent = `Order ID: ${data.orderId}`;
 
-      button.textContent = "Pagamento confirmado";
+      /* Cria o link para a página que simula a plataforma de pagamento. */
+      paymentLink.href = `/test-payment.html?orderId=${encodeURIComponent(data.orderId)}`;
+
+      /* Mostra a área de pagamento de teste. */
+      paymentPanel.hidden = false;
+
+      /* Informa o cliente sobre o passo seguinte. */
+      paymentStatus.textContent =
+        "O pedido foi criado. Abra o pagamento de teste para confirmar o pagamento.";
+
+      /* Atualiza o botão principal. */
+      submitButton.textContent = "Pedido criado";
+
+      /* Mostra uma mensagem geral de sucesso. */
+      message.textContent =
+        "O seu pedido foi criado. O próximo passo é confirmar o pagamento.";
     } catch (error) {
+      /* Mostra qualquer erro ocorrido durante a criação do pedido. */
       message.textContent = error.message;
-      button.disabled = false;
-      button.textContent = "Confirmar pagamento";
+      submitButton.disabled = false;
+      submitButton.textContent = "Criar pedido";
     }
   });
+}
+
+/* =========================================================
+   GERAÇÃO DO PNG FINAL
+   ========================================================= */
+
+async function renderFinalInvitationToPng() {
+  /* Define a resolução real exigida para todos os convites. */
+  const CANVAS_WIDTH = 1080;
+  const CANVAS_HEIGHT = 1920;
+
+  /* Cria o canvas que vai receber o convite final. */
+  const canvas = document.createElement("canvas");
+  canvas.width = CANVAS_WIDTH;
+  canvas.height = CANVAS_HEIGHT;
+
+  /* Obtém o contexto 2D usado para desenhar a imagem e os textos. */
+  const context = canvas.getContext("2d");
+
+  /* Aguarda o carregamento das fontes antes de desenhar o texto. */
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
+  /*
+    IMPORTANTE: não desenhamos aqui a imagem com marca d'água.
+    Este canvas fica transparente e contém apenas os textos personalizados.
+    O servidor aplica esta camada sobre ToyStory1_sem.png, que está na pasta
+    privada do repositório e nunca é exposta diretamente ao cliente.
+  */
+
+  /* Desenha cada camada de texto no mesmo sistema de coordenadas do editor. */
+  selectedTemplate.textLayers.forEach((layer, index) => {
+    /* Obtém o texto atualmente escolhido pelo cliente. */
+    const value = getLayerValue(layer);
+
+    /* Ignora camadas vazias. */
+    if (!value) {
+      return;
+    }
+
+    /* Obtém a posição atual da camada. */
+    const position = layerPositions[index] || {
+      x: layer.x,
+      y: layer.y
+    };
+
+    /* Obtém o tamanho atual da camada. */
+    const size = layerSizes[index] ?? layer.size;
+
+    /* Obtém a cor atual da camada. */
+    const color = layerColors[index] || layer.color || "#07588c";
+
+    /* Converte a percentagem de tamanho para pixels na resolução final. */
+    const fontSize = (Number(size) / 100) * CANVAS_WIDTH;
+
+    /* Converte a posição percentual para pixels. */
+    const x = (Number(position.x) / 100) * CANVAS_WIDTH;
+    const y = (Number(position.y) / 100) * CANVAS_HEIGHT;
+
+    /* Obtém o nome da fonte configurada para a camada. */
+    const fontFamily = layer.font || "HortaRegular, Horta, sans-serif";
+
+    /* Obtém o peso da fonte configurado para a camada. */
+    const fontWeight = layer.weight || "700";
+
+    /* Configura a fonte no canvas. */
+    context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+    /* Mantém o mesmo alinhamento utilizado no editor. */
+    context.textAlign = layer.align || "center";
+    context.textBaseline = "middle";
+
+    /* Aplica a cor escolhida pelo cliente. */
+    context.fillStyle = color;
+
+    /* Guarda o estado antes de aplicar rotação e sombra. */
+    context.save();
+
+    /* Move o ponto de desenho para o centro da camada. */
+    context.translate(x, y);
+
+    /* Aplica a rotação configurada para a camada. */
+    context.rotate(((layer.rotate || 0) * Math.PI) / 180);
+
+    /* Aplica a sombra quando a camada tiver uma sombra configurada. */
+    applyCanvasShadow(context, layer.shadow, CANVAS_WIDTH);
+
+    /* Converte o texto para maiúsculas quando o CSS original o faria. */
+    const text = shouldUppercaseLayer(layer)
+      ? String(value).toUpperCase()
+      : String(value);
+
+    /* Obtém a altura entre linhas. */
+    const lineHeight = fontSize * Number(layer.lineHeight || 1);
+
+    /* Divide o texto pelas quebras de linha introduzidas pelo cliente. */
+    const lines = text.split("\n");
+
+    /* Calcula o deslocamento vertical para centrar várias linhas. */
+    const totalHeight = lineHeight * lines.length;
+    const firstLineY = -(totalHeight - lineHeight) / 2;
+
+    /* Desenha todas as linhas da camada. */
+    lines.forEach((line, lineIndex) => {
+      context.fillText(
+        line,
+        0,
+        firstLineY + lineIndex * lineHeight
+      );
+    });
+
+    /* Restaura o estado anterior do canvas. */
+    context.restore();
+  });
+
+  /*
+    Converte a camada transparente para PNG.
+    O servidor acrescenta depois a imagem privada sem marca d'água.
+  */
+  return canvas.toDataURL("image/png");
+}
+
+/* =========================================================
+   CARREGAMENTO DE IMAGENS PARA O CANVAS
+   ========================================================= */
+
+function loadImage(source) {
+  /* Devolve uma Promise para podermos aguardar a imagem. */
+  return new Promise((resolve, reject) => {
+    /* Cria o elemento de imagem temporário. */
+    const image = new Image();
+
+    /* Resolve a Promise quando a imagem estiver pronta. */
+    image.onload = () => resolve(image);
+
+    /* Rejeita a Promise quando a imagem não puder ser carregada. */
+    image.onerror = () => {
+      reject(new Error("Não foi possível carregar a imagem de fundo do convite."));
+    };
+
+    /* Define o caminho da imagem. */
+    image.src = source;
+  });
+}
+
+/* =========================================================
+   SOMBRA DO TEXTO NO PNG FINAL
+   ========================================================= */
+
+function applyCanvasShadow(context, shadowValue, canvasWidth) {
+  /* Remove qualquer sombra anterior. */
+  context.shadowBlur = 0;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.shadowColor = "transparent";
+
+  /* Não faz nada quando a camada não tem sombra. */
+  if (!shadowValue) {
+    return;
+  }
+
+  /* Tenta interpretar o formato usado pelo CSS atual. */
+  const match = String(shadowValue).match(
+    /(-?[0-9.]+)cqw\s+(-?[0-9.]+)cqw\s+0\s+(#[0-9a-fA-F]+)/
+  );
+
+  /* Sai se a sombra tiver um formato que não reconhecemos. */
+  if (!match) {
+    return;
+  }
+
+  /* Converte os valores cqw para pixels da resolução final. */
+  context.shadowOffsetX = Number(match[1]) * canvasWidth / 100;
+  context.shadowOffsetY = Number(match[2]) * canvasWidth / 100;
+  context.shadowBlur = 0;
+  context.shadowColor = match[3];
+}
+
+/* =========================================================
+   TRANSFORMAÇÃO PARA MAIÚSCULAS
+   ========================================================= */
+
+function shouldUppercaseLayer(layer) {
+  /* Obtém as classes visuais da camada. */
+  const classes = String(layer.className || "");
+
+  /* Estas classes têm text-transform: uppercase no CSS do convite. */
+  return [
+    "name",
+    "small-white",
+    "blue",
+    "yellow"
+  ].some(className => classes.split(" ").includes(className));
 }
 
 /* =========================================================

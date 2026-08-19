@@ -1,10 +1,4 @@
 /* =========================================================
-   TONInvitation — CONFIGURAÇÃO DOS MODELOS
-   Cada objeto descreve um convite, as suas imagens e camadas.
-   As posições das camadas usam percentagens do canvas 1080x1920.
-   ========================================================= */
-
-/* =========================================================
    MODELOS DE CONVITES
 
    Cada objeto representa um convite do catálogo.

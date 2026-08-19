@@ -1,952 +1,83 @@
 /* Estilos principais TONInvitation */
-/* Regra de estilo: :root. */
-:root {
-  --cream:#f9ebe1;
-  --cream-light:#fff7f4;
-  --brown:#5b4038;
-  --brown-soft:#6d5b55;
-  --pink:#d68588;
-  --pink-dark:#895562;
-  --pink-soft:#d98ea2;
-  --line:#ead2db
-}
-/* Regra de estilo: *. */
-* {
-  box-sizing:border-box;
-  margin:0;
-  padding:0
-}
-/* Regra de estilo: html. */
-html {
-  scroll-behavior:smooth
-}
-/* Regra de estilo: body. */
-body {
-  font-family:Poppins,sans-serif;
-  color:var(--brown);
-  overflow-x:hidden
-}
-/* Regra de estilo: a. */
-a {
-  color:inherit
-}
-/* Regra de estilo: button / input. */
-button,input {
-  font:inherit
-}
-/* Regra de estilo: .site-header. */
-.site-header {
-  position:sticky;
-  top:0;
-  z-index:1000;
-  display:grid;
-  grid-template-columns:240px 1fr auto auto;
-  align-items:center;
-  gap:28px;
-  padding:10px 30px;
-  background:#f9ebe1f5;
-  border-bottom:1px solid var(--line)
-}
-/* Regra de estilo: .logo img. */
-.logo img {
-  width:150px
-}
-/* Regra de estilo: .main-nav. */
-.main-nav {
-  display:flex;
-  justify-content:center
-}
-/* Regra de estilo: .main-nav ul. */
-.main-nav ul {
-  display:flex;
-  gap:30px;
-  list-style:none
-}
-/* Regra de estilo: .main-nav a. */
-.main-nav a {
-  text-decoration:none;
-  font-size:14px
-}
-/* Regra de estilo: .btn. */
-.btn {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  border:0;
-  border-radius:999px;
-  padding:11px 24px;
-  text-decoration:none;
-  font-size:14px
-}
-/* Regra de estilo: .btn-primary. */
-.btn-primary {
-  background:var(--pink);
-  color:#fff
-}
-/* Regra de estilo: .btn-primary:hover. */
-.btn-primary:hover {
-  background:var(--pink-dark)
-}
-/* Regra de estilo: .btn-outline. */
-.btn-outline {
-  border:1px solid #e9d5cd
-}
-/* Regra de estilo: .btn-large. */
-.btn-large {
-  padding:13px 25px
-}
-/* Regra de estilo: .menu-mobile. */
-.menu-mobile {
-  display:none
-}
-/* Regra de estilo: .hero. */
-.hero {
-  min-height:650px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:center;
-  gap:70px;
-  padding:80px 8%;
-  background:var(--cream)
-}
-/* Regra de estilo: .hero h1 / .section-heading h2 / .customization-promo h2 / .steps-grid h3 / .category-info h3. */
-.hero h1,.section-heading h2,.customization-promo h2,.steps-grid h3,.category-info h3 {
-  font-family:"Cormorant Garamond",serif
-}
-/* Regra de estilo: .hero h1. */
-.hero h1 {
-  font-size:67px;
-  font-weight:400;
-  line-height:1.05
-}
-/* Regra de estilo: .hero h1 em. */
-.hero h1 em {
-  display:block;
-  font-family:Allura,cursive;
-  font-size:91px;
-  color:var(--pink);
-  font-style:normal
-}
-/* Regra de estilo: .hero-subtitle. */
-.hero-subtitle {
-  max-width:560px;
-  margin-top:25px;
-  color:var(--brown-soft);
-  line-height:1.9
-}
-/* Regra de estilo: .hero-actions. */
-.hero-actions {
-  display:flex;
-  gap:12px;
-  margin-top:30px
-}
-/* Regra de estilo: .hero-tags. */
-.hero-tags {
-  display:flex;
-  flex-wrap:wrap;
-  gap:9px;
-  margin-top:25px
-}
-/* Regra de estilo: .hero-tags span. */
-.hero-tags span {
-  font-size:11px;
-  background:#fff8;
-  padding:7px 12px;
-  border:1px solid #ead7d0;
-  border-radius:999px
-}
-/* Regra de estilo: .hero-visual. */
-.hero-visual {
-  position:relative;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:470px
-}
-/* Regra de estilo: .hero-invitation. */
-.hero-invitation {
-  width:min(430px,78%);
-  position:relative;
-  z-index:2;
-  box-shadow:0 25px 60px #5b403833
-}
-/* Regra de estilo: .hero-card-decoration. */
-.hero-card-decoration { /*Página inicial*/
-  position:absolute;
-  width:370px;
-  height:440px;
-  border:1px solid #e6c7c7;
-  transform:rotate(7deg);
-  background:#fff7f4
-}
-/* Regra de estilo: .hero-badge. */
-.hero-badge { /*Bolinha inicial 'personalise ao seu gosto'*/
-  position:absolute;
-  right:3%;
-  bottom:4%;
-  z-index:3;
-  background:#fff;
-  border-radius:50%;
-  width:105px;
-  height:105px;
-  display:grid;
-  place-items:center;
-  text-align:center;
-  font-size:10px
+:root{--cream:#f9ebe1;--cream-light:#fff7f4;--brown:#5b4038;--brown-soft:#6d5b55;--pink:#d68588;--pink-dark:#895562;--pink-soft:#d98ea2;--line:#ead2db}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:Poppins,sans-serif;color:var(--brown);overflow-x:hidden}a{color:inherit}button,input{font:inherit}.site-header{position:sticky;top:0;z-index:1000;display:grid;grid-template-columns:240px 1fr auto auto;align-items:center;gap:28px;padding:10px 30px;background:rgba(249,235,225,.96);border-bottom:1px solid var(--line)}.logo img{width:150px}.main-nav{display:flex;justify-content:center}.main-nav ul{display:flex;gap:30px;list-style:none}.main-nav a{text-decoration:none;font-size:14px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:11px 24px;text-decoration:none;font-size:14px}.btn-primary{background:var(--pink);color:#fff}.btn-primary:hover{background:var(--pink-dark)}.btn-outline{border:1px solid #e9d5cd}.btn-large{padding:13px 25px}.menu-mobile{display:none}.hero{min-height:650px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:70px;padding:80px 8%;background:var(--cream)}.hero h1,.section-heading h2,.customization-promo h2,.steps-grid h3,.category-info h3{font-family:"Cormorant Garamond",serif}.hero h1{font-size:67px;font-weight:400;line-height:1.05}.hero h1 em{display:block;font-family:Allura,cursive;font-size:91px;color:var(--pink);font-style:normal}.hero-subtitle{max-width:560px;margin-top:25px;color:var(--brown-soft);line-height:1.9}.hero-actions{display:flex;gap:12px;margin-top:30px}.hero-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.hero-tags span{font-size:11px;background:#fff8;padding:7px 12px;border:1px solid #ead7d0;border-radius:999px}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;min-height:470px}.hero-invitation{width:min(430px,78%);position:relative;z-index:2;box-shadow:0 25px 60px #5b403833}.hero-card-decoration{position:absolute;width:370px;height:440px;border:1px solid #e6c7c7;transform:rotate(7deg);background:#fff7f4}.hero-badge{position:absolute;right:3%;bottom:4%;z-index:3;background:#fff;border-radius:50%;width:105px;height:105px;display:grid;place-items:center;text-align:center;font-size:10px}.benefits{padding:55px 6%;background:#fef3ed}.section-heading{text-align:center;max-width:800px;margin:0 auto 55px}.section-heading h2{font-size:52px;font-weight:400}.eyebrow{display:inline-block;color:var(--pink-dark);font-size:11px;letter-spacing:2.5px;font-weight:600;margin-bottom:12px}.title-decoration{display:flex;justify-content:center;gap:12px;margin-top:20px}.title-decoration span{width:55px;height:1px;background:#e8a1a8}.title-decoration b{color:var(--pink-soft)}.section-heading p{color:var(--brown-soft);font-size:14px;line-height:1.8;margin-top:18px}.benefits-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:25px;max-width:1400px;margin:auto}.benefits-grid article{text-align:center}.benefits-grid svg{width:36px;color:var(--pink-soft);margin-bottom:15px}.benefits-grid h3{font-size:21px;margin-bottom:8px}.benefits-grid p,.customization-promo p,.steps-grid p{font-size:12px;color:var(--brown-soft);line-height:1.7}.catalog-section{padding:90px 5%;background:var(--cream-light)}.category-grid{max-width:1500px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.category-card{background:#fff;border-radius:18px;overflow:hidden;text-decoration:none;box-shadow:0 8px 20px #78504614;transition:.3s}.category-card:hover{transform:translateY(-6px)}.category-image-wrap{aspect-ratio:1;position:relative;overflow:hidden}.category-image-wrap img{width:100%;height:100%;object-fit:cover}.category-overlay{position:absolute;left:12px;right:12px;bottom:12px;background:#fffffff2;padding:10px 14px;border-radius:999px;color:var(--pink-dark);font-size:11px;display:flex;justify-content:space-between;opacity:0;transition:.25s}.category-card:hover .category-overlay{opacity:1}.category-info{text-align:center;padding:18px 12px}.category-info h3{font-size:24px;color:var(--pink-dark);font-weight:500}.category-info p{font-size:11px;color:var(--brown-soft);margin-top:5px}.customization-promo{padding:65px 9%;display:flex;align-items:center;justify-content:space-between;gap:50px}.customization-promo h2{font-size:45px;font-weight:400;margin-bottom:12px}.palette-demo{display:flex;gap:9px;flex-wrap:wrap;max-width:260px}.palette-demo span{width:54px;height:54px;border-radius:50%;background:var(--swatch);border:5px solid white;box-shadow:0 5px 15px #0002}.steps-section,.reviews-section{padding:90px 5%;background:#fff7f4}.steps-grid{max-width:1350px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:30px}.steps-grid article{text-align:center;padding:15px}.steps-grid b{display:block;font-size:11px;color:var(--pink);letter-spacing:2px;margin-bottom:14px}.steps-grid svg{width:39px;color:var(--pink-soft);margin-bottom:16px}.steps-grid h3{font-size:22px;margin-bottom:8px}.reviews-section{background:#fdf8f4}.reviews-wrap{max-width:1450px;margin:auto;display:flex;align-items:center;gap:16px}.reviews-window{overflow:hidden;width:100%}.reviews-list{display:flex;transition:.45s}.review{flex:0 0 calc(33.333% - 20px);margin:0 10px;min-height:230px;padding:35px 28px;background:#fff;border:1px solid #f0dfd9;border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.stars{color:#bd8d4d;letter-spacing:2px;font-size:20px}.review p{font-size:14px;line-height:1.8;margin-top:18px}.review strong{font-size:12px;font-weight:400;color:#806b63;margin-top:22px}.review-btn{width:44px;height:44px;border:1px solid #eadbd5;border-radius:50%;background:#fff;color:#806b63;font-size:29px;flex-shrink:0}footer{background:var(--cream);border-top:1px solid var(--line)}.footer-content{max-width:1500px;margin:auto;padding:10px 17px;display:grid;grid-template-columns:2fr 1fr 1.3fr 1.3fr;gap:28px}.footer-logo{width:150px;margin-bottom:14px}.footer-content p,.footer-links a{font-size:12px;color:var(--brown-soft);line-height:1.8}.footer-content h3{font-family:"Cormorant Garamond",serif;font-size:21px;margin-bottom:15px}.footer-links{list-style:none}.footer-links a{text-decoration:none}.footer-btn{margin-top:18px}.footer-bottom{padding:8px;text-align:center;background:#6d5b55;color:#fff;font-size:10px}.modal{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modal-backdrop{position:absolute;inset:0;background:#2f1d198c}.customizer{position:relative;z-index:2;width:min(1050px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:35px}.modal-close{position:absolute;right:18px;top:14px;border:0;background:transparent;font-size:30px}.customizer-head{text-align:center;margin-bottom:30px}.customizer-head h2{font-family:"Cormorant Garamond",serif;font-size:42px;font-weight:400}.customizer-head p{font-size:12px;color:var(--brown-soft)}.customizer-layout{display:grid;grid-template-columns:1fr 1fr;gap:45px}.customizer-form{display:grid;gap:15px}.customizer-form label{display:grid;gap:6px;font-size:12px;color:var(--brown-soft)}.customizer-form input{border:1px solid #e7d8d2;border-radius:10px;padding:11px 13px}.form-label{font-size:12px;color:var(--brown-soft)}.color-options{display:flex;gap:10px;margin-top:8px}.color-choice{width:31px;height:31px;border-radius:50%;border:3px solid white;outline:1px solid #ddd}.color-choice.active{outline:2px solid var(--brown)}.full-width{width:100%;margin-top:5px}.form-message{text-align:center;font-size:11px;color:var(--pink-dark);min-height:18px}.preview-area{display:flex;flex-direction:column;align-items:center}.invitation-preview{--preview-main:#d98ea2;width:min(330px,100%);aspect-ratio:3/4;position:relative;background:#fff7f4;border:8px solid white;outline:1px solid #e9d7d1;box-shadow:0 20px 45px #5b40382b;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:35px 25px}.invitation-preview:before,.invitation-preview:after{content:"";position:absolute;border:1px solid var(--preview-main);opacity:.45}.invitation-preview:before{inset:13px}.invitation-preview:after{inset:21px}.preview-ornament{color:var(--preview-main);font-size:22px}.preview-small{font-size:9px;letter-spacing:4px;color:var(--preview-main)}.preview-name{font-family:Allura,cursive;font-size:48px;line-height:1.1;margin:15px 0;color:var(--preview-main);max-width:260px;overflow-wrap:anywhere}.preview-divider{width:55px;height:1px;background:var(--preview-main);margin:5px 0 15px}#preview-date,#preview-time,#preview-place{font-family:"Cormorant Garamond",serif;font-size:18px}.preview-place-label{font-size:8px;letter-spacing:2px;color:var(--preview-main);margin-top:20px}
+
+@media(max-width:1100px)
+{
+  .benefits-grid{grid-template-columns:repeat(3,1fr)}
+  .category-grid{grid-template-columns:repeat(3,1fr)}
+  .steps-grid{grid-template-columns:repeat(3,1fr)}
+  .footer-content{grid-template-columns:1.5fr 1fr 1fr}
+  .site-header{grid-template-columns:200px 1fr auto}
 }
 
-/* Regra de estilo: .eyebrow. */
-.eyebrow {
-  display:inline-block;
-  color:var(--pink-dark);
-  font-size:11px;
-  letter-spacing:2.5px;
-  font-weight:600;
-  margin-bottom:12px
+@media(max-width:900px){
+  .site-header{grid-template-columns:1fr auto;padding:10px 20px}
+  .logo img{width:165px}
+  .header-contact{display:none}
+  .menu-mobile{display:flex;width:43px;height:43px;border:1px solid #e5d5d0;border-radius:13px;
+    background:white;flex-direction:column;align-items:center;justify-content:center;gap:5px
+  }
+  .menu-mobile span{width:17px;height:2px;background:var(--brown)}
+  .main-nav{position:absolute;top:100%;left:0;width:100%;background:#fff7f4;padding:15px 20px;
+    opacity:0;visibility:hidden;pointer-events:none
+  }
+  .main-nav.ativo{opacity:1;visibility:visible;pointer-events:auto}
+  .main-nav ul{flex-direction:column;gap:18px}
+  .hero{grid-template-columns:1fr;padding:65px 25px;text-align:center}
+  .hero h1{font-size:53px}
+  .hero h1 em{font-size:74px}
+  .hero-subtitle{margin:20px auto}
+  .hero-actions{justify-content:center}
+  .hero-tags{justify-content:center}
+  .benefits-grid,.category-grid,.steps-grid{grid-template-columns:1fr 1fr}
+  .customization-promo{flex-direction:column;text-align:center;padding:55px 25px}
+  .reviews-section{padding:70px 20px}
+  .review{flex:0 0 100%;margin:0}
+  .footer-content{grid-template-columns:1fr;padding:40px 25px}
+  .customizer-layout{grid-template-columns:1fr}
+  .preview-area{order:-1}
 }
 
+@media(max-width:520px){
+  .benefits-grid,.category-grid{grid-template-columns:1fr}.hero h1{font-size:47px}.hero h1 em{font-size:67px}.hero-actions{display:grid}.hero-actions .btn{width:100%}}
 
-/*--------------------Secção 2 - As vantagens----------------------------
--------------------------------------------------------------------------*/
-
-/* Regra de estilo: .benefits. */
-.benefits { /*Segunda secção*/
-  padding:50px 5%;  /*onde começa à esquerda x % de espaço vazio à mostra*/
-  background:#fff7f4 /*Cor de fundo deste secção*/
-}
-
-/* Regra de estilo: .benefits-grid. */
-.benefits-grid {
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:25px;
-  max-width:1400px;
-  margin:auto
-}
-
-/* Regra de estilo: .benefits-grid article. */
-.benefits-grid article {
-  text-align:center
-}
-/* Regra de estilo: .benefits-grid svg. */
-.benefits-grid svg {
-  width:36px;
-  color:var(--pink-soft);
-  margin-bottom:15px  /*Distânia dos ícones às frases dos benefícios*/
-}
-/* Regra de estilo: .benefits-grid h3. */
-.benefits-grid h3 {
-  font-size:21px; /*Tamanho de letras dos títulos dos benefícios*/
-  margin-bottom:8px /*DistÂncia dos títulos às mini frases*/
-}
-/* Regra de estilo: .benefits-grid p / .customization-promo p / .steps-grid p. */
-.benefits-grid p,.customization-promo p,.steps-grid p {
-  font-size:12px; /*Tamanho de letra das mini frases dos benefícios*/
-  color:var(--brown-soft);
-  line-height:1.7 /*Distância entre as linhas das mini frases*/
-}
-/*-------------------------Fim - Secção2 - Vantaagens--------------------
--------------------------------------------------------------------------*/
-
-
-
-/* Regra de estilo: .section-heading. */
-.section-heading {
-  text-align:center;
-  max-width:800px;  /*Largura máxima da frase to título de secção*/
-  margin:0 auto 50px  /*Distância estre a frase em cima e as coisas do poruqê escolher convite digital no toninvitation*/
-}
-/* Regra de estilo: .section-heading h2. */
-.section-heading h2 {
-  font-size:40px; /*Tamanho de letra do título da secção 2*/
-  font-weight:00 /*O quão bold é*/
-}
-
-/* Regra de estilo: .title-decoration. */
-.title-decoration {
-  display:flex;
-  justify-content:center;
-  gap:10px; /*Distância entre os traços entre o coração*/
-  margin-top:20px /*Distância do título 'Catálogo' até as opções*/
-}
-/* Regra de estilo: .title-decoration span. */
-.title-decoration span {
-  width:550px;  /*Tamanho dos traços*/
-  height:2px;  /*Espessura dos traços*/
-  background:#e8a1a8/*Cor dos traços*/
-}
-/* Regra de estilo: .title-decoration b. */
-.title-decoration b {
-  color:var(--pink-soft)
-}
-/* Regra de estilo: .section-heading p. */
-.section-heading p {
-  color:var(--brown-soft);
-  font-size:14px; /*Tamanho de letra da frase 'clique numa categoria...'*/
-  line-height:1.8;
-  margin-top:15px/*Distância da frase até os traços em cima*/
-}
-
-/*--------------------Secção 3 - quadrado dos modelos---------------------
--------------------------------------------------------------------------*/
-/* Regra de estilo: .catalog-section. */
-.catalog-section {  
-  padding:90px 5%;  /*Onde começa a seção dos catálogos x quanto espaço vazio à mostra*/ 
-  background:#f9ebe1f5  /*Cor de fundo desta secção*/
-}
-/* Regra de estilo: .category-grid. */
-.category-grid {
-  max-width:1500px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:20px
-}
-/* Regra de estilo: .category-card. */
-.category-card {
-  background:#fff7f4; /*Cor de fundo dos botões dos difenrentes estilos de catácolo*/
-  border-radius:20px;
-  overflow:hidden;
-  text-decoration:none;
-  box-shadow:0 8px 20px #c52a0314;
-  transition:.3s
-}
-/* Regra de estilo: .category-card:hover. */
-.category-card:hover {
-  transform:translateY(-20px) /*Ao passar o rato em cima, o quanto mexe/muda de posição*/
-}
-/* Regra de estilo: .category-image-wrap. */
-.category-image-wrap {
-  aspect-ratio:1;
-  position:relative;
-  overflow:hidden
-}
-/* Regra de estilo: .category-image-wrap img. */
-.category-image-wrap img {/*O quanto as imagens ocupam no restangulo*/
-  width:100%;
-  height:100%;
-  object-fit:cover
-}
-/* Regra de estilo: .category-overlay. */
-.category-overlay {
-  position:absolute;
-  left:12px;
-  right:12px;
-  bottom:5px;
-  background:#fffffff2;
-  padding:10px 14px;/*Medidas do retangulo que diz 'ver modelo'*/
-  border-radius:999px;
-  color:var(--pink-dark);
-  font-size:15px;
-  display:flex;
-  justify-content:space-between;
-  opacity:0;
-  transition:.25s
-}
-/* Regra de estilo: .category-card:hover .category-overlay. */
-.category-card:hover .category-overlay {
-  opacity:1
-}
-/* Regra de estilo: .category-info. */
-.category-info {
-  text-align:center;
-  padding:10px 5px
-}
-/* Regra de estilo: .category-info h3. */
-.category-info h3 {
-  font-size:22px;
-  color:var(--pink-dark);
-  font-weight:700
-}
-/* Regra de estilo: .category-info p. */
-.category-info p {
-  font-size:10px;
-  color:var(--brown-soft);
-  margin-top:5px}
-/*-------------------Fim - Secção 3 - quadrado dos modelos---------------
--------------------------------------------------------------------------*/
-
-
-/* Regra de estilo: .customization-promo. */
-.customization-promo {
-  padding:65px 9%;  /*Tamanho da secção 4*/
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:50px
-}
-/* Regra de estilo: .customization-promo h2. */
-.customization-promo h2 {
-  font-size:45px;
-  font-weight:400;
-  margin-bottom:12px
-}
-/* Regra de estilo: .palette-demo. */
-.palette-demo {
-  display:flex;
-  gap:9px;
-  flex-wrap:wrap;
-  max-width:260px
-}
-/* Regra de estilo: .palette-demo span. */
-.palette-demo span {
-  width:54px;
-  height:54px;
-  border-radius:50%;
-  background:var(--swatch);
-  border:5px solid white;
-  box-shadow:0 5px 15px #0002
-}
-/* Regra de estilo: .steps-section / .reviews-section. */
-.steps-section,.reviews-section {
-  padding:90px 5%;
-  background:#fff7f4
-}
-/* Regra de estilo: .steps-grid. */
-.steps-grid {
-  max-width:1350px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:30px
-}
-/* Regra de estilo: .steps-grid article. */
-.steps-grid article {
-  text-align:center;
-  padding:15px
-}
-/* Regra de estilo: .steps-grid b. */
-.steps-grid b {
-  display:block;
-  font-size:11px;
-  color:var(--pink);
-  letter-spacing:2px;
-  margin-bottom:14px
-}
-/* Regra de estilo: .steps-grid svg. */
-.steps-grid svg {
-  width:39px;
-  color:var(--pink-soft);
-  margin-bottom:16px
-}
-/* Regra de estilo: .steps-grid h3. */
-.steps-grid h3 {
-  font-size:22px;
-  margin-bottom:8px
-}
-/* Regra de estilo: .reviews-section. */
-.reviews-section {
-  background:#fdf8f4
-}
-/* Regra de estilo: .reviews-wrap. */
-.reviews-wrap {
-  max-width:1450px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  gap:16px
-}
-/* Regra de estilo: .reviews-window. */
-.reviews-window {
-  overflow:hidden;
-  width:100%
-}
-/* Regra de estilo: .reviews-list. */
-.reviews-list {
-  display:flex;
-  transition:.45s
-}
-/* Regra de estilo: .review. */
-.review {
-  flex:0 0 calc(33.333% - 20px);
-  margin:0 10px;
-  min-height:230px;
-  padding:35px 28px;
-  background:#fff;
-  border:1px solid #f0dfd9;
-  border-radius:15px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center
-}
-/* Regra de estilo: .stars. */
-.stars {
-  color:#bd8d4d;
-  letter-spacing:2px;
-  font-size:20px
-}
-/* Regra de estilo: .review p. */
-.review p {
-  font-size:14px;
-  line-height:1.8;
-  margin-top:18px
-}
-/* Regra de estilo: .review strong. */
-.review strong {
-  font-size:12px;
-  font-weight:400;
-  color:#806b63;
-  margin-top:22px
-}
-/* Regra de estilo: .review-btn. */
-.review-btn {
-  width:44px;
-  height:44px;
-  border:1px solid #eadbd5;
-  border-radius:50%;
-  background:#fff;
-  color:#806b63;
-  font-size:29px;
-  flex-shrink:0
-}
-/* Regra de estilo: footer. */
-footer {
-  background:var(--cream);
-  border-top:1px solid var(--line)
-}
-/* Regra de estilo: .footer-content. */
-.footer-content {
-  max-width:1500px;
-  margin:auto;
-  padding:10px 17px;
-  display:grid;
-  grid-template-columns:2fr 1fr 1.3fr 1.3fr;
-  gap:28px
-}
-/* Regra de estilo: .footer-logo. */
-.footer-logo {
-  width:150px;
-  margin-bottom:14px
-}
-/* Regra de estilo: .footer-content p / .footer-links a. */
-.footer-content p,.footer-links a {
-  font-size:12px;
-  color:var(--brown-soft);
-  line-height:1.8
-}
-/* Regra de estilo: .footer-content h3. */
-.footer-content h3 {
-  font-family:"Cormorant Garamond",serif;
-  font-size:21px;
-  margin-bottom:15px
-}
-/* Regra de estilo: .footer-links. */
-.footer-links {
-  list-style:none
-}
-/* Regra de estilo: .footer-links a. */
-.footer-links a {
-  text-decoration:none
-}
-/* Regra de estilo: .footer-btn. */
-.footer-btn {
-  margin-top:18px
-}
-/* Regra de estilo: .footer-bottom. */
-.footer-bottom {
-  padding:8px;
-  text-align:center;
-  background:#6d5b55;
-  color:#fff;
-  font-size:10px
-}
-/* Regra de estilo: .modal. */
-.modal {
-  position:fixed;
-  inset:0;
-  z-index:3000;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px
-}
-/* Regra de estilo: .modal.open. */
-.modal.open {
-  display:flex
-}
-/* Regra de estilo: .modal-backdrop. */
-.modal-backdrop {
-  position:absolute;
-  inset:0;
-  background:#2f1d198c
-}
-/* Regra de estilo: .customizer. */
-.customizer {
-  position:relative;
-  z-index:2;
-  width:min(1050px,100%);
-  max-height:92vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:24px;
-  padding:35px
-}
-/* Regra de estilo: .modal-close. */
-.modal-close {
-  position:absolute;
-  right:18px;
-  top:14px;
-  border:0;
-  background:transparent;
-  font-size:30px
-}
-/* Regra de estilo: .customizer-head. */
-.customizer-head {
-  text-align:center;
-  margin-bottom:30px
-}
-/* Regra de estilo: .customizer-head h2. */
-.customizer-head h2 {
-  font-family:"Cormorant Garamond",serif;
-  font-size:42px;
-  font-weight:400
-}
-/* Regra de estilo: .customizer-head p. */
-.customizer-head p {
-  font-size:12px;
-  color:var(--brown-soft)
-}
-/* Regra de estilo: .customizer-layout. */
-.customizer-layout {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:45px
-}
-/* Regra de estilo: .customizer-form. */
-.customizer-form {
-  display:grid;
-  gap:15px
-}
-/* Regra de estilo: .customizer-form label. */
-.customizer-form label {
-  display:grid;
-  gap:6px;
-  font-size:12px;
-  color:var(--brown-soft)
-}
-/* Regra de estilo: .customizer-form input. */
-.customizer-form input {
-  border:1px solid #e7d8d2;
-  border-radius:10px;
-  padding:11px 13px
-}
-/* Regra de estilo: .form-label. */
-.form-label {
-  font-size:12px;
-  color:var(--brown-soft)
-}
-/* Regra de estilo: .color-options. */
-.color-options {
-  display:flex;
-  gap:10px;
-  margin-top:8px
-}
-/* Regra de estilo: .color-choice. */
-.color-choice {
-  width:31px;
-  height:31px;
-  border-radius:50%;
-  border:3px solid white;
-  outline:1px solid #ddd
-}
-/* Regra de estilo: .color-choice.active. */
-.color-choice.active {
-  outline:2px solid var(--brown)
-}
-/* Regra de estilo: .full-width. */
-.full-width {
-  width:100%;
-  margin-top:5px
-}
-/* Regra de estilo: .form-message. */
-.form-message {
-  text-align:center;
-  font-size:11px;
-  color:var(--pink-dark);
-  min-height:18px
-}
-/* Regra de estilo: .preview-area. */
-.preview-area {
-  display:flex;
-  flex-direction:column;
-  align-items:center
-}
-/* Regra de estilo: .invitation-preview. */
-.invitation-preview {
-  --preview-main:#d98ea2;
-  width:min(330px,100%);
-  aspect-ratio:3/4;
-  position:relative;
-  background:#fff7f4;
-  border:8px solid white;
-  outline:1px solid #e9d7d1;
-  box-shadow:0 20px 45px #5b40382b;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:35px 25px
-}
-/* Regra de estilo: .invitation-preview:before / .invitation-preview:after. */
-.invitation-preview:before,.invitation-preview:after {
-  content:"";
-  position:absolute;
-  border:1px solid var(--preview-main);
-  opacity:.45
-}
-/* Regra de estilo: .invitation-preview:before. */
-.invitation-preview:before {
-  inset:13px
-}
-/* Regra de estilo: .invitation-preview:after. */
-.invitation-preview:after {
-  inset:21px
-}
-/* Regra de estilo: .preview-ornament. */
-.preview-ornament {
-  color:var(--preview-main);
-  font-size:22px
-}
-/* Regra de estilo: .preview-small. */
-.preview-small {
-  font-size:9px;
-  letter-spacing:4px;
-  color:var(--preview-main)
-}
-/* Regra de estilo: .preview-name. */
-.preview-name {
-  font-family:Allura,cursive;
-  font-size:48px;
-  line-height:1.1;
-  margin:15px 0;
-  color:var(--preview-main);
-  max-width:260px;
-  overflow-wrap:anywhere
-}
-/* Regra de estilo: .preview-divider. */
-.preview-divider {
-  width:55px;
-  height:1px;
-  background:var(--preview-main);
-  margin:5px 0 15px
-}
-/* Regra de estilo: #preview-date / #preview-time / #preview-place. */
-#preview-date,#preview-time,#preview-place {
-  font-family:"Cormorant Garamond",serif;
-  font-size:18px
-}
-/* Regra de estilo: .preview-place-label. */
-.preview-place-label {
-  font-size:8px;
-  letter-spacing:2px;
-  color:var(--preview-main);
-  margin-top:20px
-}
-/* Regra de estilo: @media(max-width:1100px). */
-@media(max-width:1100px) {
-  /* Regra de estilo: .benefits-grid. */
-  .benefits-grid {
-    grid-template-columns:repeat(3,1fr)
-  }
-  /* Regra de estilo: .category-grid. */
-  .category-grid {
-    grid-template-columns:repeat(3,1fr)
-  }
-  /* Regra de estilo: .steps-grid. */
-  .steps-grid {
-    grid-template-columns:repeat(3,1fr)
-  }
-  /* Regra de estilo: .footer-content. */
-  .footer-content {
-    grid-template-columns:1.5fr 1fr 1fr
-  }
-  /* Regra de estilo: .site-header. */
-  .site-header {
-    grid-template-columns:200px 1fr auto
-  }
-}
-/* Regra de estilo: @media(max-width:900px). */
-@media(max-width:900px) {
-  /* Regra de estilo: .site-header. */
-  .site-header {
-    grid-template-columns:1fr auto;
-    padding:10px 20px
-  }
-  /* Regra de estilo: .logo img. */
-  .logo img {
-    width:165px
-  }
-  /* Regra de estilo: .header-contact. */
-  .header-contact {
-    display:none
-  }
-  /* Regra de estilo: .menu-mobile. */
-  .menu-mobile {
-    display:flex;
-    width:43px;
-    height:43px;
-    border:1px solid #e5d5d0;
-    border-radius:13px;
-    background:white;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:5px
-  }
-  /* Regra de estilo: .menu-mobile span. */
-  .menu-mobile span {
-    width:17px;
-    height:2px;
-    background:var(--brown)
-  }
-  /* Regra de estilo: .main-nav. */
-  .main-nav {
-    position:absolute;
-    top:100%;
-    left:0;
-    width:100%;
-    background:#fff7f4;
-    padding:15px 20px;
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none
-  }
-  /* Regra de estilo: .main-nav.ativo. */
-  .main-nav.ativo {
-    opacity:1;
-    visibility:visible;
-    pointer-events:auto
-  }
-  /* Regra de estilo: .main-nav ul. */
-  .main-nav ul {
-    flex-direction:column;
-    gap:18px
-  }
-  /* Regra de estilo: .hero. */
-  .hero {
-    grid-template-columns:1fr;
-    padding:65px 25px;
-    text-align:center
-  }
-  /* Regra de estilo: .hero h1. */
-  .hero h1 {
-    font-size:53px
-  }
-  /* Regra de estilo: .hero h1 em. */
-  .hero h1 em {
-    font-size:74px
-  }
-  /* Regra de estilo: .hero-subtitle. */
-  .hero-subtitle {
-    margin:20px auto
-  }
-  /* Regra de estilo: .hero-actions. */
-  .hero-actions {
-    justify-content:center
-  }
-  /* Regra de estilo: .hero-tags. */
-  .hero-tags {
-    justify-content:center
-  }
-  /* Regra de estilo: .benefits-grid / .category-grid / .steps-grid. */
-  .benefits-grid,.category-grid,.steps-grid {
-    grid-template-columns:1fr 1fr
-  }
-  /* Regra de estilo: .customization-promo. */
-  .customization-promo {
-    flex-direction:column;
-    text-align:center;
-    padding:55px 25px
-  }
-  /* Regra de estilo: .reviews-section. */
-  .reviews-section {
-    padding:70px 20px
-  }
-  /* Regra de estilo: .review. */
-  .review {
-    flex:0 0 100%;
-    margin:0
-  }
-  /* Regra de estilo: .footer-content. */
-  .footer-content {
-    grid-template-columns:1fr;
-    padding:40px 25px
-  }
-  /* Regra de estilo: .customizer-layout. */
-  .customizer-layout {
-    grid-template-columns:1fr
-  }
-  /* Regra de estilo: .preview-area. */
-  .preview-area {
-    order:-1
-  }
-}
-/* Regra de estilo: @media(max-width:520px). */
-@media(max-width:520px) {
-  /* Regra de estilo: .benefits-grid / .category-grid. */
-  .benefits-grid,.category-grid {
-    grid-template-columns:1fr
-  }
-  /* Regra de estilo: .hero h1. */
-  .hero h1 {
-    font-size:47px
-  }
-  /* Regra de estilo: .hero h1 em. */
-  .hero h1 em {
-    font-size:67px
-  }
-  /* Regra de estilo: .hero-actions. */
-  .hero-actions {
-    display:grid
-  }
-  /* Regra de estilo: .hero-actions .btn. */
-  .hero-actions .btn {
-    width:100%
-  }
-}
 /* =========================================================
-RESPONSIVIDADE GLOBAL — TELEMÓVEL E TABLET
-========================================================= */
-/* Regra de estilo: @media (max-width: 1100px). */
+   RESPONSIVIDADE GLOBAL — TELEMÓVEL E TABLET
+   ========================================================= */
+
 @media (max-width: 1100px) {
-  /* Regra de estilo: .hero. */
   .hero {
     gap: 40px;
     padding-left: 5%;
     padding-right: 5%;
   }
-  /* Regra de estilo: .benefits-grid / 
-  .steps-grid. */
+
   .benefits-grid,
   .steps-grid {
     gap: 18px;
   }
-  /* Regra de estilo: .footer-content. */
+
   .footer-content {
     gap: 35px;
   }
 }
-/* Regra de estilo: @media (max-width: 900px). */
+
 @media (max-width: 900px) {
-  /* Regra de estilo: body. */
   body {
     min-width: 0;
   }
-  /* Regra de estilo: .site-header. */
+
   .site-header {
     grid-template-columns: 1fr auto;
     gap: 14px;
     padding: 10px 16px;
   }
-  /* Regra de estilo: .logo img. */
+
   .logo img {
     width: min(165px, 70vw);
   }
-  /* Regra de estilo: .hero. */
+
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -954,36 +85,33 @@ RESPONSIVIDADE GLOBAL — TELEMÓVEL E TABLET
     padding: 55px 22px;
     text-align: center;
   }
-  /* Regra de estilo: .hero h1. */
+
   .hero h1 {
     font-size: clamp(42px, 9vw, 58px);
   }
-  /* Regra de estilo: .hero h1 em. */
+
   .hero h1 em {
     font-size: clamp(62px, 13vw, 78px);
   }
-  /* Regra de estilo: .hero-subtitle. */
+
   .hero-subtitle {
     margin-left: auto;
     margin-right: auto;
   }
-  /* Regra de estilo: .hero-actions. */
+
   .hero-actions {
     justify-content: center;
     flex-wrap: wrap;
   }
-  /* Regra de estilo: .hero-visual. */
+
   .hero-visual {
     min-height: auto;
   }
-  /* Regra de estilo: .hero-invitation. */
+
   .hero-invitation {
     width: min(430px, 78vw);
   }
-  /* Regra de estilo: .benefits / 
-  .catalog-section / 
-  .steps-section / 
-  .reviews-section. */
+
   .benefits,
   .catalog-section,
   .steps-section,
@@ -991,80 +119,78 @@ RESPONSIVIDADE GLOBAL — TELEMÓVEL E TABLET
     padding-top: 65px;
     padding-bottom: 65px;
   }
-  /* Regra de estilo: .section-heading. */
+
   .section-heading {
     margin-bottom: 38px;
   }
-  /* Regra de estilo: .section-heading h2. */
+
   .section-heading h2 {
     font-size: clamp(38px, 7vw, 50px);
   }
-  /* Regra de estilo: .benefits-grid / 
-  .steps-grid. */
+
   .benefits-grid,
   .steps-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  /* Regra de estilo: .category-grid. */
+
   .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  /* Regra de estilo: .customization-promo. */
+
   .customization-promo {
     flex-direction: column;
     text-align: center;
     padding: 55px 22px;
   }
-  /* Regra de estilo: .reviews-wrap. */
+
   .reviews-wrap {
     gap: 8px;
   }
-  /* Regra de estilo: .review. */
+
   .review {
     flex-basis: 100%;
     margin: 0;
   }
-  /* Regra de estilo: .footer-content. */
+
   .footer-content {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 40px 25px;
   }
+
   /* Personalizador genérico em tablet. */
-  /* Regra de estilo: .modal. */
   .modal {
     padding: 12px;
   }
-  /* Regra de estilo: .customizer. */
+
   .customizer {
     width: 100%;
     max-height: 96vh;
     padding: 26px;
     border-radius: 20px;
   }
-  /* Regra de estilo: .customizer-layout. */
+
   .customizer-layout {
     grid-template-columns: 1fr;
   }
-  /* Regra de estilo: .preview-area. */
+
   .preview-area {
     order: -1;
   }
 }
-/* Regra de estilo: @media (max-width: 600px). */
+
 @media (max-width: 600px) {
-  /* Regra de estilo: .site-header. */
   .site-header {
     padding: 9px 12px;
   }
-  /* Regra de estilo: .main-nav. */
+
   .main-nav {
     padding: 16px;
   }
-  /* Regra de estilo: .hero. */
+
   .hero {
     padding: 45px 16px;
   }
-  /* Regra de estilo: .hero-actions. */
+
   .hero-actions {
     display: grid;
     width: 100%;
@@ -1072,14 +198,11 @@ RESPONSIVIDADE GLOBAL — TELEMÓVEL E TABLET
     margin-left: auto;
     margin-right: auto;
   }
-  /* Regra de estilo: .hero-actions .btn. */
+
   .hero-actions .btn {
     width: 100%;
   }
-  /* Regra de estilo: .benefits / 
-  .catalog-section / 
-  .steps-section / 
-  .reviews-section. */
+
   .benefits,
   .catalog-section,
   .steps-section,
@@ -1087,103 +210,39 @@ RESPONSIVIDADE GLOBAL — TELEMÓVEL E TABLET
     padding-left: 16px;
     padding-right: 16px;
   }
-  /* Regra de estilo: .benefits-grid / 
-  .steps-grid / 
-  .category-grid. */
+
   .benefits-grid,
   .steps-grid,
   .category-grid {
     grid-template-columns: 1fr;
   }
-  /* Regra de estilo: .footer-content. */
+
   .footer-content {
     grid-template-columns: 1fr;
     padding: 35px 20px;
     gap: 28px;
   }
-  /* Regra de estilo: .footer-logo. */
+
   .footer-logo {
     width: 160px;
   }
-  /* Regra de estilo: .customizer. */
+
   .customizer {
     padding: 22px 14px 18px;
     border-radius: 16px;
   }
-  /* Regra de estilo: .customizer-head. */
+
   .customizer-head {
     padding-right: 28px;
     margin-bottom: 20px;
   }
-  /* Regra de estilo: .customizer-head h2. */
+
   .customizer-head h2 {
     font-size: 32px;
   }
-  /* Regra de estilo: .customizer-head p. */
+
   .customizer-head p {
     font-size: 11px;
     line-height: 1.5;
-  }
-}
-/* =========================================================
-ESCALA DAS CATEGORIAS DA PÁGINA INICIAL
-As categorias são apresentadas em cartões menores no computador.
-========================================================= */
-/* Regra de estilo: .category-grid. */
-.category-grid {
-  width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 18px;
-}
-/* Regra de estilo: .category-card. */
-.category-card {
-  width: 100%;
-  max-width: 210px;
-  margin: 0 auto;
-}
-/* Regra de estilo: .category-image-wrap. */
-.category-image-wrap {
-  aspect-ratio: 1 / 1;
-}
-/* Regra de estilo: .category-image-wrap img. */
-.category-image-wrap img {
-  object-fit: cover;
-}
-/* Regra de estilo: @media (max-width: 1100px). */
-@media (max-width: 1100px) {
-  /* Regra de estilo: .category-grid. */
-  .category-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-/* Regra de estilo: @media (max-width: 900px). */
-@media (max-width: 900px) {
-  /* Regra de estilo: .category-grid. */
-  .category-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-/* Regra de estilo: @media (max-width: 680px). */
-@media (max-width: 680px) {
-  /* Regra de estilo: .category-grid. */
-  .category-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  /* Regra de estilo: .category-card. */
-  .category-card {
-    max-width: 190px;
-  }
-}
-/* Regra de estilo: @media (max-width: 430px). */
-@media (max-width: 430px) {
-  /* Regra de estilo: .category-grid. */
-  .category-grid {
-    grid-template-columns: 1fr;
-  }
-  /* Regra de estilo: .category-card. */
-  .category-card {
-    max-width: 210px;
   }
 }

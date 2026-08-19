@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <!-- Define a codificação da página. -->
+    <meta charset="UTF-8">
+    <!-- Adapta a página aos dispositivos móveis. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Define o título da página de pagamento de teste. -->
+    <title>Pagamento de teste — TONInvitation</title>
+    <!-- Carrega os estilos gerais da loja. -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Carrega os estilos específicos da página de teste. -->
+    <link rel="stylesheet" href="test-payment.css">
+  </head>
+  <body>
+    <!-- Conteúdo principal da página de pagamento. -->
+    <main class="test-payment-page">
+      <!-- Cartão visual da simulação. -->
+      <section class="test-payment-card">
+        <!-- Identificação da área de teste. -->
+        <span class="eyebrow">PAGAMENTO DE TESTE</span>
+        <!-- Título principal. -->
+        <h1>Simular pagamento</h1>
+        <!-- Explica que não existe cobrança real. -->
+        <p>
+          Esta página simula uma plataforma de pagamento real.
+          Nenhum dinheiro é cobrado.
+        </p>
+
+        <!-- Mostra o Order ID recebido no URL. -->
+        <div class="order-box">
+          <span>Order ID</span>
+          <strong id="order-id">A carregar...</strong>
+        </div>
+
+        <!-- Botão que envia a confirmação para o backend. -->
+        <button id="simulate-payment" class="btn btn-primary btn-large full-width">
+          Confirmar pagamento de teste
+        </button>
+
+        <!-- Mensagem de resultado da operação. -->
+        <p id="payment-message" class="form-message"></p>
+
+        <!-- Link para voltar à loja. -->
+        <a id="return-link" class="test-return-link" href="index.html">
+          Voltar à loja
+        </a>
+      </section>
+    </main>
+
+    <!-- Código responsável pela simulação do pagamento. -->
+    <script src="test-payment.js"></script>
+  </body>
+</html>

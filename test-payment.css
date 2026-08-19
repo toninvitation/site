@@ -1,0 +1,88 @@
+/* =========================================================
+   PÁGINA DE PAGAMENTO DE TESTE
+   Esta página imita o comportamento de uma plataforma externa.
+   ========================================================= */
+
+/* Centraliza a página de teste no ecrã. */
+.test-payment-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 30px;
+}
+
+/* Cria o cartão principal da simulação. */
+.test-payment-card {
+  width: min(520px, 100%);
+  padding: 40px;
+  border: 1px solid #eadbd5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(60, 40, 30, 0.12);
+  text-align: center;
+}
+
+/* Estiliza o título da página. */
+.test-payment-card h1 {
+  margin: 12px 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 48px;
+  font-weight: 400;
+}
+
+/* Estiliza a explicação do pagamento de teste. */
+.test-payment-card > p {
+  color: var(--brown-soft);
+  line-height: 1.7;
+}
+
+/* Cria a caixa que identifica o pedido. */
+.order-box {
+  margin: 28px 0;
+  padding: 18px;
+  border-radius: 14px;
+  background: #fff8f5;
+}
+
+/* Coloca o rótulo do pedido numa linha própria. */
+.order-box span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--brown-soft);
+}
+
+/* Destaca o Order ID. */
+.order-box strong {
+  font-size: 18px;
+  word-break: break-all;
+}
+
+/* Mantém a mensagem de resultado afastada do botão. */
+#payment-message {
+  margin-top: 18px;
+}
+
+/* Estiliza o link de regresso. */
+.test-return-link {
+  display: inline-block;
+  margin-top: 20px;
+  color: var(--brown-soft);
+}
+
+/* Adapta o cartão para ecrãs pequenos. */
+@media (max-width: 600px) {
+  .test-payment-page {
+    padding: 16px;
+  }
+
+  .test-payment-card {
+    padding: 28px 20px;
+  }
+
+  .test-payment-card h1 {
+    font-size: 38px;
+  }
+}

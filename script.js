@@ -1,9 +1,4 @@
 /* =========================================================
-   TONInvitation — PÁGINA INICIAL
-   Controla o menu mobile, categorias e carrossel de avaliações.
-   ========================================================= */
-
-/* =========================================================
    SCRIPT DA PÁGINA INICIAL
    - Menu mobile
    - Grelha de categorias
