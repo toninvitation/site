@@ -1,195 +1,477 @@
-.category-page{
-  max-width:1400px;
-  margin:auto;
-  padding:10px 1% 90px;/*Distância secção do convite1 de toystory até cabeçalho - Onde começa - Tamanho vetical da página*/
-min-height:40vh } /*Altura vertical mínima*/
-
-.back-link{
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  text-decoration:none;
-  color:var(--brown-soft);
-  font-size:13px;
-margin-bottom:30px }
-
-.category-page-title{
-  text-align:center;
-  max-width:800px;
-margin:0 auto 55px }
-
-.category-page-title h1{
-  font-family:'Cormorant Garamond',serif;
-  font-size:60px;font-weight:400;
-color:var(--brown) }
-  
-.category-page-title p{
-  color:var(--brown-soft);
-  font-size:14px;
-  line-height:1.8;
-margin-top:15px }
-    
-.page-intro{
-  text-align:center;
-margin-bottom:30px }
-      
-.page-intro h2{
-  font-family:'Cormorant Garamond',serif;
-  font-size:36px;
-font-weight:400 }
-
-        
-.page-intro p{
-  color:var(--brown-soft);
-  font-size:13px;
-margin-top:6px }
-
-.theme-grid,.invitation-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-gap:25px }
-
-.theme-card,.invitation-card{
-  background:#fff;
-  border:1px solid #f0dfd9;
-  border-radius:18px;
-  overflow:hidden;
-  text-decoration:none;
-  box-shadow:0 10px 28px rgba(91,64,56,.07);
-transition:.25s }
-
-.theme-card:hover,.invitation-card:hover{
-  transform:translateY(-5px);
-box-shadow:0 16px 35px rgba(91,64,56,.12) }
-
-.theme-image,.invitation-image{
-  aspect-ratio:1/1;
-  overflow:hidden;
-background:#fff7f4 }
-
-.theme-image img,.invitation-image img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-display:block }
-
-.theme-info,.invitation-info{
-padding:18px }
-  
-.theme-info h3,.invitation-info h3{
-  font-family:'Cormorant Garamond',serif;
-  font-size:25px;
-font-weight:500 }
-
-.theme-info p,.invitation-info p{
-  font-size:12px;
-  color:var(--brown-soft);
-  line-height:1.6;
-margin:5px 0 15px }
-
-.theme-info span{
-  color:var(--pink-dark);
-font-size:12px }
-
-.invitation-info .btn{
-  width:100%;
-font-size:12px }
-
-.empty-category{
-  grid-column:1/-1;
-  text-align:center;
-  background:#fff;
-  padding:55px 25px;
-  border:1px solid #f0dfd9;
-  border-radius:18px;
-  color:var(--brown-soft);
-line-height:1.8 }
-
-.empty-category h2{
-  font-family:'Cormorant Garamond',serif;
-  font-size:34px;color:var(--brown);
-font-weight:400;margin-bottom:8px }
-
-
-
-@media(max-width:1100px){
-  .theme-grid,.invitation-grid{
-grid-template-columns:repeat(3,1fr)} }
-      
-@media(max-width:900px)
-{
-  .theme-grid,.invitation-grid{grid-template-columns:repeat(2,1fr)} 
-
-  .category-page{padding:30px 20px 70px}
-    
-  .category-page-title h1{font-size:48px}
-}
-    
-    
-@media(max-width:520px)
-{
-  .theme-grid,.invitation-grid{grid-template-columns:1fr}
-  .category-page-title h1{font-size:42px}
-}
-
-/*RESPONSIVIDADE — CATEGORIAS E MODELOS*/
-
-@media (max-width: 900px) 
-{
-  .category-page {padding: 30px 20px 65px;}
-
-  .category-page-title {margin-bottom: 38px;}
-
-  .category-page-title h1 {font-size: clamp(42px, 8vw, 52px);}
-
-  .theme-grid,.invitation-grid{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px; }
-
-  .theme-info,.invitation-info{padding: 15px;}
-}
-
-@media (max-width: 600px) 
-{
-  .category-page {padding: 22px 14px 55px;}
-
-  .back-link {
-    margin-bottom: 22px;
-  font-size: 12px; }
-
-  .category-page-title h1 {font-size: 40px;}
-
-  .category-page-title p {font-size: 12px;} 
-
-  .theme-grid,.invitation-grid{
-    grid-template-columns: 1fr;
-  gap: 16px;}
-
-  .theme-info h3,.invitation-info h3{font-size: 23px;}
-
-  .theme-info p,.invitation-info p{font-size: 11px;}
-}
-
-
 /* =========================================================
-   MODELOS VERTICAIS — ESCALA COMPACTA
-   Mantemos a proporção 1080x1920, mas reduzimos a escala
-   visual para que o convite não ocupe demasiado espaço.
+   TONInvitation — PÁGINA DE CATEGORIAS E MODELOS
+   Este ficheiro controla:
+   - página Infantil e restantes categorias;
+   - cartões dos temas;
+   - cartões dos convites;
+   - tamanho visual dos temas e das imagens quadradas;
+   - adaptação para computador, tablet e telemóvel.
    ========================================================= */
 
-.invitation-grid .invitation-image-portrait{
-  width: min(170px, 100%);  /*Tamanho da imagem do convite 1 ToyStory (escala)*/
-  margin: 0 auto; /*Posição da imagem dentro do quadro*/
-aspect-ratio: 1080 / 1920;}  /*Tamanho real da imagens dos convite*/
+/* =========================================================
+   VARIÁVEIS DE ESCALA
+   ALTERAÇÃO IMPORTANTE:
+   Estes valores controlam o tamanho visual dos cartões.
 
-.invitation-grid .invitation-image-portrait img {object-fit: contain;}
+   As imagens podem ter qualquer dimensão original.
+   O espaço dos temas é quadrado e a escala é controlada pelo cartão.
 
-@media (max-width: 900px) {
-  .invitation-grid .invitation-image-portrait {width: min(210px, 100%);}
+   Para aumentar ou diminuir TODOS os temas:
+   altera --theme-card-width.
+
+   Para aumentar ou diminuir TODOS os convites:
+   altera --invitation-card-width.
+   ========================================================= */
+
+:root {
+  --theme-card-width: 220px;
+  --invitation-card-width: 220px;
+
+  /* ALTERAÇÃO IMPORTANTE: escala visual do conjunto tema + imagem. 1 = tamanho atual; 0.80 = 80%. */
+  --theme-card-scale: 0.82;
+
+  /* ALTERAÇÃO IMPORTANTE: escala visual do conjunto convite + imagem. 1 = tamanho atual; 0.80 = 80%. */
+  --invitation-card-scale: 0.82;
 }
 
+/* =========================================================
+   ESTRUTURA GERAL DA PÁGINA
+   ========================================================= */
+
+.category-page {
+  max-width: 1400px;
+  margin: auto;
+  padding: 45px 5% 90px;
+  min-height: 75vh;
+}
+
+/* Link para voltar à página anterior. */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  color: var(--brown-soft);
+  font-size: 13px;
+  margin-bottom: 30px;
+}
+
+/* Cabeçalho da categoria ou tema. */
+.category-page-title {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 55px;
+}
+
+/* Título principal da categoria. */
+.category-page-title h1 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 60px;
+  font-weight: 400;
+  color: var(--brown);
+}
+
+/* Descrição da categoria. */
+.category-page-title p {
+  color: var(--brown-soft);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-top: 15px;
+}
+
+/* Introdução antes da grelha. */
+.page-intro {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Título da introdução. */
+.page-intro h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 36px;
+  font-weight: 400;
+}
+
+/* Texto da introdução. */
+.page-intro p {
+  color: var(--brown-soft);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* =========================================================
+   GRELHA DOS TEMAS E DOS CONVITES
+   ========================================================= */
+
+/*
+   Os cartões deixam de ocupar quatro colunas gigantes.
+   Cada cartão tem uma largura controlada pela variável acima.
+   A grelha centra automaticamente os cartões disponíveis.
+*/
+.theme-grid,
+.invitation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, var(--theme-card-width));
+  justify-content: center;
+  gap: 25px;
+}
+
+/*
+   IMPORTANTE:
+   Os cartões dos convites usam a mesma lógica de escala,
+   mas têm a sua própria largura definida abaixo.
+*/
+.invitation-grid {
+  grid-template-columns: repeat(auto-fit, var(--invitation-card-width));
+}
+
+/* =========================================================
+   CARTÃO DE TEMA
+   Exemplo: Toy Story, Cars, etc.
+   ========================================================= */
+
+.theme-card {
+  width: var(--theme-card-width);
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #f0dfd9;
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 10px 28px rgba(91, 64, 56, 0.07);
+  transition: 0.25s;
+
+  /* ALTERAÇÃO IMPORTANTE: reduz o conjunto inteiro sem alterar a proporção da imagem nem do retângulo. */
+  transform: scale(var(--theme-card-scale));
+
+  /* Mantém a redução centrada no meio do cartão. */
+  transform-origin: center center;
+}
+
+/* Efeito visual ao passar o rato no tema. */
+.theme-card:hover {
+  transform: scale(var(--theme-card-scale)) translateY(-5px);
+  box-shadow: 0 16px 35px rgba(91, 64, 56, 0.12);
+}
+
+/* =========================================================
+   IMAGEM DOS TEMAS — ESPAÇO QUADRADO
+
+   ALTERAÇÃO IMPORTANTE:
+   A partir de agora, TODOS os temas usam exatamente o mesmo
+   espaço quadrado para a imagem.
+
+   O tamanho base do quadrado é controlado pela largura do cartão:
+   --theme-card-width.
+
+   Exemplo:
+   220px de largura = 220px de altura para a imagem.
+
+   Assim, todos os temas ficam com exatamente o mesmo tamanho
+   de conjunto, independentemente da imagem que for colocada.
+
+   IMPORTANTE:
+   As imagens dos temas devem ser preparadas para este espaço
+   quadrado. Se uma imagem ainda for 1080x1920, ela continuará
+   a aparecer inteira porque usamos object-fit: contain.
+   Quando substituíres pela nova imagem quadrada, ela preencherá
+   naturalmente todo o espaço.
+   ========================================================= */
+
+.theme-image {
+  /* Largura do espaço quadrado. */
+  width: 100%;
+
+  /* Altura igual à largura para criar um quadrado. */
+  aspect-ratio: 1 / 1;
+
+  /* Impede que a imagem saia do espaço definido. */
+  overflow: hidden;
+
+  /* Fundo visível caso a imagem não preencha todo o quadrado. */
+  background: #fff7f4;
+}
+
+/*
+   ALTERAÇÃO IMPORTANTE:
+   contain garante que a imagem fique completamente visível.
+
+   Se a imagem for quadrada:
+   - preenche o quadrado.
+
+   Se a imagem ainda for 1080x1920:
+   - fica inteira dentro do quadrado;
+   - não é cortada;
+   - não é deformada.
+*/
+.theme-image img {
+  /* Ocupa toda a largura disponível. */
+  width: 100%;
+
+  /* Ocupa toda a altura disponível. */
+  height: 100%;
+
+  /* Mantém a proporção original da imagem. */
+  object-fit: contain;
+
+  /* Mantém a imagem centrada. */
+  object-position: center;
+
+  /* Remove espaços adicionais criados pelo elemento img. */
+  display: block;
+}
+
+/* =========================================================
+   INFORMAÇÃO DO TEMA
+   ========================================================= */
+
+.theme-info {
+  padding: 16px;
+}
+
+/* Nome do tema. */
+.theme-info h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+/* Descrição do tema. */
+.theme-info p {
+  font-size: 12px;
+  color: var(--brown-soft);
+  line-height: 1.6;
+  margin: 5px 0 15px;
+}
+
+/* Link para abrir os modelos do tema. */
+.theme-info span {
+  color: var(--pink-dark);
+  font-size: 12px;
+}
+
+/* =========================================================
+   CARTÃO DO CONVITE
+   Exemplo: Toy Story 1.
+   ========================================================= */
+
+.invitation-card {
+  width: var(--invitation-card-width);
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #f0dfd9;
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 10px 28px rgba(91, 64, 56, 0.07);
+  transition: 0.25s;
+
+  /* ALTERAÇÃO IMPORTANTE: reduz o conjunto inteiro sem alterar a proporção da imagem nem do retângulo. */
+  transform: scale(var(--invitation-card-scale));
+
+  /* Mantém a redução centrada no meio do cartão. */
+  transform-origin: center center;
+}
+
+/* Efeito visual ao passar o rato no convite. */
+.invitation-card:hover {
+  transform: scale(var(--invitation-card-scale)) translateY(-5px);
+  box-shadow: 0 16px 35px rgba(91, 64, 56, 0.12);
+}
+
+/* =========================================================
+   IMAGEM DOS CONVITES — 1080x1920
+
+   ALTERAÇÃO IMPORTANTE:
+   O retângulo tem exatamente a proporção da imagem.
+   O cartão e a imagem diminuem/aumentam em conjunto.
+
+   Para alterar a escala de todos os convites,
+   muda --invitation-card-width no início deste ficheiro.
+   ========================================================= */
+
+.invitation-image {
+  width: 100%;
+  aspect-ratio: 1080 / 1920;
+  overflow: hidden;
+  background: #fff7f4;
+}
+
+/*
+   A imagem completa fica sempre visível.
+   Não existe corte nem deformação.
+*/
+.invitation-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+/* =========================================================
+   INFORMAÇÃO DO CONVITE
+   ========================================================= */
+
+.invitation-info {
+  padding: 16px;
+}
+
+/* Nome do convite. */
+.invitation-info h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+/* Descrição do convite. */
+.invitation-info p {
+  font-size: 12px;
+  color: var(--brown-soft);
+  line-height: 1.6;
+  margin: 5px 0 15px;
+}
+
+/* Botão de personalização. */
+.invitation-info .btn {
+  width: 100%;
+  font-size: 12px;
+}
+
+/* =========================================================
+   ESTADO VAZIO
+   ========================================================= */
+
+.empty-category {
+  grid-column: 1 / -1;
+  text-align: center;
+  background: #fff;
+  padding: 55px 25px;
+  border: 1px solid #f0dfd9;
+  border-radius: 18px;
+  color: var(--brown-soft);
+  line-height: 1.8;
+}
+
+/* Título do estado vazio. */
+.empty-category h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 34px;
+  color: var(--brown);
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+  /* Reduz ligeiramente os temas no tablet. */
+  :root {
+    --theme-card-width: 190px;
+    --invitation-card-width: 190px;
+  }
+
+  /* Reduz o espaço exterior da página. */
+  .category-page {
+    padding: 30px 20px 65px;
+  }
+
+  /* Reduz o espaço do título. */
+  .category-page-title {
+    margin-bottom: 38px;
+  }
+
+  /* Reduz o título principal. */
+  .category-page-title h1 {
+    font-size: clamp(42px, 8vw, 52px);
+  }
+
+  /* Reduz o espaço entre cartões. */
+  .theme-grid,
+  .invitation-grid {
+    gap: 18px;
+  }
+
+  /* Reduz o espaço das informações. */
+  .theme-info,
+  .invitation-info {
+    padding: 14px;
+  }
+}
+
+/* =========================================================
+   TELEMÓVEL
+   ========================================================= */
+
 @media (max-width: 600px) {
-  .invitation-grid .invitation-image-portrait {
-    width: min(230px, 100%);
+  /* Os cartões ficam ainda mais pequenos no telemóvel. */
+  :root {
+    --theme-card-width: 165px;
+    --invitation-card-width: 165px;
+  }
+
+  /* Reduz o espaço exterior. */
+  .category-page {
+    padding: 22px 14px 55px;
+  }
+
+  /* Reduz o link de retorno. */
+  .back-link {
+    margin-bottom: 22px;
+    font-size: 12px;
+  }
+
+  /* Reduz o título principal. */
+  .category-page-title h1 {
+    font-size: 40px;
+  }
+
+  /* Reduz a descrição. */
+  .category-page-title p {
+    font-size: 12px;
+  }
+
+  /* Mantém os cartões centrados e pequenos. */
+  .theme-grid,
+  .invitation-grid {
+    grid-template-columns: repeat(2, var(--theme-card-width));
+    gap: 14px;
+  }
+
+  /* Garante a largura correta da grelha de convites. */
+  .invitation-grid {
+    grid-template-columns: repeat(2, var(--invitation-card-width));
+  }
+
+  /* Reduz os títulos dos cartões. */
+  .theme-info h3,
+  .invitation-info h3 {
+    font-size: 21px;
+  }
+
+  /* Reduz as descrições. */
+  .theme-info p,
+  .invitation-info p {
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   TELEMÓVEIS MUITO PEQUENOS
+   ========================================================= */
+
+@media (max-width: 380px) {
+  /* Num ecrã muito pequeno usamos uma coluna. */
+  .theme-grid,
+  .invitation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* O cartão mantém uma escala confortável. */
+  .theme-card,
+  .invitation-card {
+    width: 180px;
   }
 }
