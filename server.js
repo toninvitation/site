@@ -416,6 +416,33 @@ async function deliverOrderEmail(order) {
   };
 }
 
+/*
+  Mantém apenas URLs internas do próprio site para o retorno depois do pagamento.
+  Nunca aceitamos aqui um domínio externo enviado pelo navegador.
+*/
+function sanitizeReturnUrl(value) {
+  const fallback = "modelos.html";
+  const candidate = String(value || "").trim();
+
+  if (!candidate) {
+    return fallback;
+  }
+
+  if (candidate.startsWith("/")) {
+    return candidate;
+  }
+
+  if (candidate.startsWith("modelos.html")) {
+    return candidate;
+  }
+
+  if (candidate.startsWith("categoria.html")) {
+    return candidate;
+  }
+
+  return fallback;
+}
+
 /* =========================================================
    API — CRIAR PEDIDO
    ========================================================= */
@@ -456,6 +483,14 @@ app.post("/api/orders", async (request, response) => {
       previewImage: input.previewImage,
       finalImageSource: "Categorias Private/*_sem.png",
       email: String(input.email).trim(),
+
+      /*
+        Guarda a página de onde o cliente iniciou o pedido.
+        Depois do pagamento de teste, o cliente poderá regressar
+        exatamente ao catálogo/modelo onde estava.
+      */
+      returnUrl: sanitizeReturnUrl(input.returnUrl),
+
       templateId: input.templateId,
       templateName: input.templateName || input.templateId,
       name: input.name || "",
@@ -482,7 +517,8 @@ app.post("/api/orders", async (request, response) => {
       success: true,
       orderId,
       paymentStatus: order.paymentStatus,
-      testPaymentUrl: `/test-payment.html?orderId=${encodeURIComponent(orderId)}`
+      testPaymentUrl:
+        `/test-payment.html?orderId=${encodeURIComponent(orderId)}&returnUrl=${encodeURIComponent(order.returnUrl)}`
     });
   } catch (error) {
     /* Regista o erro completo no terminal do servidor. */
@@ -746,6 +782,14 @@ function discoverThemeModels(categoryFolderName, themeFolderName, themeDirectory
         fallbackImage: "Images/infantil.jpg",
         description: config.description || `Convite personalizado — ${prettifyModelName(modelEntry.name)}.`,
         priceEUR: Number(config.priceEUR || 5),
+
+        /*
+          A fonte pode ser definida individualmente no config.json do modelo.
+          Isto permite que Cars, Baby Shark, Toy Story, etc. tenham fontes
+          diferentes sem alterar o código do site.
+        */
+        fontConfig: config.fontConfig || {},
+
         defaultName: config.defaultName || "João",
         defaultAge: config.defaultAge || "3",
         defaultDate: config.defaultDate || "2026-05-10",

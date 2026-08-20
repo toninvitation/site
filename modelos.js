@@ -645,7 +645,10 @@ function setupCustomizer() {
       positions: cloneObject(layerPositions),
       sizes: cloneObject(layerSizes),
       colors: cloneObject(layerColors),
-      email
+      email,
+
+      /* Guarda a página atual para voltar depois do pagamento. */
+      returnUrl: window.location.href
     };
 
     button.disabled = true;
@@ -690,7 +693,8 @@ function createTextOverlayDataUrl() {
 
     const position = layerPositions[index] || { x: layer.x, y: layer.y };
     const size = layerSizes[index] ?? layer.size;
-    const fontFamily = layer.font || "HortaRegular, Horta, sans-serif";
+    const configuredFont = selectedTemplate.fontConfig?.[layer.field];
+    const fontFamily = configuredFont || layer.font || "HortaRegular, Horta, sans-serif";
     const pixelSize = size / 100 * 1080;
 
     context.save();
