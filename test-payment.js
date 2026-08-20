@@ -9,9 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("orderId");
 
-  /* Lê a página onde o cliente estava antes de ir para o pagamento. */
-  const returnUrl = params.get("returnUrl") || "modelos.html";
-
   /* Localiza os elementos da página. */
   const orderIdElement = document.getElementById("order-id");
   const paymentButton = document.getElementById("simulate-payment");
@@ -29,8 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
   /* Mostra o identificador do pedido. */
   orderIdElement.textContent = orderId;
 
-  /* Permite voltar ao personalizador mantendo o Order ID. */
-  returnLink.href = `${returnUrl}${returnUrl.includes("?") ? "&" : "?"}payment=cancelled&orderId=${encodeURIComponent(orderId)}`;
+  /* Depois do pagamento, o botão de retorno deve levar à página inicial. */
+  returnLink.href = `index.html?orderId=${encodeURIComponent(orderId)}`;
 
   /* Confirma o pagamento de teste no servidor. */
   paymentButton.addEventListener("click", async () => {
@@ -70,13 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       /* Desativa definitivamente o botão depois da confirmação. */
       paymentButton.textContent = "Pagamento confirmado";
-
-      /*
-        Depois de confirmar o pagamento, o cliente pode regressar
-        exatamente à página onde iniciou o pedido. O Order ID fica no URL.
-      */
-      returnLink.href = `${returnUrl}${returnUrl.includes("?") ? "&" : "?"}payment=confirmed&orderId=${encodeURIComponent(orderId)}`;
-      returnLink.textContent = "Voltar ao convite";
     } catch (error) {
       /* Mostra o erro e permite tentar novamente. */
       paymentMessage.textContent = error.message;

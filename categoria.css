@@ -24,8 +24,11 @@
    ========================================================= */
 
 :root {
-  --theme-card-width: 220px;
-  --invitation-card-width: 220px;
+  /* Tamanho base dos cartões dos temas. */
+  --theme-card-width: 200px;
+
+  /* Tamanho base dos cartões dos convites. */
+  --invitation-card-width: 200px;
 
   /* ALTERAÇÃO IMPORTANTE: escala visual do conjunto tema + imagem. 1 = tamanho atual; 0.80 = 80%. */
   --theme-card-scale: 0.82;
@@ -38,11 +41,18 @@
    ESTRUTURA GERAL DA PÁGINA
    ========================================================= */
 
+/* Fundo pedido para a página de temas/categorias. */
+body.category-page-body {
+  background: #f9ebe1;
+}
+
+/* Mantém a área principal com o mesmo fundo da página. */
 .category-page {
   max-width: 1400px;
   margin: auto;
   padding: 45px 5% 90px;
   min-height: 75vh;
+  background: #f9ebe1;
 }
 
 /* Link para voltar à página anterior. */
@@ -189,16 +199,20 @@
   overflow: hidden;
 
   /* Fundo visível caso a imagem não preencha todo o quadrado. */
-  background: #fff7f4;
+  background: #f9ebe1;
 }
 
 /*
    ALTERAÇÃO IMPORTANTE:
-   As imagens usadas nesta área são as imagens de CAPA do tema:
-   ToyStory_capa.png, Cars_capa.png, BabyShark_capa.png, etc.
+   contain garante que a imagem fique completamente visível.
 
-   Como as capas são quadradas, a imagem ocupa todo o botão quadrado.
-   Não usamos a imagem completa vertical do convite nesta área.
+   Se a imagem for quadrada:
+   - preenche o quadrado.
+
+   Se a imagem ainda for 1080x1920:
+   - fica inteira dentro do quadrado;
+   - não é cortada;
+   - não é deformada.
 */
 .theme-image img {
   /* Ocupa toda a largura disponível. */
@@ -207,8 +221,8 @@
   /* Ocupa toda a altura disponível. */
   height: 100%;
 
-  /* Faz a capa quadrada preencher todo o botão. */
-  object-fit: cover;
+  /* Mantém a proporção original da imagem. */
+  object-fit: contain;
 
   /* Mantém a imagem centrada. */
   object-position: center;
@@ -365,8 +379,8 @@
 @media (max-width: 900px) {
   /* Reduz ligeiramente os temas no tablet. */
   :root {
-    --theme-card-width: 190px;
-    --invitation-card-width: 190px;
+    --theme-card-width: 175px;
+    --invitation-card-width: 175px;
   }
 
   /* Reduz o espaço exterior da página. */
@@ -404,8 +418,8 @@
 @media (max-width: 600px) {
   /* Os cartões ficam ainda mais pequenos no telemóvel. */
   :root {
-    --theme-card-width: 165px;
-    --invitation-card-width: 165px;
+    --theme-card-width: 150px;
+    --invitation-card-width: 150px;
   }
 
   /* Reduz o espaço exterior. */

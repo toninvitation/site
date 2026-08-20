@@ -36,6 +36,9 @@ const fs = require("fs");
 /* Carrega as funções para trabalhar com caminhos. */
 const path = require("path");
 
+/* Carrega as configurações opcionais de fontes e layouts dos modelos. */
+const MODEL_CONFIGURATIONS = require("./model-configs.js");
+
 /* Cria a aplicação HTTP. */
 const app = express();
 
@@ -416,33 +419,6 @@ async function deliverOrderEmail(order) {
   };
 }
 
-/*
-  Mantém apenas URLs internas do próprio site para o retorno depois do pagamento.
-  Nunca aceitamos aqui um domínio externo enviado pelo navegador.
-*/
-function sanitizeReturnUrl(value) {
-  const fallback = "modelos.html";
-  const candidate = String(value || "").trim();
-
-  if (!candidate) {
-    return fallback;
-  }
-
-  if (candidate.startsWith("/")) {
-    return candidate;
-  }
-
-  if (candidate.startsWith("modelos.html")) {
-    return candidate;
-  }
-
-  if (candidate.startsWith("categoria.html")) {
-    return candidate;
-  }
-
-  return fallback;
-}
-
 /* =========================================================
    API — CRIAR PEDIDO
    ========================================================= */
@@ -483,14 +459,6 @@ app.post("/api/orders", async (request, response) => {
       previewImage: input.previewImage,
       finalImageSource: "Categorias Private/*_sem.png",
       email: String(input.email).trim(),
-
-      /*
-        Guarda a página de onde o cliente iniciou o pedido.
-        Depois do pagamento de teste, o cliente poderá regressar
-        exatamente ao catálogo/modelo onde estava.
-      */
-      returnUrl: sanitizeReturnUrl(input.returnUrl),
-
       templateId: input.templateId,
       templateName: input.templateName || input.templateId,
       name: input.name || "",
@@ -517,8 +485,7 @@ app.post("/api/orders", async (request, response) => {
       success: true,
       orderId,
       paymentStatus: order.paymentStatus,
-      testPaymentUrl:
-        `/test-payment.html?orderId=${encodeURIComponent(orderId)}&returnUrl=${encodeURIComponent(order.returnUrl)}`
+      testPaymentUrl: `/test-payment.html?orderId=${encodeURIComponent(orderId)}`
     });
   } catch (error) {
     /* Regista o erro completo no terminal do servidor. */
@@ -706,21 +673,141 @@ function prettifyModelName(folderName) {
     .trim();
 }
 
+/* Normaliza o nome de uma fonte para conseguir encontrá-la no nome do ficheiro. */
+function normalizeFontName(fontName) {
+  return String(fontName || "")
+    .split(",")[0]
+    .replace(/["']/g, "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+/* Procura recursivamente um ficheiro de fonte dentro de uma pasta. */
+function findFontFile(directory, fontName) {
+  const normalizedFontName = normalizeFontName(fontName);
+  const supportedExtensions = /\.(ttf|otf|woff|woff2)$/i;
+
+  if (!normalizedFontName || !fs.existsSync(directory)) {
+    return null;
+  }
+
+  const entries = fs.readdirSync(directory, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const entryPath = path.join(directory, entry.name);
+
+    if (entry.isFile() && supportedExtensions.test(entry.name)) {
+      const normalizedFileName = normalizeFontName(
+        path.basename(entry.name, path.extname(entry.name))
+      );
+
+      if (
+        normalizedFileName.includes(normalizedFontName) ||
+        normalizedFontName.includes(normalizedFileName)
+      ) {
+        return entryPath;
+      }
+    }
+
+    if (entry.isDirectory()) {
+      const nestedMatch = findFontFile(entryPath, fontName);
+
+      if (nestedMatch) {
+        return nestedMatch;
+      }
+    }
+  }
+
+  return null;
+}
+
+/* Converte um caminho absoluto dentro de Categorias para uma URL pública. */
+function createPublicFontPath(fontPath) {
+  const categoriesRoot = path.resolve(ROOT_DIRECTORY, "Categorias");
+  const resolvedFontPath = path.resolve(fontPath);
+
+  if (!resolvedFontPath.startsWith(categoriesRoot + path.sep)) {
+    return null;
+  }
+
+  const relativePath = path.relative(categoriesRoot, resolvedFontPath);
+  return createPublicCategoryPath(...relativePath.split(path.sep));
+}
+
+/* Descobre as fontes usadas por um modelo sem obrigar a mover os ficheiros. */
+function discoverModelFonts(modelDirectory, config) {
+  const fontNames = new Set();
+
+  /* Adiciona a fonte geral do modelo, se existir. */
+  if (config.fontFamily) {
+    fontNames.add(String(config.fontFamily).split(",")[0].trim());
+  }
+
+  /* Adiciona fontes específicas por campo, se existirem. */
+  Object.values(config.fontByField || {}).forEach(fontName => {
+    if (fontName) {
+      fontNames.add(String(fontName).split(",")[0].trim());
+    }
+  });
+
+  /* Adiciona as fontes declaradas diretamente nas camadas. */
+  (config.textLayers || []).forEach(layer => {
+    if (layer.font) {
+      fontNames.add(String(layer.font).split(",")[0].trim());
+    }
+  });
+
+  const fontFiles = {};
+  const categoriesDirectory = path.join(ROOT_DIRECTORY, "Categorias");
+
+  fontNames.forEach(fontName => {
+    /* Primeiro procura dentro da pasta do próprio convite. */
+    let fontPath = findFontFile(modelDirectory, fontName);
+
+    /* Se não encontrar, procura noutras pastas de Categorias. */
+    if (!fontPath) {
+      fontPath = findFontFile(categoriesDirectory, fontName);
+    }
+
+    if (fontPath) {
+      const publicPath = createPublicFontPath(fontPath);
+
+      if (publicPath) {
+        fontFiles[fontName] = publicPath;
+      }
+    }
+  });
+
+  return fontFiles;
+}
+
 /* Cria camadas de texto genéricas para novos modelos. */
-function createDefaultTextLayers() {
+function createDefaultTextLayers(fontConfiguration = {}) {
+  /* Define a fonte padrão do modelo. */
+  const defaultFont = fontConfiguration.fontFamily || "HortaRegular, Horta, sans-serif";
+
+  /* Define uma fonte específica para cada campo quando necessário. */
+  const fontByField = fontConfiguration.fontByField || {};
+
+  /* Obtém a fonte correta para cada camada. */
+  const getFont = field => fontByField[field] || fontByField.default || defaultFont;
+
+  /* Cria as camadas genéricas usando a configuração de fontes. */
   return [
-    { field: "name", x: 50, y: 18, size: 10, font: "Sigmar One, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
-    { field: "faz", x: 50, y: 28, size: 6, font: "HortaRegular, Horta, sans-serif", color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
-    { field: "age", x: 50, y: 38, size: 15, font: "Sigmar One, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.85, align: "center" },
-    { field: "anos", x: 50, y: 46, size: 6, font: "Sigmar One, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
-    { field: "adventure", x: 50, y: 55, size: 5, font: "HortaRegular, Horta, sans-serif", color: "#07588c", weight: 700, lineHeight: 0.95, align: "center" },
-    { field: "date-month", x: 38, y: 64, size: 4, font: "HortaRegular, Horta, sans-serif", color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
-    { field: "date-day", x: 38, y: 70, size: 8, font: "HortaRegular, Horta, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.85, align: "center" },
-    { field: "weekday-time", x: 67, y: 64, size: 3.5, font: "HortaRegular, Horta, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
-    { value: "LOCAL", className: "small-white place-label", x: 67, y: 69, size: 3.5, font: "HortaRegular, Horta, sans-serif", color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
-    { field: "place", x: 67, y: 73, size: 2.5, font: "HortaRegular, Horta, sans-serif", color: "#ffc000", weight: 700, lineHeight: 0.95, align: "center" },
-    { field: "end", x: 50, y: 81, size: 5, font: "HortaRegular, Horta, sans-serif", color: "#07588c", weight: 700, lineHeight: 0.9, align: "center" },
-    { field: "otherInfo", x: 50, y: 89, size: 3.5, font: "HortaRegular, Horta, sans-serif", color: "#07588c", weight: 600, lineHeight: 1, align: "center" }
+    { field: "name", x: 50, y: 18, size: 10, font: getFont("name"), color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "faz", x: 50, y: 28, size: 6, font: getFont("faz"), color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "age", x: 50, y: 38, size: 15, font: getFont("age"), color: "#ffc000", weight: 700, lineHeight: 0.85, align: "center" },
+    { field: "anos", x: 50, y: 46, size: 6, font: getFont("anos"), color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "adventure", x: 50, y: 55, size: 5, font: getFont("adventure"), color: "#07588c", weight: 700, lineHeight: 0.95, align: "center" },
+    { field: "date-month", x: 38, y: 64, size: 4, font: getFont("date-month"), color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "date-day", x: 38, y: 70, size: 8, font: getFont("date-day"), color: "#ffc000", weight: 700, lineHeight: 0.85, align: "center" },
+    { field: "weekday-time", x: 67, y: 64, size: 3.5, font: getFont("weekday-time"), color: "#ffc000", weight: 700, lineHeight: 0.9, align: "center" },
+    { value: "LOCAL", className: "small-white place-label", x: 67, y: 69, size: 3.5, font: getFont("place-label"), color: "#f0f0f0", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "place", x: 67, y: 73, size: 2.5, font: getFont("place"), color: "#ffc000", weight: 700, lineHeight: 0.95, align: "center" },
+    { field: "end", x: 50, y: 81, size: 5, font: getFont("end"), color: "#07588c", weight: 700, lineHeight: 0.9, align: "center" },
+    { field: "otherInfo", x: 50, y: 89, size: 3.5, font: getFont("otherInfo"), color: "#07588c", weight: 600, lineHeight: 1, align: "center" }
   ];
 }
 
@@ -756,8 +843,10 @@ function discoverThemeModels(categoryFolderName, themeFolderName, themeDirectory
         return;
       }
 
-      const config = readOptionalModelConfig(modelDirectory);
+      const fileConfig = readOptionalModelConfig(modelDirectory);
       const modelId = createCatalogId(categoryFolderName, themeFolderName, modelEntry.name);
+      const centralConfig = MODEL_CONFIGURATIONS[modelId] || {};
+      const config = { ...centralConfig, ...fileConfig };
       const previewFile = publicFile || completeFile;
 
       models.push({
@@ -782,14 +871,6 @@ function discoverThemeModels(categoryFolderName, themeFolderName, themeDirectory
         fallbackImage: "Images/infantil.jpg",
         description: config.description || `Convite personalizado — ${prettifyModelName(modelEntry.name)}.`,
         priceEUR: Number(config.priceEUR || 5),
-
-        /*
-          A fonte pode ser definida individualmente no config.json do modelo.
-          Isto permite que Cars, Baby Shark, Toy Story, etc. tenham fontes
-          diferentes sem alterar o código do site.
-        */
-        fontConfig: config.fontConfig || {},
-
         defaultName: config.defaultName || "João",
         defaultAge: config.defaultAge || "3",
         defaultDate: config.defaultDate || "2026-05-10",
@@ -801,9 +882,24 @@ function discoverThemeModels(categoryFolderName, themeFolderName, themeDirectory
         defaultEnd: config.defaultEnd || "ESPERAMOS POR TI!",
         defaultOtherInfo: config.defaultOtherInfo || "",
         defaultOtherInfoColor: config.defaultOtherInfoColor || "#07588c",
+        editableFields: Array.isArray(config.editableFields)
+          ? config.editableFields
+          : [
+              "name",
+              "age",
+              "date",
+              "time",
+              "place",
+              "adventure",
+              "faz",
+              "anos",
+              "end",
+              "otherInfo"
+            ],
+        fontFiles: discoverModelFonts(modelDirectory, config),
         textLayers: Array.isArray(config.textLayers)
           ? config.textLayers
-          : createDefaultTextLayers()
+          : createDefaultTextLayers(config)
       });
     });
 

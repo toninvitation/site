@@ -1,0 +1,137 @@
+{
+  "name": "Cars 1",
+  "description": "Convite personalizado Cars 1.",
+  "priceEUR": 5,
+  "fontByField": {
+    "name": "Magz",
+    "age": "NFLDOLPH",
+    "date": "NFLDOLPH",
+    "time": "NFLDOLPH",
+    "place": "NFLDOLPH",
+    "otherInfo": "NFLDOLPH"
+  },
+  "editableFields": [
+    "name",
+    "age",
+    "date",
+    "time",
+    "place",
+    "otherInfo"
+  ],
+  "defaultPlace": "Rua Luís de Camões 4",
+  "defaultTime": "17:00",
+  "textLayers": [
+    {
+      "field": "name",
+      "className": "cars-name",
+      "x": 50,
+      "y": 14.5,
+      "size": 15,
+      "font": "Magz",
+      "color": "#e9e9e9",
+      "weight": 700,
+      "lineHeight": 0.9,
+      "align": "center"
+    },
+    {
+      "field": "age",
+      "className": "cars-age",
+      "x": 50,
+      "y": 32.5,
+      "size": 20,
+      "font": "NFLDOLPH",
+      "color": "#f04a20",
+      "weight": 700,
+      "lineHeight": 0.85,
+      "align": "center"
+    },
+    {
+      "field": "date-day",
+      "className": "cars-day",
+      "x": 17.2,
+      "y": 77.5,
+      "size": 15,
+      "font": "NFLDOLPH",
+      "color": "#f79238",
+      "weight": 700,
+      "lineHeight": 0.85,
+      "align": "center"
+    },
+    {
+      "value": "MINHA CASA",
+      "className": "cars-place-label",
+      "x": 50,
+      "y": 77.2,
+      "size": 4.3,
+      "font": "NFLDOLPH",
+      "color": "#f79238",
+      "weight": 700,
+      "lineHeight": 0.9,
+      "align": "center"
+    },
+    {
+      "field": "place",
+      "className": "cars-place",
+      "x": 50,
+      "y": 83.8,
+      "size": 4.1,
+      "font": "NFLDOLPH",
+      "color": "#f0f0f0",
+      "weight": 700,
+      "lineHeight": 0.95,
+      "align": "center"
+    },
+    {
+      "field": "time",
+      "className": "cars-time",
+      "x": 82.8,
+      "y": 77.4,
+      "size": 8.2,
+      "font": "NFLDOLPH",
+      "color": "#f79238",
+      "weight": 700,
+      "lineHeight": 0.85,
+      "align": "center"
+    },
+    {
+      "value": "HORAS",
+      "className": "cars-hours",
+      "x": 82.8,
+      "y": 86.0,
+      "size": 4.7,
+      "font": "NFLDOLPH",
+      "color": "#f0f0f0",
+      "weight": 700,
+      "lineHeight": 0.9,
+      "align": "center"
+    },
+    {
+      "field": "date-month",
+      "className": "cars-month",
+      "x": 17.2,
+      "y": 87.0,
+      "size": 4.7,
+      "font": "NFLDOLPH",
+      "color": "#f0f0f0",
+      "weight": 700,
+      "lineHeight": 0.9,
+      "align": "center"
+    },
+    {
+      "field": "otherInfo",
+      "className": "other-info",
+      "label": "Outras informações",
+      "x": 50,
+      "y": 92,
+      "size": 3.5,
+      "font": "Magz",
+      "color": "#f0f0f0",
+      "weight": 600,
+      "lineHeight": 1,
+      "align": "center"
+    }
+  ],
+  "defaultName": "Paulo",
+  "defaultAge": "6",
+  "defaultDate": "2026-05-20"
+}

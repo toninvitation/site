@@ -50,3 +50,30 @@ Não é necessário criar `config.json` para começar a adicionar modelos.
 ## Importante
 
 A versão `_sem.png` nunca é servida pelo navegador. O servidor usa essa imagem apenas quando cria o convite final depois do pedido.
+
+## Fontes e layouts dos modelos
+
+O ficheiro `model-configs.js` permite indicar a fonte de cada convite sem alterar `server.js`.
+
+Para uma fonte única:
+
+```js
+"infantil-cars-cars1": {
+  fontFamily: "Magz, sans-serif"
+}
+```
+
+Para fontes diferentes por campo:
+
+```js
+"infantil-toy-story-toystory1": {
+  fontByField: {
+    name: "Sigmar One, sans-serif",
+    age: "Sigmar One, sans-serif",
+    anos: "Sigmar One, sans-serif",
+    default: "HortaRegular, Horta, sans-serif"
+  }
+}
+```
+
+Quando `textLayers` é definido, ele controla a posição, tamanho, cor e fonte inicial de cada escrita.

@@ -10,7 +10,7 @@
   <link href="style.css" rel="stylesheet">
   <link href="categoria.css" rel="stylesheet">
 </head>
-<body>
+<body class="category-page-body">
   <header class="site-header">
     <a class="logo" href="index.html"><img alt="TONInvitation" src="Images/logo_pt.png"></a>
     <nav class="main-nav" id="menu">
@@ -22,6 +22,15 @@
       </ul>
     </nav>
     <a class="btn btn-primary header-contact" href="https://wa.link/jy0xch" target="_blank">Contactar</a>
+    <div class="language-selector">
+      <button type="button" class="language-current" aria-label="Choose language">🇵🇹 PT</button>
+      <div class="language-menu">
+        <button type="button" class="language-option" data-language="pt">🇵🇹 PT</button>
+        <button type="button" class="language-option" data-language="en">🇬🇧 EN</button>
+        <button type="button" class="language-option" data-language="fr">🇫🇷 FR</button>
+        <button type="button" class="language-option" data-language="es">🇪🇸 ES</button>
+      </div>
+    </div>
     <button class="menu-mobile" id="menu-mobile" aria-label="Abrir menu"><span></span><span></span><span></span></button>
   </header>
 
@@ -32,6 +41,7 @@
     <p data-catalog-error class="form-message"></p>
   </main>
 
+  <script src="i18n.js"></script>
   <script src="categories.js"></script>
   <script src="categoria.js"></script>
   <script>lucide.createIcons();</script>

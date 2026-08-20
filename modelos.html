@@ -51,29 +51,29 @@
 
       <div class="customizer-layout">
         <form id="customizer-form" class="customizer-form">
-          <label>
+          <label id="field-group-name">
             Nome
             <textarea id="field-name" maxlength="45" rows="2" placeholder="Ex.: João"></textarea>
           </label>
-          <label>
+          <label id="field-group-age">
             Idade
             <input id="field-age" type="text" maxlength="2" inputmode="numeric">
           </label>
-          <label>
+          <label id="field-group-date">
             Data
             <input id="field-date" type="date">
             <small class="field-help">Escolha a data no calendário. O dia da semana é preenchido automaticamente.</small>
           </label>
-          <label>
+          <label id="field-group-time">
             Hora
             <input id="field-time" type="text" maxlength="20" placeholder="Ex.: 15H">
           </label>
-          <label>
+          <label id="field-group-place">
             Morada / Local
             <textarea id="field-place" maxlength="80" rows="2" placeholder="Ex.: Rua Luís de Camões 4"></textarea>
           </label>
 
-          <div class="editable-phrases">
+          <div id="field-group-phrases" class="editable-phrases">
             <span class="form-label">Frases no convite</span>
             <p class="field-help">Estas frases aparecem como no modelo, mas pode alterá-las ou apagá-las.</p>
             <label>
@@ -94,7 +94,7 @@
             </label>
           </div>
 
-          <label>
+          <label id="field-group-other-info">
             Outras informações da festa
             <textarea id="field-other-info" maxlength="180" rows="4" placeholder="Escreva aqui alguma informação extra, se desejar."></textarea>
             <small class="field-help">Esta frase também pode ser arrastada e redimensionada no convite.</small>
@@ -147,6 +147,7 @@
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="categories.js"></script>
   <script src="modelos.js"></script>
   <script>lucide.createIcons();</script>

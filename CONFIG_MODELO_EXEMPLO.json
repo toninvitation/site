@@ -1,0 +1,27 @@
+{
+  "name": "Nome do convite",
+  "description": "Descrição do convite.",
+  "priceEUR": 5,
+  "fontFamily": "Nome da Fonte",
+  "editableFields": [
+    "name",
+    "age",
+    "date",
+    "time",
+    "place",
+    "otherInfo"
+  ],
+  "textLayers": [
+    {
+      "field": "name",
+      "x": 50,
+      "y": 20,
+      "size": 10,
+      "font": "Nome da Fonte",
+      "color": "#ffffff",
+      "weight": 700,
+      "lineHeight": 0.9,
+      "align": "center"
+    }
+  ]
+}

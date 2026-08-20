@@ -104,15 +104,121 @@ function setupMenu() {
   });
 }
 
+/* Instala no navegador as fontes que pertencem ao modelo selecionado. */
+function installTemplateFonts(template) {
+  /* Não faz nada se o servidor não encontrou ficheiros de fonte. */
+  if (!template?.fontFiles) return;
+
+  /* Remove apenas as fontes dinâmicas instaladas anteriormente pelo editor. */
+  document.querySelectorAll("style[data-toninvitation-template-fonts]").forEach(style => {
+    style.remove();
+  });
+
+  /* Cria uma folha de estilos exclusiva para o modelo atual. */
+  const style = document.createElement("style");
+  style.dataset.toninvitationTemplateFonts = "true";
+
+  /* Constrói as regras @font-face para todas as fontes encontradas. */
+  style.textContent = Object.entries(template.fontFiles)
+    .map(([fontFamily, fontUrl]) => {
+      const safeFamily = String(fontFamily).replace(/[^a-zA-Z0-9 _-]/g, "");
+      const safeUrl = String(fontUrl).replace(/"/g, "\\\"");
+      const extension = safeUrl.split("?")[0].split(".").pop().toLowerCase();
+      const formatMap = {
+        ttf: "truetype",
+        otf: "opentype",
+        woff: "woff",
+        woff2: "woff2"
+      };
+      const format = formatMap[extension] || "truetype";
+
+      return `@font-face { font-family: "${safeFamily}"; src: url("${safeUrl}") format("${format}"); font-style: normal; font-weight: 100 900; font-display: swap; }`;
+    })
+    .join("\n");
+
+  document.head.appendChild(style);
+}
+
+/* Aguarda as fontes do modelo antes de atualizar o convite. */
+async function waitForTemplateFonts(template) {
+  installTemplateFonts(template);
+
+  if (!document.fonts) return;
+
+  const families = new Set();
+
+  Object.values(template.fontFiles || {}).forEach(fontFamily => {
+    families.add(fontFamily);
+  });
+
+  (template.textLayers || []).forEach(layer => {
+    if (layer.font) {
+      families.add(String(layer.font).split(",")[0].replace(/["']/g, "").trim());
+    }
+  });
+
+  for (const fontFamily of families) {
+    try {
+      await document.fonts.load(`700 32px "${fontFamily}"`);
+    } catch (error) {
+      console.warn(`Não foi possível carregar a fonte: ${fontFamily}`);
+    }
+  }
+}
+
+/* Mostra apenas os campos que o modelo realmente utiliza. */
+function applyTemplateFormConfiguration(template) {
+  const editableFields = new Set(
+    template.editableFields || [
+      "name",
+      "age",
+      "date",
+      "time",
+      "place",
+      "adventure",
+      "faz",
+      "anos",
+      "end",
+      "otherInfo"
+    ]
+  );
+
+  const fieldGroupMap = {
+    name: "field-group-name",
+    age: "field-group-age",
+    date: "field-group-date",
+    time: "field-group-time",
+    place: "field-group-place",
+    otherInfo: "field-group-other-info"
+  };
+
+  Object.entries(fieldGroupMap).forEach(([field, groupId]) => {
+    const group = document.getElementById(groupId);
+
+    if (group) {
+      group.hidden = !editableFields.has(field);
+    }
+  });
+
+  const phraseGroup = document.getElementById("field-group-phrases");
+
+  if (phraseGroup) {
+    const phraseFields = ["adventure", "faz", "anos", "end"];
+    phraseGroup.hidden = !phraseFields.some(field => editableFields.has(field));
+  }
+}
+
 /* Abre o personalizador. */
 function openCustomizer(id) {
   selectedTemplate = INVITATION_TEMPLATES.find(template => template.id === id);
 
   if (!selectedTemplate) return;
 
+  applyTemplateFormConfiguration(selectedTemplate);
   fillDefaultFields();
   resetEditorState();
   updatePreview();
+  waitForTemplateFonts(selectedTemplate).then(updatePreview);
 
   const modal = document.getElementById("customizer-modal");
   modal.classList.add("open");
@@ -361,7 +467,7 @@ function changeSelectedLayerSize(delta) {
     5
   );
 
-  const nextSize = Math.max(1, Math.min(30, currentSize + delta));
+  const nextSize = Math.max(1, Math.min(40, currentSize + delta));
 
   if (nextSize === currentSize) return;
 
@@ -402,7 +508,7 @@ function updateSelectedLayerControls() {
     colorInput.disabled = false;
   }
   if (decrease) decrease.disabled = size <= 1;
-  if (increase) increase.disabled = size >= 30;
+  if (increase) increase.disabled = size >= 40;
 }
 
 /* Altera a cor da camada selecionada. */
@@ -439,6 +545,7 @@ function updatePreview() {
 
   const preview = document.getElementById("invitation-preview");
   preview.innerHTML = "";
+  preview.dataset.themeId = selectedTemplate.themeId || selectedTemplate.theme || "";
   preview.style.backgroundImage = selectedTemplate.previewImage
     ? `url("${selectedTemplate.previewImage}")`
     : "none";
@@ -464,7 +571,7 @@ function renderLayeredInvitation(preview) {
     element.style.top = `${position.y}%`;
     element.style.fontSize = `${size}cqw`;
     element.style.color = layerColors[index] || layer.color || "#07588c";
-    element.style.fontFamily = layer.font || "HortaRegular, Horta, sans-serif";
+    element.style.fontFamily = layer.font || "Horta, sans-serif";
     element.style.fontWeight = layer.weight || "700";
     element.style.lineHeight = layer.lineHeight || "1";
     element.style.textAlign = layer.align || "center";
@@ -624,7 +731,7 @@ function setupCustomizer() {
 
     const selectedDate = getFieldValue("date", "");
     const dateInfo = formatSelectedDate(selectedDate);
-    const overlay = createTextOverlayDataUrl();
+    const overlay = await createTextOverlayDataUrl();
 
     const order = {
       templateId: selectedTemplate.id,
@@ -645,10 +752,9 @@ function setupCustomizer() {
       positions: cloneObject(layerPositions),
       sizes: cloneObject(layerSizes),
       colors: cloneObject(layerColors),
-      email,
-
-      /* Guarda a página atual para voltar depois do pagamento. */
-      returnUrl: window.location.href
+      editableFields: selectedTemplate.editableFields || [],
+      fontFiles: cloneObject(selectedTemplate.fontFiles || {}),
+      email
     };
 
     button.disabled = true;
@@ -681,7 +787,15 @@ function setupCustomizer() {
 }
 
 /* Cria uma camada PNG transparente com os textos personalizados. */
-function createTextOverlayDataUrl() {
+async function createTextOverlayDataUrl() {
+  /* Instala e carrega as fontes reais do modelo antes de desenhar. */
+  await waitForTemplateFonts(selectedTemplate);
+
+  /* Aguarda o carregamento geral das fontes do navegador. */
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
   canvas.height = 1920;
@@ -693,14 +807,13 @@ function createTextOverlayDataUrl() {
 
     const position = layerPositions[index] || { x: layer.x, y: layer.y };
     const size = layerSizes[index] ?? layer.size;
-    const configuredFont = selectedTemplate.fontConfig?.[layer.field];
-    const fontFamily = configuredFont || layer.font || "HortaRegular, Horta, sans-serif";
+    const fontFamily = layer.font || "Horta";
     const pixelSize = size / 100 * 1080;
 
     context.save();
     context.translate(position.x / 100 * 1080, position.y / 100 * 1920);
     context.rotate((layer.rotate || 0) * Math.PI / 180);
-    context.font = `${layer.weight || 700} ${pixelSize}px ${fontFamily}`;
+    context.font = `${layer.weight || 700} ${pixelSize}px "${String(fontFamily).split(",")[0].replace(/["']/g, "").trim()}"`;
     context.fillStyle = layerColors[index] || layer.color || "#07588c";
     context.textAlign = layer.align || "center";
     context.textBaseline = "middle";
