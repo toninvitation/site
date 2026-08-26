@@ -1,48 +1,12 @@
-# =========================================================
-# FICHEIROS SECRETOS
-# =========================================================
-
-# Impede o envio das variáveis secretas do projeto.
-.env
-
-# Impede versões alternativas do ficheiro .env.
-.env.*
-
-# Permite apenas ficheiros de exemplo sem passwords.
-!.env.example
-
-
-# =========================================================
-# IMAGENS PRIVADAS
-# =========================================================
-
-# Impede o envio das imagens sem marca d'água.
-Categorias Private/
-
-
-# =========================================================
-# PEDIDOS DOS CLIENTES
-# =========================================================
-
-# Impede o envio dos pedidos e dados dos clientes.
-data/orders/
-
-
-# =========================================================
-# DEPENDÊNCIAS
-# =========================================================
-
-# Impede o envio das dependências instaladas.
+# Dependências instaladas pelo npm.
 node_modules/
 
+# Variáveis privadas de ambiente.
+.env
 
-# =========================================================
-# FICHEIROS TEMPORÁRIOS
-# =========================================================
+# Pedidos e ficheiros gerados durante os testes.
+data/orders/
 
-# Impede ficheiros temporários.
-*.log
-
-# Impede ficheiros temporários do sistema.
+# Ficheiros temporários do sistema.
 .DS_Store
 Thumbs.db

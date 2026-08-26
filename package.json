@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build:catalog": "node build-catalog.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

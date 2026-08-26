@@ -1,0 +1,69 @@
+# =========================================================
+# TONInvitation — PUBLICAÇÃO AUTOMÁTICA NO GITHUB PAGES
+#
+# Sempre que houver um push para a branch main:
+# 1. O catálogo é reconstruído a partir da pasta Categorias.
+# 2. O site é publicado no GitHub Pages.
+#
+# As imagens de Categorias são públicas.
+# A pasta Categorias Private NÃO deve estar neste repositório.
+# =========================================================
+
+name: Publicar TONInvitation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Faz download do conteúdo do repositório.
+      - name: Obter código
+        uses: actions/checkout@v4
+
+      # Prepara o Node.js usado para gerar o catálogo.
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Gera catalog.json automaticamente a partir das pastas de convites.
+      - name: Gerar catálogo
+        run: node build-catalog.js
+
+      # Configura o GitHub Pages.
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      # Prepara os ficheiros para publicação.
+      - name: Preparar artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      # Publica o artefacto no GitHub Pages.
+      - name: Publicar site
+        id: deployment
+        uses: actions/deploy-pages@v4
