@@ -1,4 +1,10 @@
 /* =========================================================
+   TONInvitation — CONFIGURAÇÃO DOS MODELOS
+   Cada objeto descreve um convite, as suas imagens e camadas.
+   As posições das camadas usam percentagens do canvas 1080x1920.
+   ========================================================= */
+
+/* =========================================================
    MODELOS DE CONVITES
 
    Cada objeto representa um convite do catálogo.
@@ -258,7 +264,9 @@ const INVITATION_TEMPLATES = [
     category: "infantil",
     theme: "toy-story",
     image: `${TOY_STORY_1}ToyStory1_completo.png`,
+    /* Base visual da personalização: imagem com marca d'água, sem substituir as camadas editáveis. */
     previewImage: `${TOY_STORY_1}ToyStory1_com.png`,
+    /* Imagem completa usada como referência/final. */
     finalImage: `${TOY_STORY_1}ToyStory1_completo.png`,
     fallbackImage: "Images/infantil.jpg",
     description: "Modelo infantil do tema Toy Story.",

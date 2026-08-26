@@ -1,16 +1,10 @@
-# TONInvitation — correção da imagem dos modelos
+# TONInvitation — correção da pré-visualização Toy Story 1
 
-Substituir no projeto os ficheiros:
-- `build-catalog.js`
-- `categories.js`
+Substitui estes ficheiros no site:
 - `modelos.js`
+- `templates.js`
+- `toy-story.css`
 
-A imagem apresentada no cartão de cada convite passa a procurar automaticamente primeiro uma imagem com o mesmo nome da pasta do modelo.
+A correção mantém a imagem `ToyStory1_com.png` como base da pré-visualização (com marca d'água) e garante que os textos default do convite são mostrados nas camadas editáveis. Se a imagem de pré-visualização não existir, o JavaScript tenta a imagem principal/final como fallback.
 
-Exemplo:
-
-`Categorias/Infantil/Toy Story/Toy Story1/Toy Story1.png`
-
-Essa imagem é usada no catálogo/modelos. A imagem `_com.png` continua disponível para a pré-visualização/fluxo de personalização e não é escolhida como imagem do cartão.
-
-Depois de substituir os ficheiros, fazer commit/push para `main` para o GitHub Actions voltar a gerar o `catalog.json`.
+O `ToyStory1_completo.png` continua definido como `finalImage` e não é usado como fundo das camadas editáveis, para evitar duplicar os textos do exemplo.
