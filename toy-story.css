@@ -61,6 +61,7 @@
   justify-content: center;
 }
 
+/* O mockup é apenas uma escala visual do canvas real de 1080x1920. */
 .phone-mockup {
   position: relative;
   width: min(270px, 100%);
@@ -111,14 +112,14 @@
    --------------------------------------------------------- */
 
 /* Nome, idade e ANOS usam Sigmar One. */
-.invitation-text-layer.name,
-.invitation-text-layer.number,
-.invitation-text-layer.anos {
+.invitation-canvas[data-theme-id="infantil-toy-story"] .invitation-text-layer.name,
+.invitation-canvas[data-theme-id="infantil-toy-story"] .invitation-text-layer.number,
+.invitation-canvas[data-theme-id="infantil-toy-story"] .invitation-text-layer.anos {
   font-family: "Sigmar One", sans-serif !important;
 }
 
 /* Os restantes textos usam Horta. */
-.invitation-text-layer:not(.name):not(.number):not(.anos) {
+.invitation-canvas[data-theme-id="infantil-toy-story"] .invitation-text-layer:not(.name):not(.number):not(.anos) {
   font-family: "HortaRegular", Horta, sans-serif !important;
 }
 
@@ -150,7 +151,7 @@
   cursor: grabbing;
 }
 
-.invitation-text-layer.name {
+.invitation-canvas[data-theme-id="infantil-toy-story"] .invitation-text-layer.name {
   font-family: "Sigmar One", sans-serif;
   font-weight: 700 !important;
   color: #ffc000;
@@ -158,8 +159,9 @@
   text-shadow: 0.55cqw 0.65cqw 0 #00538b !important;
 }
 
-.invitation-text-layer.number {
-  font-family: Oswald, sans-serif;
+/* A idade do Toy Story também usa Sigmar One, tal como o nome e ANOS. */
+.invitation-canvas[data-theme-id="infantil-toy-story"] .invitation-text-layer.number {
+  font-family: "Sigmar One", sans-serif !important;
   font-weight: 700 !important;
 }
 
@@ -615,4 +617,21 @@
   .customizer-toy-story .customizer-head h2 {
     font-size: 27px;
   }
+}
+
+
+/* =========================================================
+   CARS 1 — FONTE ESTRUTURADA PELO CONFIG.JSON
+   ========================================================= */
+
+/* Todas as escritas do Cars 1 usam Magz. */
+.invitation-canvas[data-theme-id="infantil-cars"] .invitation-text-layer {
+  font-family: "Magz", sans-serif !important;
+}
+
+/* Os textos principais do Cars mantêm as cores do convite completo. */
+.invitation-canvas[data-theme-id="infantil-cars"] .invitation-text-layer.cars-name,
+.invitation-canvas[data-theme-id="infantil-cars"] .invitation-text-layer.cars-place-label,
+.invitation-canvas[data-theme-id="infantil-cars"] .invitation-text-layer.cars-time {
+  font-weight: 700 !important;
 }

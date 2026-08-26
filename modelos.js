@@ -1,22 +1,8 @@
 /* =========================================================
-   TONInvitation — PÁGINA DE MODELOS E PERSONALIZADOR
-   Mostra os modelos de um tema e controla o editor Toy Story.
-   ========================================================= */
+   TONInvitation — MODELOS E PERSONALIZADOR AUTOMÁTICO
 
-/* =========================================================
-   PÁGINA DE MODELOS / PERSONALIZADOR
-
-   Toy Story 1:
-   - a imagem completa aparece no cartão do modelo;
-   - a imagem "_com.png" é o fundo do convite;
-   - os textos são camadas independentes;
-   - cada camada pode ser arrastada e redimensionada;
-   - existe histórico para voltar/avançar alterações;
-   - "Default" repõe textos, posições e tamanhos originais.
-   ========================================================= */
-
-/* =========================================================
-   ESTADO GLOBAL DO PERSONALIZADOR
+   Todos os modelos vêm de /api/catalog.
+   O personalizador é o mesmo para todos os convites.
    ========================================================= */
 
 let selectedTemplate = null;
@@ -24,25 +10,22 @@ let layerPositions = {};
 let layerSizes = {};
 let layerColors = {};
 let selectedLayerIndex = null;
-
-/* Histórico de alterações. */
 let history = [];
 let historyIndex = -1;
 let restoringHistory = false;
 
-/* =========================================================
-   INICIALIZAÇÃO DA PÁGINA
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
+/* Inicializa a página dos modelos. */
+function initializeModelsPage() {
   const params = new URLSearchParams(location.search);
   const categoryId = params.get("categoria") || "infantil";
   const themeId = params.get("tema") || "";
+  const modelId = params.get("modelo") || "";
+  const themeModels = INVITATION_THEMES[themeId] || [];
+  const items = modelId
+    ? INVITATION_TEMPLATES.filter(item => item.id === modelId)
+    : themeModels;
 
-  const theme = (INVITATION_THEMES[categoryId] || []).find(
-    item => item.id === themeId
-  );
-
+  const themeName = themeModels[0]?.themeName || prettifyClientName(themeId);
   const backLink = document.getElementById("back-link");
   const header = document.getElementById("models-header");
   const grid = document.getElementById("models-grid");
@@ -51,8 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   header.innerHTML = `
     <div class="category-page-title">
-      <span class="eyebrow">${theme?.name || "CONVITES"}</span>
-      <h1>${theme?.name || "Convites"}</h1>
+      <span class="eyebrow">${escapeHtml(themeName)}</span>
+      <h1>${escapeHtml(themeName)}</h1>
       <div class="title-decoration">
         <span></span>
         <b>♥</b>
@@ -62,16 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
 
-  const items = INVITATION_TEMPLATES.filter(
-    item => item.category === categoryId && item.theme === themeId
-  );
-
   grid.innerHTML = items.length
     ? items.map(createInvitationCard).join("")
     : `
       <div class="empty-category">
         <h2>Ainda não há convites neste tema</h2>
-        <p>Adiciona o novo convite ao templates.js.</p>
+        <p>Coloca as imagens do novo convite na pasta do tema.</p>
       </div>
     `;
 
@@ -85,29 +64,27 @@ document.addEventListener("DOMContentLoaded", () => {
       openCustomizer(button.dataset.template);
     });
   });
-});
+}
 
-/* =========================================================
-   CARTÃO DO MODELO
-   ========================================================= */
-
+/* Cria um cartão para cada modelo encontrado automaticamente. */
 function createInvitationCard(template) {
   return `
     <article class="invitation-card">
       <div class="invitation-image invitation-image-portrait">
         <img
           src="${template.image}"
-          onerror="this.src='${template.fallbackImage}'"
-          alt="${template.name}"
+          onerror="this.src='${template.fallbackImage || "Images/infantil.jpg"}'"
+          alt="${escapeHtml(template.name)}"
         >
       </div>
-
       <div class="invitation-info">
-        <h3>${template.name}</h3>
-        <p>${template.description}</p>
+        <h3>${escapeHtml(template.name)}</h3>
+        <p>${escapeHtml(template.description || "")}</p>
+        <p class="template-price">€ ${Number(template.priceEUR || 5).toFixed(2)}</p>
         <button
           class="btn btn-primary customize-template"
           data-template="${template.id}"
+          type="button"
         >
           Personalizar
         </button>
@@ -116,10 +93,7 @@ function createInvitationCard(template) {
   `;
 }
 
-/* =========================================================
-   MENU MOBILE
-   ========================================================= */
-
+/* Configura o menu mobile. */
 function setupMenu() {
   const menu = document.getElementById("menu");
   const mobileButton = document.getElementById("menu-mobile");
@@ -130,20 +104,121 @@ function setupMenu() {
   });
 }
 
-/* =========================================================
-   ABRIR / FECHAR PERSONALIZADOR
-   ========================================================= */
+/* Instala no navegador as fontes que pertencem ao modelo selecionado. */
+function installTemplateFonts(template) {
+  /* Não faz nada se o servidor não encontrou ficheiros de fonte. */
+  if (!template?.fontFiles) return;
 
-function openCustomizer(id) {
-  selectedTemplate = INVITATION_TEMPLATES.find(
-    template => template.id === id
+  /* Remove apenas as fontes dinâmicas instaladas anteriormente pelo editor. */
+  document.querySelectorAll("style[data-toninvitation-template-fonts]").forEach(style => {
+    style.remove();
+  });
+
+  /* Cria uma folha de estilos exclusiva para o modelo atual. */
+  const style = document.createElement("style");
+  style.dataset.toninvitationTemplateFonts = "true";
+
+  /* Constrói as regras @font-face para todas as fontes encontradas. */
+  style.textContent = Object.entries(template.fontFiles)
+    .map(([fontFamily, fontUrl]) => {
+      const safeFamily = String(fontFamily).replace(/[^a-zA-Z0-9 _-]/g, "");
+      const safeUrl = String(fontUrl).replace(/"/g, "\\\"");
+      const extension = safeUrl.split("?")[0].split(".").pop().toLowerCase();
+      const formatMap = {
+        ttf: "truetype",
+        otf: "opentype",
+        woff: "woff",
+        woff2: "woff2"
+      };
+      const format = formatMap[extension] || "truetype";
+
+      return `@font-face { font-family: "${safeFamily}"; src: url("${safeUrl}") format("${format}"); font-style: normal; font-weight: 100 900; font-display: swap; }`;
+    })
+    .join("\n");
+
+  document.head.appendChild(style);
+}
+
+/* Aguarda as fontes do modelo antes de atualizar o convite. */
+async function waitForTemplateFonts(template) {
+  installTemplateFonts(template);
+
+  if (!document.fonts) return;
+
+  const families = new Set();
+
+  Object.values(template.fontFiles || {}).forEach(fontFamily => {
+    families.add(fontFamily);
+  });
+
+  (template.textLayers || []).forEach(layer => {
+    if (layer.font) {
+      families.add(String(layer.font).split(",")[0].replace(/["']/g, "").trim());
+    }
+  });
+
+  for (const fontFamily of families) {
+    try {
+      await document.fonts.load(`700 32px "${fontFamily}"`);
+    } catch (error) {
+      console.warn(`Não foi possível carregar a fonte: ${fontFamily}`);
+    }
+  }
+}
+
+/* Mostra apenas os campos que o modelo realmente utiliza. */
+function applyTemplateFormConfiguration(template) {
+  const editableFields = new Set(
+    template.editableFields || [
+      "name",
+      "age",
+      "date",
+      "time",
+      "place",
+      "adventure",
+      "faz",
+      "anos",
+      "end",
+      "otherInfo"
+    ]
   );
+
+  const fieldGroupMap = {
+    name: "field-group-name",
+    age: "field-group-age",
+    date: "field-group-date",
+    time: "field-group-time",
+    place: "field-group-place",
+    otherInfo: "field-group-other-info"
+  };
+
+  Object.entries(fieldGroupMap).forEach(([field, groupId]) => {
+    const group = document.getElementById(groupId);
+
+    if (group) {
+      group.hidden = !editableFields.has(field);
+    }
+  });
+
+  const phraseGroup = document.getElementById("field-group-phrases");
+
+  if (phraseGroup) {
+    const phraseFields = ["adventure", "faz", "anos", "end"];
+    phraseGroup.hidden = !phraseFields.some(field => editableFields.has(field));
+  }
+}
+
+/* Abre o personalizador. */
+function openCustomizer(id) {
+  selectedTemplate = INVITATION_TEMPLATES.find(template => template.id === id);
 
   if (!selectedTemplate) return;
 
+  applyTemplateFormConfiguration(selectedTemplate);
   fillDefaultFields();
   resetEditorState();
   updatePreview();
+  waitForTemplateFonts(selectedTemplate).then(updatePreview);
 
   const modal = document.getElementById("customizer-modal");
   modal.classList.add("open");
@@ -154,23 +229,34 @@ function openCustomizer(id) {
   updateSelectedLayerControls();
 }
 
+/* Fecha apenas quando o X for usado. */
 function closeCustomizer() {
   const modal = document.getElementById("customizer-modal");
-
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
 }
 
-document.querySelector(".modal-close[data-close-modal]")?.addEventListener(
-  "click",
-  closeCustomizer
-);
+document.querySelector(".modal-close[data-close-modal]")?.addEventListener("click", closeCustomizer);
 
-/* =========================================================
-   ESTADO DEFAULT
-   ========================================================= */
+/* Preenche os campos com os valores definidos para o modelo. */
+function fillDefaultFields() {
+  document.getElementById("customizer-title").textContent = `Personalize: ${selectedTemplate.name}`;
+  document.getElementById("field-name").value = selectedTemplate.defaultName || "";
+  document.getElementById("field-age").value = selectedTemplate.defaultAge || "";
+  document.getElementById("field-date").value = selectedTemplate.defaultDate || "";
+  document.getElementById("field-time").value = selectedTemplate.defaultTime || "";
+  document.getElementById("field-place").value = selectedTemplate.defaultPlace || "";
+  document.getElementById("field-adventure").value = selectedTemplate.defaultAdventure || "";
+  document.getElementById("field-faz").value = selectedTemplate.defaultFaz || "";
+  document.getElementById("field-anos").value = selectedTemplate.defaultAnos || "";
+  document.getElementById("field-end").value = selectedTemplate.defaultEnd || "";
+  document.getElementById("field-other-info").value = selectedTemplate.defaultOtherInfo || "";
+  document.getElementById("field-email").value = "";
+  document.getElementById("form-message").textContent = "";
+}
 
+/* Repõe posições, tamanhos e cores do modelo. */
 function resetEditorState() {
   layerPositions = {};
   layerSizes = {};
@@ -178,66 +264,18 @@ function resetEditorState() {
   selectedLayerIndex = null;
 
   (selectedTemplate.textLayers || []).forEach((layer, index) => {
-    layerPositions[index] = {
-      x: layer.x,
-      y: layer.y
-    };
-
+    layerPositions[index] = { x: layer.x, y: layer.y };
     layerSizes[index] = layer.size;
-    layerColors[index] = layer.field === "otherInfo"
-      ? (selectedTemplate.defaultOtherInfoColor || layer.color || "#07588c")
-      : (layer.color || "#07588c");
+    layerColors[index] = layer.color || "#07588c";
   });
 
   history = [];
   historyIndex = -1;
   restoringHistory = false;
-
   pushHistory();
 }
 
-function fillDefaultFields() {
-  document.getElementById("customizer-title").textContent =
-    `Personalize: ${selectedTemplate.name}`;
-
-  document.getElementById("field-name").value =
-    selectedTemplate.defaultName || "";
-
-  document.getElementById("field-age").value =
-    selectedTemplate.defaultAge || "";
-
-  document.getElementById("field-date").value =
-    selectedTemplate.defaultDate || "";
-
-  document.getElementById("field-time").value =
-    selectedTemplate.defaultTime || "";
-
-  document.getElementById("field-place").value =
-    selectedTemplate.defaultPlace || "";
-
-  document.getElementById("field-adventure").value =
-    selectedTemplate.defaultAdventure || "";
-
-  document.getElementById("field-faz").value =
-    selectedTemplate.defaultFaz || "";
-
-  document.getElementById("field-anos").value =
-    selectedTemplate.defaultAnos || "";
-
-  document.getElementById("field-end").value =
-    selectedTemplate.defaultEnd || "";
-
-  document.getElementById("field-other-info").value =
-    selectedTemplate.defaultOtherInfo || "";
-
-  document.getElementById("field-email").value = "";
-  document.getElementById("form-message").textContent = "";
-}
-
-/* =========================================================
-   HISTÓRICO: VOLTAR / AVANÇAR
-   ========================================================= */
-
+/* Obtém os campos editáveis. */
 function getEditableFieldIds() {
   return [
     "field-name",
@@ -253,6 +291,7 @@ function getEditableFieldIds() {
   ];
 }
 
+/* Guarda o estado atual para undo/redo. */
 function captureState() {
   const fields = {};
 
@@ -268,32 +307,32 @@ function captureState() {
   };
 }
 
+/* Faz uma cópia profunda simples de um objeto. */
 function cloneObject(object) {
   return JSON.parse(JSON.stringify(object || {}));
 }
 
-function statesAreEqual(a, b) {
-  return JSON.stringify(a) === JSON.stringify(b);
+/* Compara dois estados. */
+function statesAreEqual(first, second) {
+  return JSON.stringify(first) === JSON.stringify(second);
 }
 
+/* Adiciona uma alteração ao histórico. */
 function pushHistory() {
   if (!selectedTemplate || restoringHistory) return;
 
   const nextState = captureState();
   const currentState = history[historyIndex];
 
-  if (currentState && statesAreEqual(currentState, nextState)) {
-    return;
-  }
+  if (currentState && statesAreEqual(currentState, nextState)) return;
 
-  /* Uma nova alteração depois de "voltar" elimina o ramo de redo. */
   history = history.slice(0, historyIndex + 1);
   history.push(nextState);
   historyIndex = history.length - 1;
-
   updateHistoryButtons();
 }
 
+/* Repõe um estado anterior. */
 function restoreState(state) {
   if (!state) return;
 
@@ -306,8 +345,7 @@ function restoreState(state) {
 
   layerPositions = cloneObject(state.positions);
   layerSizes = cloneObject(state.sizes);
-  layerColors = cloneObject(state.colors || {});
-
+  layerColors = cloneObject(state.colors);
   restoringHistory = false;
 
   updatePreview();
@@ -315,88 +353,66 @@ function restoreState(state) {
   updateHistoryButtons();
 }
 
+/* Volta à alteração anterior. */
 function undoChange() {
   if (historyIndex <= 0) return;
-
   historyIndex -= 1;
   restoreState(history[historyIndex]);
 }
 
+/* Avança para a alteração seguinte. */
 function redoChange() {
   if (historyIndex >= history.length - 1) return;
-
   historyIndex += 1;
   restoreState(history[historyIndex]);
 }
 
+/* Repõe todos os campos e camadas no estado original. */
 function resetToDefault() {
   if (!selectedTemplate) return;
 
-  /*
-    O default é exatamente o estado inicial definido no templates.js:
-    textos, posições e tamanhos.
-  */
   const defaultState = buildDefaultState();
 
   if (statesAreEqual(captureState(), defaultState)) return;
 
-  restoringHistory = true;
-
-  Object.entries(defaultState.fields).forEach(([id, value]) => {
-    const input = document.getElementById(id);
-    if (input) input.value = value;
-  });
-
-  layerPositions = cloneObject(defaultState.positions);
-  layerSizes = cloneObject(defaultState.sizes);
-  layerColors = cloneObject(defaultState.colors);
-  selectedLayerIndex = null;
-
-  restoringHistory = false;
-
+  restoreState(defaultState);
   pushHistory();
-  updatePreview();
-  updateSelectedLayerControls();
 }
 
+/* Cria o estado original do modelo. */
 function buildDefaultState() {
   const fields = {};
 
-  fields["field-name"] = selectedTemplate.defaultName || "";
-  fields["field-age"] = selectedTemplate.defaultAge || "";
-  fields["field-date"] = selectedTemplate.defaultDate || "";
-  fields["field-time"] = selectedTemplate.defaultTime || "";
-  fields["field-place"] = selectedTemplate.defaultPlace || "";
-  fields["field-adventure"] = selectedTemplate.defaultAdventure || "";
-  fields["field-faz"] = selectedTemplate.defaultFaz || "";
-  fields["field-anos"] = selectedTemplate.defaultAnos || "";
-  fields["field-end"] = selectedTemplate.defaultEnd || "";
-  fields["field-other-info"] = selectedTemplate.defaultOtherInfo || "";
+  getEditableFieldIds().forEach(id => {
+    const fieldMap = {
+      "field-name": "defaultName",
+      "field-age": "defaultAge",
+      "field-date": "defaultDate",
+      "field-time": "defaultTime",
+      "field-place": "defaultPlace",
+      "field-adventure": "defaultAdventure",
+      "field-faz": "defaultFaz",
+      "field-anos": "defaultAnos",
+      "field-end": "defaultEnd",
+      "field-other-info": "defaultOtherInfo"
+    };
+    fields[id] = selectedTemplate[fieldMap[id]] || "";
+  });
 
   const positions = {};
   const sizes = {};
   const colors = {};
 
   (selectedTemplate.textLayers || []).forEach((layer, index) => {
-    positions[index] = {
-      x: layer.x,
-      y: layer.y
-    };
-
+    positions[index] = { x: layer.x, y: layer.y };
     sizes[index] = layer.size;
-    colors[index] = layer.field === "otherInfo"
-      ? (selectedTemplate.defaultOtherInfoColor || layer.color || "#07588c")
-      : (layer.color || "#07588c");
+    colors[index] = layer.color || "#07588c";
   });
 
-  return {
-    fields,
-    positions,
-    sizes,
-    colors
-  };
+  return { fields, positions, sizes, colors };
 }
 
+/* Atualiza o estado visual dos botões de histórico. */
 function updateHistoryButtons() {
   const undo = document.getElementById("undo-button");
   const redo = document.getElementById("redo-button");
@@ -404,13 +420,10 @@ function updateHistoryButtons() {
 
   if (undo) undo.disabled = historyIndex <= 0;
   if (redo) redo.disabled = historyIndex >= history.length - 1;
-  if (reset) reset.disabled = statesAreEqual(captureState(), buildDefaultState());
+  if (reset) reset.disabled = !selectedTemplate || statesAreEqual(captureState(), buildDefaultState());
 }
 
-/* =========================================================
-   FERRAMENTAS DE TAMANHO
-   ========================================================= */
-
+/* Configura os controlos do editor. */
 function setupEditorControls() {
   document.getElementById("undo-button")?.addEventListener("click", undoChange);
   document.getElementById("redo-button")?.addEventListener("click", redoChange);
@@ -429,12 +442,14 @@ function setupEditorControls() {
   });
 }
 
+/* Seleciona uma camada de texto. */
 function selectLayer(index) {
   selectedLayerIndex = index;
   updateSelectedLayerControls();
   updateLayerSelectionVisuals();
 }
 
+/* Atualiza a indicação da camada selecionada. */
 function updateLayerSelectionVisuals() {
   document.querySelectorAll(".invitation-text-layer").forEach(element => {
     const index = Number(element.dataset.layerIndex);
@@ -442,6 +457,7 @@ function updateLayerSelectionVisuals() {
   });
 }
 
+/* Aumenta ou diminui o tamanho da camada selecionada. */
 function changeSelectedLayerSize(delta) {
   if (selectedLayerIndex === null) return;
 
@@ -451,17 +467,17 @@ function changeSelectedLayerSize(delta) {
     5
   );
 
-  const nextSize = Math.max(1, Math.min(30, currentSize + delta));
+  const nextSize = Math.max(1, Math.min(40, currentSize + delta));
 
   if (nextSize === currentSize) return;
 
   layerSizes[selectedLayerIndex] = Number(nextSize.toFixed(1));
-
-  pushHistory();
   updatePreview();
+  pushHistory();
   selectLayer(selectedLayerIndex);
 }
 
+/* Atualiza os controlos do texto selecionado. */
 function updateSelectedLayerControls() {
   const label = document.getElementById("selected-layer-label");
   const sizeLabel = document.getElementById("selected-layer-size");
@@ -492,18 +508,19 @@ function updateSelectedLayerControls() {
     colorInput.disabled = false;
   }
   if (decrease) decrease.disabled = size <= 1;
-  if (increase) increase.disabled = size >= 30;
+  if (increase) increase.disabled = size >= 40;
 }
 
+/* Altera a cor da camada selecionada. */
 function changeSelectedLayerColor(color) {
   if (selectedLayerIndex === null) return;
-
   layerColors[selectedLayerIndex] = color;
   updatePreview();
   pushHistory();
   updateSelectedLayerControls();
 }
 
+/* Obtém um nome legível para uma camada. */
 function getLayerLabel(layer) {
   const labels = {
     name: "Nome",
@@ -514,75 +531,47 @@ function getLayerLabel(layer) {
     "date-month": "Mês",
     "date-day": "Dia",
     "weekday-time": "Dia e hora",
-    "place-label": "Título do local",
     place: "Morada",
-    end: "Frase final"
+    end: "Frase final",
+    otherInfo: "Outras informações"
   };
 
   return labels[layer.field] || "Texto";
 }
 
-/* =========================================================
-   PRÉ-VISUALIZAÇÃO
-   ========================================================= */
-
+/* Atualiza a imagem e as camadas no mockup. */
 function updatePreview() {
   if (!selectedTemplate) return;
 
   const preview = document.getElementById("invitation-preview");
-  const isLayered = Array.isArray(selectedTemplate.textLayers);
-
   preview.innerHTML = "";
-  /* Usa a imagem de pré-visualização e, se ela não existir, tenta a imagem principal/final. */
-  const previewImage =
-    selectedTemplate.previewImage ||
-    selectedTemplate.image ||
-    selectedTemplate.finalImage ||
-    selectedTemplate.fallbackImage;
-
-  preview.style.backgroundImage = previewImage
-    ? `url("${previewImage}")`
+  preview.dataset.themeId = selectedTemplate.themeId || selectedTemplate.theme || "";
+  preview.style.backgroundImage = selectedTemplate.previewImage
+    ? `url("${selectedTemplate.previewImage}")`
     : "none";
-  preview.style.backgroundColor = selectedTemplate.previewImage
-    ? "#fff"
-    : "#fff7f4";
+  preview.style.backgroundColor = "#fff";
 
-  if (isLayered) {
-    renderLayeredInvitation(preview);
-  } else {
-    renderLegacyInvitation(preview);
-  }
-
+  renderLayeredInvitation(preview);
   updateSelectedLayerControls();
 }
 
-/* =========================================================
-   DESENHO DAS CAMADAS
-   ========================================================= */
-
+/* Desenha todas as camadas de texto. */
 function renderLayeredInvitation(preview) {
-  selectedTemplate.textLayers.forEach((layer, index) => {
+  (selectedTemplate.textLayers || []).forEach((layer, index) => {
     const element = document.createElement("div");
     const position = layerPositions[index] || { x: layer.x, y: layer.y };
     const size = layerSizes[index] ?? layer.size;
-    /* Obtém o valor atual e, se o campo ainda estiver vazio, usa o valor por defeito do convite. */
-    const value = getLayerValue(
-      layer,
-      getDefaultLayerValue(layer)
-    );
+    const value = getLayerValue(layer);
 
     element.className = `invitation-text-layer ${layer.className || ""}`;
     element.dataset.field = layer.field || "";
     element.dataset.layerIndex = index;
     element.textContent = value;
-
     element.style.left = `${position.x}%`;
     element.style.top = `${position.y}%`;
     element.style.fontSize = `${size}cqw`;
-    const layerColor = layerColors[index] || layer.color || "#07588c";
-
-    element.style.color = layerColor;
-    element.style.fontFamily = layer.font || "HortaRegular, Horta, sans-serif";
+    element.style.color = layerColors[index] || layer.color || "#07588c";
+    element.style.fontFamily = layer.font || "Horta, sans-serif";
     element.style.fontWeight = layer.weight || "700";
     element.style.lineHeight = layer.lineHeight || "1";
     element.style.textAlign = layer.align || "center";
@@ -590,23 +579,17 @@ function renderLayeredInvitation(preview) {
     element.style.letterSpacing = layer.letterSpacing || "normal";
     element.style.transform = `translate(-50%, -50%) rotate(${layer.rotate || 0}deg)`;
 
-    if (!value) {
-      element.classList.add("is-empty");
-    }
+    if (!value) element.classList.add("is-empty");
 
     element.addEventListener("pointerdown", startDraggingLayer);
     element.addEventListener("click", () => selectLayer(index));
-
     preview.appendChild(element);
   });
 
   updateLayerSelectionVisuals();
 }
 
-/* =========================================================
-   ARRASTAR TEXTO
-   ========================================================= */
-
+/* Permite arrastar uma camada sem impor uma área fixa. */
 function startDraggingLayer(event) {
   const layer = event.currentTarget;
   const preview = document.getElementById("invitation-preview");
@@ -621,29 +604,20 @@ function startDraggingLayer(event) {
 
   const startX = event.clientX;
   const startY = event.clientY;
-  const startPosition = {
-    ...(layerPositions[index] || { x: 50, y: 50 })
-  };
-
+  const startPosition = { ...(layerPositions[index] || { x: 50, y: 50 }) };
   let moved = false;
 
-  function move(eventMove) {
+  function move(moveEvent) {
     const rect = preview.getBoundingClientRect();
-    const deltaX = ((eventMove.clientX - startX) / rect.width) * 100;
-    const deltaY = ((eventMove.clientY - startY) / rect.height) * 100;
+    const deltaX = ((moveEvent.clientX - startX) / rect.width) * 100;
+    const deltaY = ((moveEvent.clientY - startY) / rect.height) * 100;
 
-    if (Math.abs(deltaX) > 0.05 || Math.abs(deltaY) > 0.05) {
-      moved = true;
-    }
+    if (Math.abs(deltaX) > 0.05 || Math.abs(deltaY) > 0.05) moved = true;
 
     const nextX = startPosition.x + deltaX;
     const nextY = startPosition.y + deltaY;
 
-    layerPositions[index] = {
-      x: nextX,
-      y: nextY
-    };
-
+    layerPositions[index] = { x: nextX, y: nextY };
     layer.style.left = `${nextX}%`;
     layer.style.top = `${nextY}%`;
   }
@@ -655,10 +629,7 @@ function startDraggingLayer(event) {
     layer.removeEventListener("pointerup", end);
     layer.removeEventListener("pointercancel", end);
 
-    if (moved) {
-      pushHistory();
-    }
-
+    if (moved) pushHistory();
     updateHistoryButtons();
   }
 
@@ -667,33 +638,9 @@ function startDraggingLayer(event) {
   layer.addEventListener("pointercancel", end);
 }
 
-/* =========================================================
-   VALORES DAS CAMADAS
-   ========================================================= */
-
-function getDefaultLayerValue(layer) {
-  if (!selectedTemplate || !layer) return "";
-
-  const defaults = {
-    name: selectedTemplate.defaultName,
-    age: selectedTemplate.defaultAge,
-    date: selectedTemplate.defaultDate,
-    time: selectedTemplate.defaultTime,
-    place: selectedTemplate.defaultPlace,
-    adventure: selectedTemplate.defaultAdventure,
-    faz: selectedTemplate.defaultFaz,
-    anos: selectedTemplate.defaultAnos,
-    end: selectedTemplate.defaultEnd,
-    otherInfo: selectedTemplate.defaultOtherInfo
-  };
-
-  return defaults[layer.field] || layer.fallback || "";
-}
-
+/* Obtém o valor atual de uma camada. */
 function getLayerValue(layer) {
-  if (layer.value !== undefined && !layer.field) {
-    return layer.value;
-  }
+  if (layer.value !== undefined && !layer.field) return layer.value;
 
   if (layer.field === "date-month") {
     return formatSelectedDate(getFieldValue("date", "")).month;
@@ -717,39 +664,20 @@ function getLayerValue(layer) {
   return getFieldValue(layer.field, layer.fallback);
 }
 
-/* =========================================================
-   DATA ESCOLHIDA NO CALENDÁRIO
-   ========================================================= */
-
+/* Converte a data escolhida no calendário para os textos do convite. */
 function formatSelectedDate(value) {
-  if (!value) {
-    return {
-      day: "",
-      month: "",
-      weekday: ""
-    };
-  }
+  if (!value) return { day: "", month: "", weekday: "" };
 
   const parts = String(value).split("-").map(Number);
 
   if (parts.length !== 3 || parts.some(Number.isNaN)) {
-    return {
-      day: "",
-      month: "",
-      weekday: ""
-    };
+    return { day: "", month: "", weekday: "" };
   }
 
   const [year, month, day] = parts;
   const date = new Date(year, month - 1, day);
-
-  const weekday = new Intl.DateTimeFormat("pt-PT", {
-    weekday: "long"
-  }).format(date);
-
-  const monthName = new Intl.DateTimeFormat("pt-PT", {
-    month: "long"
-  }).format(date);
+  const weekday = new Intl.DateTimeFormat("pt-PT", { weekday: "long" }).format(date);
+  const monthName = new Intl.DateTimeFormat("pt-PT", { month: "long" }).format(date);
 
   return {
     day: String(day),
@@ -758,10 +686,7 @@ function formatSelectedDate(value) {
   };
 }
 
-/* =========================================================
-   LEITURA DOS CAMPOS
-   ========================================================= */
-
+/* Liga nomes de campos aos inputs do formulário. */
 function getFieldValue(field, fallback = "") {
   const map = {
     name: "field-name",
@@ -779,56 +704,17 @@ function getFieldValue(field, fallback = "") {
   return document.getElementById(map[field])?.value ?? fallback ?? "";
 }
 
-/* =========================================================
-   COR DAS CAMADAS
-   ========================================================= */
-
-function getOtherInfoColor() {
-  const otherInfoIndex = (selectedTemplate?.textLayers || []).findIndex(
-    layer => layer.field === "otherInfo"
-  );
-
-  if (otherInfoIndex < 0) {
-    return selectedTemplate?.defaultOtherInfoColor || "#07588c";
-  }
-
-  return (
-    layerColors[otherInfoIndex] ||
-    selectedTemplate.defaultOtherInfoColor ||
-    selectedTemplate.textLayers[otherInfoIndex].color ||
-    "#07588c"
-  );
-}
-
-/* =========================================================
-   EVENTOS DOS CAMPOS
-   ========================================================= */
-
-[
-  "field-name",
-  "field-age",
-  "field-date",
-  "field-time",
-  "field-place",
-  "field-adventure",
-  "field-faz",
-  "field-anos",
-  "field-end",
-  "field-other-info"
-].forEach(id => {
+/* Regista alterações feitas nos campos. */
+getEditableFieldIds().forEach(id => {
   document.getElementById(id)?.addEventListener("input", () => {
     updatePreview();
     pushHistory();
   });
 });
 
-/* =========================================================
-   ENVIO / CONFIRMAÇÃO DO PEDIDO
-   ========================================================= */
-
+/* Configura a criação do pedido. */
 function setupCustomizer() {
   const form = document.getElementById("customizer-form");
-
   if (!form) return;
 
   form.addEventListener("submit", async event => {
@@ -845,10 +731,13 @@ function setupCustomizer() {
 
     const selectedDate = getFieldValue("date", "");
     const dateInfo = formatSelectedDate(selectedDate);
+    const overlay = await createTextOverlayDataUrl();
 
     const order = {
       templateId: selectedTemplate.id,
       templateName: selectedTemplate.name,
+      previewImage: selectedTemplate.previewImage,
+      textOverlayDataUrl: overlay,
       name: getFieldValue("name", selectedTemplate.defaultName),
       age: getFieldValue("age", selectedTemplate.defaultAge),
       date: selectedDate,
@@ -860,51 +749,35 @@ function setupCustomizer() {
       anos: getFieldValue("anos", selectedTemplate.defaultAnos),
       end: getFieldValue("end", selectedTemplate.defaultEnd),
       otherInfo: getFieldValue("otherInfo", selectedTemplate.defaultOtherInfo),
-      otherInfoColor: getOtherInfoColor(),
       positions: cloneObject(layerPositions),
       sizes: cloneObject(layerSizes),
       colors: cloneObject(layerColors),
+      editableFields: selectedTemplate.editableFields || [],
+      fontFiles: cloneObject(selectedTemplate.fontFiles || {}),
       email
     };
 
     button.disabled = true;
-    button.textContent = "A confirmar...";
+    button.textContent = "A criar pedido...";
 
     try {
-      const response = await fetch("/api/confirm-payment-test", {
+      const response = await fetch("/api/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order)
       });
 
-      const text = await response.text();
-      let data;
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(
-          "Abra o site em http://localhost:3000 e mantenha o servidor ligado."
-        );
-      }
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "Não foi possível concluir o pedido."
-        );
+        throw new Error(data.error || "Não foi possível criar o pedido.");
       }
 
       message.innerHTML = `
-        <span class="payment-success">
-          <strong>Pagamento efetuado com sucesso!</strong><br>
-          O seu convite está a ser preparado e será enviado para
-          <strong>${escapeHtml(email)}</strong>.
-        </span>
+        Pedido criado: <strong>${escapeHtml(data.orderId)}</strong>.<br>
+        <a href="${data.testPaymentUrl}">Abrir pagamento de teste</a>
       `;
-
-      button.textContent = "Pagamento confirmado";
+      button.textContent = "Pedido criado";
     } catch (error) {
       message.textContent = error.message;
       button.disabled = false;
@@ -913,39 +786,76 @@ function setupCustomizer() {
   });
 }
 
-/* =========================================================
-   FALLBACK PARA MODELOS ANTIGOS
-   ========================================================= */
+/* Cria uma camada PNG transparente com os textos personalizados. */
+async function createTextOverlayDataUrl() {
+  /* Instala e carrega as fontes reais do modelo antes de desenhar. */
+  await waitForTemplateFonts(selectedTemplate);
 
-function renderLegacyInvitation(preview) {
-  const fallback = document.createElement("div");
-  fallback.className = "legacy-preview-content";
+  /* Aguarda o carregamento geral das fontes do navegador. */
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
 
-  fallback.innerHTML = `
-    <div class="preview-ornament">✦</div>
-    <div class="preview-small">CONVITE</div>
-    <div class="preview-name">
-      ${escapeHtml(getFieldValue("name", ""))}
-    </div>
-    <div class="preview-divider"></div>
-    <div>${escapeHtml(getFieldValue("date", ""))}</div>
-    <div>${escapeHtml(getFieldValue("time", ""))}</div>
-    <div class="preview-place-label">LOCAL</div>
-    <div>${escapeHtml(getFieldValue("place", ""))}</div>
-  `;
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1920;
+  const context = canvas.getContext("2d");
 
-  preview.appendChild(fallback);
+  (selectedTemplate.textLayers || []).forEach((layer, index) => {
+    const value = getLayerValue(layer);
+    if (!value) return;
+
+    const position = layerPositions[index] || { x: layer.x, y: layer.y };
+    const size = layerSizes[index] ?? layer.size;
+    const fontFamily = layer.font || "Horta";
+    const pixelSize = size / 100 * 1080;
+
+    context.save();
+    context.translate(position.x / 100 * 1080, position.y / 100 * 1920);
+    context.rotate((layer.rotate || 0) * Math.PI / 180);
+    context.font = `${layer.weight || 700} ${pixelSize}px "${String(fontFamily).split(",")[0].replace(/["']/g, "").trim()}"`;
+    context.fillStyle = layerColors[index] || layer.color || "#07588c";
+    context.textAlign = layer.align || "center";
+    context.textBaseline = "middle";
+
+    if (layer.shadow) {
+      context.shadowColor = "#00538b";
+      context.shadowOffsetX = pixelSize * 0.04;
+      context.shadowOffsetY = pixelSize * 0.05;
+      context.shadowBlur = 0;
+    }
+
+    const lines = String(value).split("\n");
+    const lineHeight = pixelSize * Number(layer.lineHeight || 1);
+    const startOffset = -(lines.length - 1) * lineHeight / 2;
+
+    lines.forEach((line, lineIndex) => {
+      context.fillText(line, 0, startOffset + lineIndex * lineHeight);
+    });
+
+    context.restore();
+  });
+
+  return canvas.toDataURL("image/png");
 }
 
-/* =========================================================
-   SEGURANÇA BÁSICA PARA TEXTO INSERIDO NO HTML
-   ========================================================= */
+/* Mostra um texto legível para o tema. */
+function prettifyClientName(value) {
+  return String(value || "Convites")
+    .replace(/^[^-]+-/, "")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, letter => letter.toUpperCase());
+}
 
+/* Escapa texto antes de o inserir em HTML. */
 function escapeHtml(value) {
-  return String(value)
+  return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+/* Inicializa quando o catálogo estiver carregado. */
+window.addEventListener("toninvitation:catalog-ready", initializeModelsPage);
