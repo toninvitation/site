@@ -633,10 +633,27 @@ async function createShopifyCheckout(order, variantId, countryCode = "PT", buyer
     throw new Error("A Shopify não devolveu o checkoutUrl.");
   }
 
+  /* Guarda o URL original devolvido pela Shopify. */
+  const checkoutUrl = payload.cart.checkoutUrl;
+
+  /*
+    Permite testar um destino de regresso personalizado.
+
+    IMPORTANTE:
+    A Shopify não garante este parâmetro em todos os fluxos de checkout/headless.
+    Por isso esta opção é apenas um teste e o URL original continua guardado.
+  */
+  const returnUrl = String(process.env.SHOPIFY_RETURN_URL || "").trim();
+  const checkoutUrlWithReturn = returnUrl
+    ? `${checkoutUrl}${checkoutUrl.includes("?") ? "&" : "?"}return_to=${encodeURIComponent(returnUrl)}`
+    : checkoutUrl;
+
   /* Devolve os dados necessários para o nosso pedido. */
   return {
     cartId: payload.cart.id,
-    checkoutUrl: payload.cart.checkoutUrl,
+    checkoutUrl: checkoutUrlWithReturn,
+    rawCheckoutUrl: checkoutUrl,
+    returnUrl: returnUrl || null,
     warnings: payload.warnings || []
   };
 }
@@ -694,6 +711,8 @@ app.post("/api/shopify/create-checkout", async (request, response) => {
       variantId,
       cartId: checkout.cartId,
       checkoutUrl: checkout.checkoutUrl,
+      rawCheckoutUrl: checkout.rawCheckoutUrl || checkout.checkoutUrl,
+      returnUrl: checkout.returnUrl || null,
       countryCode,
       checkoutCreatedAt: new Date().toISOString()
     };
