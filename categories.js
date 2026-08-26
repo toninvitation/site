@@ -1,52 +1,16 @@
-/* =========================================================
-   TONInvitation — CATÁLOGO AUTOMÁTICO
+const INVITATION_CATEGORIES=[
+{id:"infantil",name:"Infantil",image:"Images/infantil.jpg",description:"Temas divertidos para festas dos mais pequenos.",type:"themes"},
+{id:"casamentos",name:"Casamentos",image:"Images/casamentos.jpg",description:"Convites românticos e elegantes para o grande dia.",type:"invitations"},
+{id:"adultos",name:"Adultos",image:"Images/adultos.jpg",description:"Aniversários e celebrações para adultos.",type:"invitations"},
+{id:"cha-bebe",name:"Chá de Bebé",image:"Images/cha_bebe.jpg",description:"Modelos delicados para celebrar a chegada do bebé.",type:"invitations"},
+{id:"batizados",name:"Batizados",image:"Images/batizados.jpg",description:"Convites delicados para um momento especial.",type:"invitations"},
+{id:"formaturas",name:"Formaturas",image:"Images/formaturas.jpg",description:"Modelos para celebrar uma grande conquista.",type:"invitations"},
+{id:"outros-eventos",name:"Outros Eventos",image:"Images/outros eventos.jpg",description:"Outras ocasiões especiais.",type:"invitations"}];
 
-   Em produção no GitHub Pages, o catálogo é carregado de
-   catalog.json, criado automaticamente pelo GitHub Actions.
 
-   Em localhost, o site continua a tentar usar /api/catalog,
-   para não quebrar o servidor que já funciona.
-   ========================================================= */
 
-let INVITATION_CATEGORIES = [];
-let INVITATION_THEMES = {};
-let INVITATION_TEMPLATES = [];
-let catalogReady = false;
-
-async function loadAutomaticCatalog() {
-  try {
-    let response;
-
-    /* Primeiro tenta o catálogo estático usado pelo GitHub Pages. */
-    response = await fetch("catalog.json", { cache: "no-store" });
-
-    /* Se ainda não existir, tenta o endpoint do servidor local. */
-    if (!response.ok) {
-      response = await fetch("/api/catalog", { cache: "no-store" });
-    }
-
-    if (!response.ok) {
-      throw new Error("Não foi possível carregar o catálogo.");
-    }
-
-    const catalog = await response.json();
-
-    INVITATION_CATEGORIES = catalog.categories || [];
-    INVITATION_THEMES = catalog.themes || {};
-    INVITATION_TEMPLATES = catalog.templates || [];
-    catalogReady = true;
-
-    window.dispatchEvent(
-      new CustomEvent("toninvitation:catalog-ready")
-    );
-  } catch (error) {
-    console.error("Erro ao carregar o catálogo automático:", error);
-
-    document.querySelectorAll("[data-catalog-error]").forEach(element => {
-      element.textContent =
-        "Não foi possível carregar os convites. Tenta atualizar a página.";
-    });
-  }
-}
-
-loadAutomaticCatalog();
+const INVITATION_THEMES={infantil:[
+{id:"toy-story",name:"Toy Story",image:"Categorias/Infantil/Toy Story/ToyStory_capa.jpg",description:"Convites com o tema Toy Story.",folder:"Toy Story"},
+{id:"cars",name:"Cars",image:"Images/infantil.jpg",description:"Convites para fãs de Cars.",folder:"Cars"},
+{id:"kpop-demon-hunters",name:"K-Pop Demon Hunters",image:"Images/infantil.jpg",description:"Convites com o tema K-Pop Demon Hunters.",folder:"K-Pop Demon Hunters"}
+]};

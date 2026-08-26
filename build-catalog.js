@@ -47,19 +47,29 @@ function discoverModel(categoryName, themeName, modelDirectory) {
     .filter(entry => entry.isFile())
     .map(entry => entry.name);
 
+  // Imagem principal do modelo: usa primeiro a imagem com o nome do próprio convite.
+  // Exemplo: dentro de "Toy Story1" -> "Toy Story1.png".
+  // Esta é a imagem que o cliente deve ver no catálogo.
+  const modelName = path.basename(modelDirectory);
+  const modelImage = modelFiles.find(name => {
+    const extension = /\.(png|jpg|jpeg|webp)$/i;
+    return extension.test(name) && path.parse(name).name.toLowerCase() === modelName.toLowerCase();
+  });
+
   const complete = modelFiles.find(name => /_completo\.(png|jpg|jpeg|webp)$/i.test(name));
   const preview = modelFiles.find(name => /_com\.(png|jpg|jpeg|webp)$/i.test(name));
   const cover = modelFiles.find(name => /_capa\.(png|jpg|jpeg|webp)$/i.test(name));
 
-  if (!complete && !preview && !cover) {
+  if (!modelImage && !complete && !preview && !cover) {
     return null;
   }
 
   const base = modelDirectory.split(path.sep);
-  const modelName = path.basename(modelDirectory);
   const relativeParts = base.slice(base.indexOf("Categorias") + 1);
 
-  const imageFile = preview || complete || cover;
+  // Prioridade: Toy Story1.png / Cars1.png / etc.
+  // Se essa imagem não existir, mantém os fallbacks antigos.
+  const imageFile = modelImage || preview || complete || cover;
   const image = publicPath(["Categorias", ...relativeParts, imageFile]);
   const completeImage = complete
     ? publicPath(["Categorias", ...relativeParts, complete])
@@ -71,6 +81,9 @@ function discoverModel(categoryName, themeName, modelDirectory) {
   return {
     id: catalogId(`${categoryName}-${themeName}-${modelName}`),
     name: modelName,
+    // Imagem usada especificamente nos cartões do catálogo.
+    // Ex.: dentro de "Toy Story1" procura "Toy Story1.png".
+    catalogImage: image,
     category: catalogId(categoryName),
     categoryName,
     themeId: themeName ? catalogId(`${categoryName}-${themeName}`) : "",
