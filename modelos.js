@@ -712,6 +712,23 @@ getEditableFieldIds().forEach(id => {
   });
 });
 
+/* Obtém o país aproximado a partir do idioma escolhido no site. */
+function getShopifyCountryCode() {
+  /* Usa o idioma guardado pelo sistema de traduções. */
+  const language = localStorage.getItem("toninvitation-language") || "pt";
+
+  /* Converte os idiomas disponíveis em códigos de país para o checkout. */
+  const languageCountryMap = {
+    pt: "PT",
+    en: "GB",
+    fr: "FR",
+    es: "ES"
+  };
+
+  /* Devolve Portugal como fallback. */
+  return languageCountryMap[language] || "PT";
+}
+
 /* Configura a criação do pedido. */
 function setupCustomizer() {
   const form = document.getElementById("customizer-form");
@@ -773,15 +790,53 @@ function setupCustomizer() {
         throw new Error(data.error || "Não foi possível criar o pedido.");
       }
 
+      /* Exige que o modelo tenha um produto/variante correspondente na Shopify. */
+      if (!selectedTemplate.shopifyVariantId) {
+        throw new Error(
+          "Este convite ainda não está ligado a um produto Shopify. Adiciona o Shopify Variant ID no config.json deste convite."
+        );
+      }
+
+      /* Informa o servidor que queremos criar o checkout Shopify para este pedido. */
+      button.textContent = "A abrir pagamento seguro...";
+
+      const checkoutResponse = await fetch("/api/shopify/create-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          orderId: data.orderId,
+          variantId: selectedTemplate.shopifyVariantId,
+          countryCode: getShopifyCountryCode()
+        })
+      });
+
+      /* Converte a resposta do checkout para JSON. */
+      const checkoutData = await checkoutResponse.json();
+
+      /* Mostra o erro caso a Shopify não consiga criar o checkout. */
+      if (!checkoutResponse.ok) {
+        throw new Error(
+          checkoutData.error || "Não foi possível abrir o checkout Shopify."
+        );
+      }
+
+      /* Guarda o Order ID para podermos mostrá-lo quando o cliente voltar à loja. */
+      sessionStorage.setItem("toninvitation-last-order-id", data.orderId);
+
+      /* Mostra a confirmação antes de encaminhar o cliente para a Shopify. */
       message.innerHTML = `
-        Pedido criado: <strong>${escapeHtml(data.orderId)}</strong>.<br>
-        <a href="${data.testPaymentUrl}">Abrir pagamento de teste</a>
+        <strong>Pedido ${escapeHtml(data.orderId)} criado.</strong><br>
+        A abrir o pagamento seguro...
       `;
-      button.textContent = "Pedido criado";
+
+      /* Encaminha o cliente para o checkout oficial da Shopify. */
+      window.location.href = checkoutData.checkoutUrl;
     } catch (error) {
       message.textContent = error.message;
       button.disabled = false;
-      button.textContent = "Confirmar pagamento";
+      button.textContent = "Ir para pagamento seguro";
     }
   });
 }
