@@ -2,7 +2,6 @@
   "name": "Nome do convite",
   "description": "Descrição do convite.",
   "priceEUR": 5,
-  "shopifyVariantId": "gid://shopify/ProductVariant/COLOCA_AQUI_O_ID",
   "fontFamily": "Nome da Fonte",
   "editableFields": [
     "name",
