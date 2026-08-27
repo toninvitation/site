@@ -48,6 +48,75 @@ function initializeHomePage() {
 
   /* Configura o carrossel de avaliações. */
   setupReviewsCarousel();
+  setupRatingForm();
+}
+
+/* Gere a classificação enviada pelo visitante e a média apresentada. */
+function setupRatingForm() {
+  const form = document.getElementById("rating-form");
+  const stars = [...document.querySelectorAll("[data-rating]")];
+  const nameInput = document.getElementById("rating-name");
+  const anonymousInput = document.getElementById("rating-anonymous");
+  const average = document.getElementById("rating-average-value");
+  let selectedRating = 0;
+
+  if (!form || !average) return;
+
+  const storedRatings = () => JSON.parse(localStorage.getItem("toninvitation-ratings") || "[]");
+
+  const updateAverage = () => {
+    const ratings = [5, 5, ...storedRatings()];
+    const value = ratings.reduce((sum, item) => sum + (item.rating || item), 0) / ratings.length;
+    average.textContent = value.toLocaleString(currentLanguage || "pt", {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1
+    });
+  };
+
+  const updateStars = () => {
+    stars.forEach(star => {
+      star.classList.toggle("selected", Number(star.dataset.rating) <= selectedRating);
+    });
+  };
+
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      selectedRating = Number(star.dataset.rating);
+      updateStars();
+    });
+  });
+
+  anonymousInput?.addEventListener("change", () => {
+    nameInput.disabled = anonymousInput.checked;
+    if (anonymousInput.checked) nameInput.value = "";
+  });
+
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    const message = document.getElementById("rating-message");
+
+    if (!selectedRating) {
+      message.textContent = "Escolha uma classificação.";
+      return;
+    }
+
+    const ratings = storedRatings();
+    ratings.push({
+      rating: selectedRating,
+      name: anonymousInput?.checked ? "Anónimo" : nameInput.value.trim() || "Anónimo",
+      country: document.getElementById("rating-country").value,
+      comment: document.getElementById("rating-comment").value.trim()
+    });
+    localStorage.setItem("toninvitation-ratings", JSON.stringify(ratings));
+    form.reset();
+    selectedRating = 0;
+    updateStars();
+    nameInput.disabled = false;
+    message.textContent = getTranslation("ratingSuccess");
+    updateAverage();
+  });
+
+  updateAverage();
 }
 
 /* Configura o carrossel de avaliações. */

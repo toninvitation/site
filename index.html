@@ -31,9 +31,12 @@
                   <a href="#precos"><span data-i18n="navPrices">Preços</span></a>
                 </li>
                 <li>
-                  <a href="#avaliacoes"
-                  ><span data-i18n="navReviews">Avaliações</span></a
-                  >
+                  <a href="#avaliar"><span data-i18n="navAssess">Avaliar</span></a>
+                </li>
+                <li>
+                    <a href="#avaliacoes"
+                    ><span data-i18n="navReviews">Avaliações</span></a
+                    >
                 </li>
                 <li>
                     <a href="#contactos"
@@ -233,7 +236,7 @@
         </div>
         <div class="steps-grid">
           <article>
-            <b>01</b><i data-lucide="layout-template"></i>
+            <div class="step-icon"><b>1</b><i data-lucide="layout-template"></i></div>
             <h3><span data-i18n="step1Title">Escolha o modelo</span></h3>
             <p>
               <span data-i18n="step1Text"
@@ -242,14 +245,7 @@
             </p>
           </article>
           <article>
-            <b>02</b><i data-lucide="palette"></i>
-            <h3><span data-i18n="step2Title">Escolha a cor</span></h3>
-            <p>
-              <span data-i18n="step2Text">Selecione uma cor disponível.</span>
-            </p>
-          </article>
-          <article>
-            <b>03</b><i data-lucide="pencil"></i>
+            <div class="step-icon"><b>2</b><i data-lucide="pencil"></i></div>
             <h3><span data-i18n="step3Title">Preencha os dados</span></h3>
             <p>
               <span data-i18n="step3Text"
@@ -258,7 +254,7 @@
             </p>
           </article>
           <article>
-            <b>04</b><i data-lucide="credit-card"></i>
+            <div class="step-icon"><b>3</b><i data-lucide="credit-card"></i></div>
             <h3><span data-i18n="step4Title">Confirme o pagamento</span></h3>
             <p>
               <span data-i18n="step4Text"
@@ -267,7 +263,7 @@
             </p>
           </article>
           <article>
-            <b>05</b><i data-lucide="mail"></i>
+            <div class="step-icon"><b>4</b><i data-lucide="mail"></i></div>
             <h3><span data-i18n="step5Title">Receba o convite</span></h3>
             <p>
               <span data-i18n="step5Text"
@@ -277,18 +273,62 @@
           </article>
         </div>
       </section>
+      <section id="avaliar" class="rating-section">
+        <div class="section-heading">
+          <span class="eyebrow" data-i18n="ratingEyebrow">A SUA OPINIÃO</span>
+          <h2 data-i18n="ratingTitle">Avaliar</h2>
+          <div class="title-decoration"><span></span><b>♥</b><span></span></div>
+        </div>
+        <form id="rating-form" class="rating-form">
+          <label>
+            <span data-i18n="ratingName">Nome (opcional)</span>
+            <input id="rating-name" type="text" maxlength="60">
+          </label>
+          <label class="rating-anonymous">
+            <input id="rating-anonymous" type="checkbox">
+            <span data-i18n="ratingAnonymous">Publicar como anónimo</span>
+          </label>
+          <label>
+            <span data-i18n="ratingCountry">País</span>
+            <select id="rating-country" required>
+              <option value="Portugal">Portugal</option>
+              <option value="Espanha">Espanha</option>
+              <option value="França">França</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="ratingComment">A sua opinião</span>
+            <textarea id="rating-comment" maxlength="500" required></textarea>
+          </label>
+          <fieldset class="rating-stars">
+            <legend data-i18n="ratingStars">Classificação</legend>
+            <div>
+              <button type="button" data-rating="1" aria-label="1 estrela">★</button>
+              <button type="button" data-rating="2" aria-label="2 estrelas">★</button>
+              <button type="button" data-rating="3" aria-label="3 estrelas">★</button>
+              <button type="button" data-rating="4" aria-label="4 estrelas">★</button>
+              <button type="button" data-rating="5" aria-label="5 estrelas">★</button>
+            </div>
+          </fieldset>
+          <button type="submit" class="btn btn-primary" data-i18n="ratingSubmit">Enviar avaliação</button>
+          <p id="rating-message" class="form-message" role="status"></p>
+        </form>
+        <div class="rating-average">
+          <strong id="rating-average-value">0,0</strong>
+          <span>/ 5</span>
+          <p data-i18n="ratingAverage">Média das avaliações</p>
+        </div>
+      </section>
       <section id="avaliacoes" class="reviews-section">
         <div class="section-heading">
           <span class="eyebrow"
-            ><span data-i18n="reviewsEyebrow"
-              >O QUE DIZEM OS CLIENTES</span
-            ></span
+            ><span data-i18n="reviewsEyebrow">O QUE DIZEM OS CLIENTES</span></span
           >
           <h2><span data-i18n="reviewsTitle">Algumas opiniões</span></h2>
           <div class="title-decoration"><span></span><b>♥</b><span></span></div>
         </div>
         <div class="reviews-wrap">
-          <button class="review-btn review-prev">‹</button>
           <div class="reviews-window">
             <div class="reviews-list">
               <article class="review">
@@ -301,14 +341,8 @@
                 <p>“O processo foi simples e o convite ficou lindo.”</p>
                 <strong>— Ana Silva</strong>
               </article>
-              <article class="review">
-                <div class="stars">★★★★★</div>
-                <p>“O convite ficou ainda mais bonito do que eu imaginava!”</p>
-                <strong>— Sofia Martins</strong>
-              </article>
             </div>
           </div>
-          <button class="review-btn review-next">›</button>
         </div>
       </section>
     </main>
@@ -360,11 +394,12 @@
               <h3>Navegação</h3>
 
               <ul>
-                  <li><a href="#">Início</a></li>
-                  <li><a href="#">Catálogo</a></li>
-                  <li><a href="#">Modelos</a></li>
-                  <li><a href="#">Como funciona</a></li>
-                  <li><a href="#">Contactos</a></li>
+                  <li><a href="#inicio" data-i18n="navHome">Página Inicial</a></li>
+                  <li><a href="#catalogo" data-i18n="navCatalog">Catálogo</a></li>
+                  <li><a href="#precos" data-i18n="navPrices">Preços</a></li>
+                  <li><a href="#avaliar" data-i18n="navAssess">Avaliar</a></li>
+                  <li><a href="#avaliacoes" data-i18n="navReviews">Avaliações</a></li>
+                  <li><a href="#contactos" data-i18n="navContacts">Contactos</a></li>
               </ul>
           </div>
 
