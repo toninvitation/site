@@ -57,10 +57,29 @@ function setupRatingForm() {
   const stars = [...document.querySelectorAll("[data-rating]")];
   const nameInput = document.getElementById("rating-name");
   const anonymousInput = document.getElementById("rating-anonymous");
+  const countrySelect = document.getElementById("rating-country");
+  const commentInput = document.getElementById("rating-comment");
   const average = document.getElementById("rating-average-value");
   let selectedRating = 0;
 
   if (!form || !average) return;
+
+  if (countrySelect && typeof Intl.supportedValuesOf === "function") {
+    const displayNames = new Intl.DisplayNames([currentLanguage || "pt"], { type: "region" });
+    const fragment = document.createDocumentFragment();
+
+    Intl.supportedValuesOf("region")
+      .filter(code => /^[A-Z]{2}$/.test(code))
+      .sort((first, second) => displayNames.of(first).localeCompare(displayNames.of(second)))
+      .forEach(code => {
+        const option = document.createElement("option");
+        option.value = code;
+        option.textContent = `${countryFlag(code)} ${code} - ${displayNames.of(code)}`;
+        fragment.appendChild(option);
+      });
+
+    countrySelect.replaceChildren(fragment);
+  }
 
   const storedRatings = () => JSON.parse(localStorage.getItem("toninvitation-ratings") || "[]");
 
@@ -104,8 +123,8 @@ function setupRatingForm() {
     ratings.push({
       rating: selectedRating,
       name: anonymousInput?.checked ? "Anónimo" : nameInput.value.trim() || "Anónimo",
-      country: document.getElementById("rating-country").value,
-      comment: document.getElementById("rating-comment").value.trim()
+      country: countrySelect?.value || "",
+      comment: commentInput?.value.trim() || ""
     });
     localStorage.setItem("toninvitation-ratings", JSON.stringify(ratings));
     form.reset();
@@ -117,6 +136,12 @@ function setupRatingForm() {
   });
 
   updateAverage();
+}
+
+function countryFlag(code) {
+  return String(code)
+    .toUpperCase()
+    .replace(/[A-Z]/g, letter => String.fromCodePoint(letter.charCodeAt(0) + 127397));
 }
 
 /* Configura o carrossel de avaliações. */

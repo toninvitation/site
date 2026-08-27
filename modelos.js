@@ -798,7 +798,7 @@ async function createTextOverlayDataUrl() {
 
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
-  canvas.height = 1920;
+  canvas.height = 1980;
   const context = canvas.getContext("2d");
 
   (selectedTemplate.textLayers || []).forEach((layer, index) => {
@@ -811,7 +811,7 @@ async function createTextOverlayDataUrl() {
     const pixelSize = size / 100 * 1080;
 
     context.save();
-    context.translate(position.x / 100 * 1080, position.y / 100 * 1920);
+    context.translate(position.x / 100 * 1080, position.y / 100 * 1980);
     context.rotate((layer.rotate || 0) * Math.PI / 180);
     context.font = `${layer.weight || 700} ${pixelSize}px "${String(fontFamily).split(",")[0].replace(/["']/g, "").trim()}"`;
     context.fillStyle = layerColors[index] || layer.color || "#07588c";

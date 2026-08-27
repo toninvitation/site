@@ -1,7 +1,7 @@
 /* =========================================================
    TOY STORY — MODELO 1
 
-   O convite mantém sempre a proporção 1080x1920.
+  O convite mantém sempre a proporção 1080x1980.
    A imagem de fundo ocupa todo o canvas e não é cortada.
    ========================================================= */
 
@@ -10,7 +10,7 @@
    --------------------------------------------------------- */
 
 .invitation-image-portrait {
-  aspect-ratio: 1080 / 1920;
+  aspect-ratio: 1080 / 1980;
   background: #fff;
 }
 
@@ -61,7 +61,7 @@
   justify-content: center;
 }
 
-/* O mockup é apenas uma escala visual do canvas real de 1080x1920. */
+/* O mockup é apenas uma escala visual do canvas real de 1080x1980. */
 .phone-mockup {
   position: relative;
   width: min(270px, 100%);
@@ -83,13 +83,13 @@
 
 /*
   Este é o verdadeiro canvas do convite.
-  A proporção nunca muda: 1080 / 1920.
+  A proporção nunca muda: 1080 / 1980.
 */
 
 .invitation-canvas {
   container-type: inline-size;
   width: 100%;
-  aspect-ratio: 1080 / 1920;
+  aspect-ratio: 1080 / 1980;
   position: relative;
   overflow: hidden;
   background-position: center;

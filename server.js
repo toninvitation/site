@@ -265,9 +265,9 @@ async function saveFinalPng(orderId, previewImagePath, textOverlayDataUrl) {
   /* Garante que a pasta individual do pedido existe. */
   fs.mkdirSync(getOrderDirectory(orderId), { recursive: true });
 
-  /* Cria a imagem final com exatamente 1080x1920 px. */
+  /* Cria a imagem final com exatamente 1080x1980 px. */
   const finalBuffer = await sharp(privateBackgroundPath)
-    .resize(1080, 1920, { fit: "fill" })
+    .resize(1080, 1980, { fit: "fill" })
     .composite([
       {
         input: overlayBuffer,

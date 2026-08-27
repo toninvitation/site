@@ -24,6 +24,7 @@
   padding: 8px 13px;
   cursor: pointer;
   font-size: 12px;
+  white-space: nowrap;
 }
 
 .language-menu {
@@ -171,7 +172,7 @@ footer {
   margin: 0 auto;
   padding: 24px 32px 28px;
   display: grid;
-  grid-template-columns: 2fr 1.05fr 1.15fr 1.35fr;
+  grid-template-columns: 2fr 1.2fr 1.4fr;
   gap: 52px;
 }
 
