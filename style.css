@@ -67,3 +67,147 @@
     margin-left: auto;
   }
 }
+
+/* Rodapé da página inicial. */
+footer {
+  background: var(--cream);
+  border-top: 1px solid var(--line);
+}
+
+.footer-conteudo {
+  max-width: 1900px;
+  margin: 0 auto;
+  padding: 24px 32px 28px;
+  display: grid;
+  grid-template-columns: 2fr 1.05fr 1.15fr 1.35fr;
+  gap: 52px;
+}
+
+.footer-col {
+  min-width: 0;
+}
+
+.footer-logo {
+  width: 240px;
+  max-width: 100%;
+  margin-bottom: 25px;
+}
+
+.footer-col h3 {
+  margin: 1px 0 20px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.footer-col p,
+.footer-col li,
+.footer-col a {
+  color: var(--brown-soft);
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.footer-col ul {
+  list-style: none;
+}
+
+.footer-col a {
+  text-decoration: none;
+}
+
+.footer-redes {
+  display: flex;
+  align-items: center;
+  gap: 23px;
+  margin-top: 28px;
+}
+
+.footer-redes a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brown-soft);
+}
+
+.footer-redes svg,
+.footer-redes i {
+  width: 24px;
+  height: 24px;
+}
+
+.footer-col p:has(> svg),
+.footer-col p:has(> i) {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.footer-col p > svg,
+.footer-col p > i {
+  width: 20px;
+  height: 20px;
+  color: var(--pink);
+  flex-shrink: 0;
+}
+
+.footer-btn {
+  width: 217px;
+  min-height: 55px;
+  margin-top: 45px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border-radius: 999px;
+  background: var(--pink);
+  color: #fff !important;
+  font-size: 18px !important;
+}
+
+.footer-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+.footer-bottom {
+  padding: 8px 20px;
+  background: var(--brown-soft);
+  color: #fff;
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (max-width: 1100px) {
+  .footer-conteudo {
+    grid-template-columns: 1.5fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .footer-conteudo {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 40px 25px;
+  }
+
+  .footer-btn {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 520px) {
+  .footer-conteudo {
+    padding: 32px 20px;
+  }
+
+  .footer-logo {
+    width: 210px;
+  }
+
+  .footer-col p,
+  .footer-col li,
+  .footer-col a {
+    font-size: 14px;
+  }
+}
