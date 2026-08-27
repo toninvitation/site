@@ -68,6 +68,94 @@
   }
 }
 
+/* Cartões de categorias e secção de preços da página inicial. */
+.category-grid {
+  max-width: 1400px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.category-card {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  background: #fff;
+}
+
+.category-image-wrap {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+}
+
+.category-info {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 74px 12px 22px;
+  background: linear-gradient(transparent, #4a3935cc);
+}
+
+.category-info h3 {
+  color: #fff;
+  font-size: 25px;
+  text-shadow: 0 1px 4px #3d282899;
+}
+
+.prices-section {
+  padding: 90px 5%;
+  background: var(--cream-light);
+}
+
+.price-card {
+  width: min(430px, 100%);
+  margin: 30px auto 0;
+  padding: 38px 30px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 30px #78504614;
+}
+
+.price-card-label {
+  display: block;
+  color: var(--brown-soft);
+  font-size: 14px;
+}
+
+.price-card strong {
+  display: block;
+  margin: 8px 0;
+  color: var(--pink-dark);
+  font-family: "Cormorant Garamond", serif;
+  font-size: 58px;
+}
+
+.price-card p {
+  margin-bottom: 22px;
+  color: var(--brown-soft);
+  font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+  .category-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Rodapé da página inicial. */
 footer {
   background: var(--cream);

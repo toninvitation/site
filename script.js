@@ -35,10 +35,9 @@ function initializeHomePage() {
             Ver modelos
             <i data-lucide="arrow-right"></i>
           </div>
-        </div>
-        <div class="category-info">
-          <h3>${category.name}</h3>
-          <p>${category.description}</p>
+          <div class="category-info">
+            <h3>${category.name}</h3>
+          </div>
         </div>
       </a>
     `).join("");
