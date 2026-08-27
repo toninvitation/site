@@ -1,155 +1,254 @@
 <!-- Página automática de modelos e personalização. -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Convites — TONInvitation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&family=Oswald:wght@400;500;600;700&family=Sigmar+One&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="https://fontlibrary.org//face/horta" type="text/css">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="categoria.css">
-  <link rel="stylesheet" href="toy-story.css">
-  <link rel="stylesheet" href="catalogo-automatico.css">
-</head>
-<body>
-  <header class="site-header">
-    <a class="logo" href="index.html">
-      <img src="Images/logo_pt.png" alt="TONInvitation">
-    </a>
-    <nav id="menu" class="main-nav">
-      <ul>
-        <li><a href="index.html">Início</a></li>
-        <li><a href="index.html#catalogo">Catálogo</a></li>
-        <li><a href="index.html#como-funciona">Como funciona</a></li>
-      </ul>
-    </nav>
-    <button id="menu-mobile" class="menu-mobile" aria-label="Abrir menu">
-      <span></span><span></span><span></span>
-    </button>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convites — TONInvitation</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&family=Oswald:wght@400;500;600;700&family=Sigmar+One&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      rel="stylesheet"
+      href="https://fontlibrary.org//face/horta"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="categoria.css" />
+    <link rel="stylesheet" href="toy-story.css" />
+    <link rel="stylesheet" href="catalogo-automatico.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="logo" href="index.html">
+        <img src="Images/logo_pt.png" alt="TONInvitation" />
+      </a>
+      <nav id="menu" class="main-nav">
+        <ul>
+          <li><a href="index.html">Início</a></li>
+          <li><a href="index.html#catalogo">Catálogo</a></li>
+          <li><a href="index.html#como-funciona">Como funciona</a></li>
+        </ul>
+      </nav>
+      <button id="menu-mobile" class="menu-mobile" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
 
-  <main class="category-page">
-    <a id="back-link" class="back-link">
-      <i data-lucide="arrow-left"></i>
-      Voltar
-    </a>
-    <div id="models-header"></div>
-    <div id="models-grid" class="invitation-grid"></div>
-    <p data-catalog-error class="form-message"></p>
-  </main>
+    <main class="category-page">
+      <a id="back-link" class="back-link">
+        <i data-lucide="arrow-left"></i>
+        Voltar
+      </a>
+      <div id="models-header"></div>
+      <div id="models-grid" class="invitation-grid"></div>
+      <p data-catalog-error class="form-message"></p>
+    </main>
 
-  <div id="customizer-modal" class="modal" aria-hidden="true">
-    <div class="modal-backdrop" aria-hidden="true"></div>
-    <div class="customizer customizer-toy-story">
-      <button class="modal-close" data-close-modal aria-label="Fechar">×</button>
-      <div class="customizer-head">
-        <h2 id="customizer-title">Personalize o seu convite</h2>
-        <p>Preencha os dados e veja o convite atualizado em tempo real.</p>
-      </div>
+    <div id="customizer-modal" class="modal" aria-hidden="true">
+      <div class="modal-backdrop" aria-hidden="true"></div>
+      <div class="customizer customizer-toy-story">
+        <button class="modal-close" data-close-modal aria-label="Fechar">
+          ×
+        </button>
+        <div class="customizer-head">
+          <h2 id="customizer-title">Personalize o seu convite</h2>
+          <p>Preencha os dados e veja o convite atualizado em tempo real.</p>
+        </div>
 
-      <div class="customizer-layout">
-        <form id="customizer-form" class="customizer-form">
-          <label id="field-group-name">
-            Nome
-            <textarea id="field-name" maxlength="45" rows="2" placeholder="Ex.: João"></textarea>
-          </label>
-          <label id="field-group-age">
-            Idade
-            <input id="field-age" type="text" maxlength="2" inputmode="numeric">
-          </label>
-          <label id="field-group-date">
-            Data
-            <input id="field-date" type="date">
-            <small class="field-help">Escolha a data no calendário. O dia da semana é preenchido automaticamente.</small>
-          </label>
-          <label id="field-group-time">
-            Hora
-            <input id="field-time" type="text" maxlength="20" placeholder="Ex.: 15H">
-          </label>
-          <label id="field-group-place">
-            Morada / Local
-            <textarea id="field-place" maxlength="80" rows="2" placeholder="Ex.: Rua Luís de Camões 4"></textarea>
-          </label>
-
-          <div id="field-group-phrases" class="editable-phrases">
-            <span class="form-label">Frases no convite</span>
-            <p class="field-help">Estas frases aparecem como no modelo, mas pode alterá-las ou apagá-las.</p>
-            <label>
-              Frase principal
-              <textarea id="field-adventure" rows="2" maxlength="80"></textarea>
+        <div class="customizer-layout">
+          <form id="customizer-form" class="customizer-form">
+            <label id="field-group-name">
+              Nome
+              <textarea
+                id="field-name"
+                maxlength="45"
+                rows="2"
+                placeholder="Ex.: João"
+              ></textarea>
             </label>
-            <label>
-              Frase “Faz"
-              <input id="field-faz" type="text" maxlength="20">
+            <label id="field-group-age">
+              Idade
+              <input
+                id="field-age"
+                type="text"
+                maxlength="2"
+                inputmode="numeric"
+              />
             </label>
-            <label>
-              Frase “Anos"
-              <input id="field-anos" type="text" maxlength="20">
+            <label id="field-group-date">
+              Data
+              <input id="field-date" type="date" />
+              <small class="field-help"
+                >Escolha a data no calendário. O dia da semana é preenchido
+                automaticamente.</small
+              >
             </label>
-            <label>
-              Frase final
-              <input id="field-end" type="text" maxlength="40">
+            <label id="field-group-time">
+              Hora
+              <input
+                id="field-time"
+                type="text"
+                maxlength="20"
+                placeholder="Ex.: 15H"
+              />
             </label>
-          </div>
+            <label id="field-group-place">
+              Morada / Local
+              <textarea
+                id="field-place"
+                maxlength="80"
+                rows="2"
+                placeholder="Ex.: Rua Luís de Camões 4"
+              ></textarea>
+            </label>
 
-          <label id="field-group-other-info">
-            Outras informações da festa
-            <textarea id="field-other-info" maxlength="180" rows="4" placeholder="Escreva aqui alguma informação extra, se desejar."></textarea>
-            <small class="field-help">Esta frase também pode ser arrastada e redimensionada no convite.</small>
-          </label>
-
-          <label>
-            E-mail para entrega
-            <input id="field-email" type="email" required>
-            <small class="watermark-note">A imagem final enviada para o seu e-mail será <strong>sem a marca d'água</strong>.</small>
-          </label>
-
-          <button type="submit" class="btn btn-primary btn-large full-width">Confirmar pagamento</button>
-          <p id="form-message" class="form-message"></p>
-        </form>
-
-        <div class="preview-area">
-          <div class="phone-mockup" aria-label="Pré-visualização do convite no telemóvel">
-            <div class="phone-side-button phone-side-button-1"></div>
-            <div class="phone-side-button phone-side-button-2"></div>
-            <div class="phone-speaker"></div>
-            <div class="phone-screen">
-              <div id="invitation-preview" class="invitation-preview invitation-canvas"></div>
-            </div>
-            <div class="phone-home-indicator"></div>
-          </div>
-
-          <p class="preview-note">Pode arrastar qualquer texto do convite para a posição que achar necessária. Selecione um texto para aumentar ou diminuir o seu tamanho.</p>
-
-          <div class="editor-toolbar" aria-label="Ferramentas de edição do convite">
-            <div class="history-controls">
-              <button type="button" id="undo-button" class="editor-button">↶ Voltar</button>
-              <button type="button" id="reset-button" class="editor-button editor-button-default">Default</button>
-              <button type="button" id="redo-button" class="editor-button">Avançar ↷</button>
-            </div>
-            <div class="size-controls">
-              <span id="selected-layer-label" class="selected-layer-label">Selecione um texto</span>
-              <div class="size-buttons">
-                <button type="button" id="decrease-size" class="editor-button size-button">−</button>
-                <span id="selected-layer-size" class="selected-layer-size">—</span>
-                <button type="button" id="increase-size" class="editor-button size-button">+</button>
-              </div>
-              <label class="selected-layer-color-control">
-                <span>Cor da escrita</span>
-                <input id="selected-layer-color" class="other-info-color" type="color" value="#07588c" disabled>
+            <div id="field-group-phrases" class="editable-phrases">
+              <span class="form-label">Frases no convite</span>
+              <p class="field-help">
+                Estas frases aparecem como no modelo, mas pode alterá-las ou
+                apagá-las.
+              </p>
+              <label>
+                Frase principal
+                <textarea
+                  id="field-adventure"
+                  rows="2"
+                  maxlength="80"
+                ></textarea>
               </label>
+              <label>
+                Frase “Faz"
+                <input id="field-faz" type="text" maxlength="20" />
+              </label>
+              <label>
+                Frase “Anos"
+                <input id="field-anos" type="text" maxlength="20" />
+              </label>
+              <label>
+                Frase final
+                <input id="field-end" type="text" maxlength="40" />
+              </label>
+            </div>
+
+            <label id="field-group-other-info">
+              Outras informações da festa
+              <textarea
+                id="field-other-info"
+                maxlength="180"
+                rows="4"
+                placeholder="Escreva aqui alguma informação extra, se desejar."
+              ></textarea>
+              <small class="field-help"
+                >Esta frase também pode ser arrastada e redimensionada no
+                convite.</small
+              >
+            </label>
+
+            <label>
+              E-mail para entrega
+              <input id="field-email" type="email" required />
+              <small class="watermark-note"
+                >A imagem final enviada para o seu e-mail será
+                <strong>sem a marca d'água</strong>.</small
+              >
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-large full-width">
+              Confirmar pagamento
+            </button>
+            <p id="form-message" class="form-message"></p>
+          </form>
+
+          <div class="preview-area">
+            <div
+              class="phone-mockup"
+              aria-label="Pré-visualização do convite no telemóvel"
+            >
+              <div class="phone-side-button phone-side-button-1"></div>
+              <div class="phone-side-button phone-side-button-2"></div>
+              <div class="phone-speaker"></div>
+              <div class="phone-screen">
+                <div
+                  id="invitation-preview"
+                  class="invitation-preview invitation-canvas"
+                ></div>
+              </div>
+              <div class="phone-home-indicator"></div>
+            </div>
+
+            <p class="preview-note">
+              Pode arrastar qualquer texto do convite para a posição que achar
+              necessária. Selecione um texto para aumentar ou diminuir o seu
+              tamanho.
+            </p>
+
+            <div
+              class="editor-toolbar"
+              aria-label="Ferramentas de edição do convite"
+            >
+              <div class="history-controls">
+                <button type="button" id="undo-button" class="editor-button">
+                  ↶ Voltar
+                </button>
+                <button
+                  type="button"
+                  id="reset-button"
+                  class="editor-button editor-button-default"
+                >
+                  Default
+                </button>
+                <button type="button" id="redo-button" class="editor-button">
+                  Avançar ↷
+                </button>
+              </div>
+              <div class="size-controls">
+                <span id="selected-layer-label" class="selected-layer-label"
+                  >Selecione um texto</span
+                >
+                <div class="size-buttons">
+                  <button
+                    type="button"
+                    id="decrease-size"
+                    class="editor-button size-button"
+                  >
+                    −
+                  </button>
+                  <span id="selected-layer-size" class="selected-layer-size"
+                    >—</span
+                  >
+                  <button
+                    type="button"
+                    id="increase-size"
+                    class="editor-button size-button"
+                  >
+                    +
+                  </button>
+                </div>
+                <label class="selected-layer-color-control">
+                  <span>Cor da escrita</span>
+                  <input
+                    id="selected-layer-color"
+                    class="other-info-color"
+                    type="color"
+                    value="#07588c"
+                    disabled
+                  />
+                </label>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="i18n.js"></script>
-  <script src="categories.js"></script>
-  <script src="modelos.js"></script>
-  <script>lucide.createIcons();</script>
-</body>
+    <script src="i18n.js"></script>
+    <script src="categories.js"></script>
+    <script src="modelos.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
 </html>

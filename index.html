@@ -1,71 +1,386 @@
-<!DOCTYPE html>/*toni*/
+<!doctype html>
 <html lang="pt">
-
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1.0">
-        <title>TONInvitation — Convites Digitais Personalizados</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-        <script src="https://unpkg.com/lucide@latest">
-        </script><link rel="stylesheet" href="style.css">
-    </head>
-    
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>TONInvitation — Convites Digitais Personalizados</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
     <body>
-
-
-
         <header class="site-header">
             <a class="logo" href="index.html">
-                <img src="Images/logo_pt.png" alt="TONInvitation">
+                <img src="Images/logo_pt.png" alt="TONInvitation" />
             </a>
             <nav id="menu" class="main-nav">
                 <ul>
-                    <li>
-                        <a href="#inicio"><span data-i18n="navHome">Início</span></a>
-                    </li>
-                    <li>
-                        <a href="#catalogo"><span data-i18n="navCatalog">Catálogo</span></a>
-                    </li>
-                    <li>
-                        <a href="#como-funciona"><span data-i18n="navHow">Como funciona</span></a>
-                    </li>
-                    <li>
-                        <a href="#avaliacoes"><span data-i18n="navReviews">Avaliações</span></a>
-                    </li>
-                    <li>
-                        <a href="#contactos"><span data-i18n="navContacts">Contactos</span></a>
-                    </li>
+                <li>
+                    <a href="#inicio"><span data-i18n="navHome">Início</span></a>
+                </li>
+                <li>
+                    <a href="#catalogo"><span data-i18n="navCatalog">Catálogo</span></a>
+                </li>
+                <li>
+                    <a href="#como-funciona"
+                    ><span data-i18n="navHow">Como funciona</span></a
+                    >
+                </li>
+                <li>
+                    <a href="#avaliacoes"
+                    ><span data-i18n="navReviews">Avaliações</span></a
+                    >
+                </li>
+                <li>
+                    <a href="#contactos"
+                    ><span data-i18n="navContacts">Contactos</span></a
+                    >
+                </li>
                 </ul>
             </nav>
-            <a class="btn btn-primary header-contact" href="https://wa.link/jy0xch" target="_blank">
+            <a
+                class="btn btn-primary header-contact"
+                href="https://wa.link/jy0xch"
+                target="_blank"
+            >
                 <i data-lucide="message-circle"></i> Contactar
             </a>
             <div class="language-selector">
-  <button type="button" class="language-current" aria-label="Choose language">🇵🇹 PT</button>
-  <div class="language-menu">
-    <button type="button" class="language-option" data-language="pt">🇵🇹 PT</button>
-    <button type="button" class="language-option" data-language="en">🇬🇧 EN</button>
-    <button type="button" class="language-option" data-language="fr">🇫🇷 FR</button>
-    <button type="button" class="language-option" data-language="es">🇪🇸 ES</button>
-  </div>
-</div>
-<button id="menu-mobile" class="menu-mobile">
+                <button
+                type="button"
+                class="language-current"
+                aria-label="Choose language"
+                >
+                🇵🇹 PT
+                </button>
+                <div class="language-menu">
+                <button type="button" class="language-option" data-language="pt">
+                    🇵🇹 PT
+                </button>
+                <button type="button" class="language-option" data-language="en">
+                    🇬🇧 EN
+                </button>
+                <button type="button" class="language-option" data-language="fr">
+                    🇫🇷 FR
+                </button>
+                <button type="button" class="language-option" data-language="es">
+                    🇪🇸 ES
+                </button>
+                </div>
+            </div>
+            <button id="menu-mobile" class="menu-mobile">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
         </header>
-        <main><section id="inicio" class="hero"><div class="hero-text"><span class="eyebrow"><span data-i18n="heroEyebrow">CONVITES DIGITAIS PERSONALIZADOS</span></span><h1>O primeiro detalhe da sua festa <em><span data-i18n="heroTitleEm">começa aqui.</span></em></h1><p class="hero-subtitle"><span data-i18n="heroSubtitle">Escolha uma categoria, encontre o seu modelo, personalize os dados e deixe o resto connosco.</span></p><div class="hero-actions"><a class="btn btn-primary btn-large" href="#catalogo">Ver catálogo <i data-lucide="arrow-right"></i></a><a class="btn btn-outline btn-large" href="#como-funciona"><span data-i18n="navHow">Como funciona</span></a></div><div class="hero-tags"><span>Casamentos</span><span>Infantil</span><span>Batizados</span><span>Chá de bebé</span><span>Formaturas</span><span>Adultos</span></div></div><div class="hero-visual"><div class="hero-card-decoration"></div><img src="Images/imagem_inicio.png" class="hero-invitation" alt="Convite Digital"><div class="hero-badge"><i data-lucide="sparkles"></i><span>Personalize<br>ao seu gosto</span></div></div></section>
-        <section class="benefits"><div class="section-heading compact"><span class="eyebrow"><span data-i18n="benefitsEyebrow">SIMPLES PARA SI</span></span><h2><span data-i18n="benefitsTitle">Um convite feito para a sua ocasião</span></h2></div><div class="benefits-grid"><article><i data-lucide="palette"></i><h3><span data-i18n="benefit1Title">Cores à sua escolha</span></h3><p><span data-i18n="benefit1Text">Escolha a paleta que combina com a sua festa.</span></p></article><article><i data-lucide="pencil"></i><h3><span data-i18n="benefit2Title">Dados personalizados</span></h3><p><span data-i18n="benefit2Text">Nome, data, hora, local e mensagens são seus.</span></p></article><article><i data-lucide="zap"></i><h3><span data-i18n="benefit3Title">Entrega rápida</span></h3><p><span data-i18n="benefit3Text">Receba o seu convite digital sem complicações.</span></p></article><article><i data-lucide="smartphone"></i><h3><span data-i18n="benefit4Title">Pronto para partilhar</span></h3><p><span data-i18n="benefit4Text">Envie por WhatsApp, e-mail ou redes sociais.</span></p></article><article><i data-lucide="leaf"></i><h3><span data-i18n="benefit5Title">100% digital</span></h3><p><span data-i18n="benefit5Text">Sem impressão, sem papel e sem desperdício.</span></p></article></div></section>
-        <section id="catalogo" class="catalog-section"><div class="section-heading"><span class="eyebrow"><span data-i18n="catalogEyebrow">ESCOLHA A OCASIÃO</span></span><h2><span data-i18n="catalogTitle">Catálogo de modelos</span></h2><div class="title-decoration"><span></span><b>♥</b><span></span></div><p><span data-i18n="catalogText">Clique numa categoria para entrar na coleção de convites.</span></p></div><div id="category-grid" class="category-grid"></div></section>
-        <section class="customization-promo"><div><span class="eyebrow"><span data-i18n="promoEyebrow">A IDEIA DA TONINVITATION</span></span><h2><span data-i18n="promoTitle">Um design pode ter muitas versões.</span></h2><p><span data-i18n="promoText">O mesmo convite pode ser preparado em diferentes cores sem criares manualmente uma versão nova para cada cor.</span></p></div><div class="palette-demo"><span style="--swatch:#d98ea2"></span><span style="--swatch:#a98ac0"></span><span style="--swatch:#8aa8b8"></span><span style="--swatch:#9bad86"></span><span style="--swatch:#d6ae7b"></span><span style="--swatch:#c98265"></span></div></section>
-        <section id="como-funciona" class="steps-section"><div class="section-heading"><span class="eyebrow"><span data-i18n="stepsEyebrow">DO MODELO À ENTREGA</span></span><h2>Como funciona</h2><div class="title-decoration"><span></span><b>♥</b><span></span></div></div><div class="steps-grid"><article><b>01</b><i data-lucide="layout-template"></i><h3><span data-i18n="step1Title">Escolha o modelo</span></h3><p><span data-i18n="step1Text">Explore as categorias e escolha o design.</span></p></article><article><b>02</b><i data-lucide="palette"></i><h3><span data-i18n="step2Title">Escolha a cor</span></h3><p><span data-i18n="step2Text">Selecione uma cor disponível.</span></p></article><article><b>03</b><i data-lucide="pencil"></i><h3><span data-i18n="step3Title">Preencha os dados</span></h3><p><span data-i18n="step3Text">Indique os dados da festa e o e-mail.</span></p></article><article><b>04</b><i data-lucide="credit-card"></i><h3><span data-i18n="step4Title">Confirme o pagamento</span></h3><p><span data-i18n="step4Text">Nesta fase de teste, o clique confirma o pagamento.</span></p></article><article><b>05</b><i data-lucide="mail"></i><h3><span data-i18n="step5Title">Receba o convite</span></h3><p><span data-i18n="step5Text">O convite é preparado e enviado.</span></p></article></div></section>
-        <section id="avaliacoes" class="reviews-section"><div class="section-heading"><span class="eyebrow"><span data-i18n="reviewsEyebrow">O QUE DIZEM OS CLIENTES</span></span><h2><span data-i18n="reviewsTitle">Algumas opiniões</span></h2><div class="title-decoration"><span></span><b>♥</b><span></span></div></div><div class="reviews-wrap"><button class="review-btn review-prev">‹</button><div class="reviews-window"><div class="reviews-list"><article class="review"><div class="stars">★★★★★</div><p>“Ficou delicado, elegante e muito bonito.”</p><strong>— Mariana Costa</strong></article><article class="review"><div class="stars">★★★★★</div><p>“O processo foi simples e o convite ficou lindo.”</p><strong>— Ana Silva</strong></article><article class="review"><div class="stars">★★★★★</div><p>“O convite ficou ainda mais bonito do que eu imaginava!”</p><strong>— Sofia Martins</strong></article></div></div><button class="review-btn review-next">›</button></div></section></main>
-        <footer id="contactos"><div class="footer-content"><div><img src="Images/logo_pt.png" class="footer-logo" alt="TONInvitation"><p><span data-i18n="footerDescription">Convites digitais personalizados para tornar a sua festa ainda mais especial.</span></p></div><div><h3><span data-i18n="footerNavigation">Navegação</span></h3><ul class="footer-links"><li><a href="#inicio"><span data-i18n="navHome">Início</span></a></li><li><a href="#catalogo"><span data-i18n="navCatalog">Catálogo</span></a></li><li><a href="#como-funciona"><span data-i18n="navHow">Como funciona</span></a></li></ul></div><div><h3><span data-i18n="footerContact">Contacto</span></h3><p>+351 938 917 594</p><p>toninvitation@gmail.com</p></div><div><h3><span data-i18n="footerOrder">Faça o seu pedido</span></h3><p><span data-i18n="footerOrderText">Escolha um modelo e personalize-o.</span></p><a class="btn btn-primary footer-btn" href="https://wa.link/jy0xch" target="_blank">WhatsApp</a></div></div><div class="footer-bottom"><span data-i18n="footerRights">© 2026 TONInvitation — Convites Digitais. Todos os direitos reservados.</span></div></footer>
-        <script src="categories.js"></script><script src="i18n.js"></script><script src="script.js"></script><script>lucide.createIcons();</script>
-    </body>
-    
+    <main>
+      <section id="inicio" class="hero">
+        <div class="hero-text">
+          <span class="eyebrow"
+            ><span data-i18n="heroEyebrow"
+              >CONVITES DIGITAIS PERSONALIZADOS</span
+            ></span
+          >
+          <h1>
+            O primeiro detalhe da sua festa
+            <em><span data-i18n="heroTitleEm">começa aqui.</span></em>
+          </h1>
+          <p class="hero-subtitle">
+            <span data-i18n="heroSubtitle"
+              >Escolha uma categoria, encontre o seu modelo, personalize os
+              dados e deixe o resto connosco.</span
+            >
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-large" href="#catalogo"
+              >Ver catálogo <i data-lucide="arrow-right"></i></a
+            ><a class="btn btn-outline btn-large" href="#como-funciona"
+              ><span data-i18n="navHow">Como funciona</span></a
+            >
+          </div>
+          <div class="hero-tags">
+            <span>Casamentos</span><span>Infantil</span><span>Batizados</span
+            ><span>Chá de bebé</span><span>Formaturas</span><span>Adultos</span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-card-decoration"></div>
+          <img
+            src="Images/imagem_inicio.png"
+            class="hero-invitation"
+            alt="Convite Digital"
+          />
+          <div class="hero-badge">
+            <i data-lucide="sparkles"></i
+            ><span>Personalize<br />ao seu gosto</span>
+          </div>
+        </div>
+      </section>
+      <section class="benefits">
+        <div class="section-heading compact">
+          <span class="eyebrow"
+            ><span data-i18n="benefitsEyebrow">SIMPLES PARA SI</span></span
+          >
+          <h2>
+            <span data-i18n="benefitsTitle"
+              >Um convite feito para a sua ocasião</span
+            >
+          </h2>
+        </div>
+        <div class="benefits-grid">
+          <article>
+            <i data-lucide="palette"></i>
+            <h3><span data-i18n="benefit1Title">Cores à sua escolha</span></h3>
+            <p>
+              <span data-i18n="benefit1Text"
+                >Escolha a paleta que combina com a sua festa.</span
+              >
+            </p>
+          </article>
+          <article>
+            <i data-lucide="pencil"></i>
+            <h3><span data-i18n="benefit2Title">Dados personalizados</span></h3>
+            <p>
+              <span data-i18n="benefit2Text"
+                >Nome, data, hora, local e mensagens são seus.</span
+              >
+            </p>
+          </article>
+          <article>
+            <i data-lucide="zap"></i>
+            <h3><span data-i18n="benefit3Title">Entrega rápida</span></h3>
+            <p>
+              <span data-i18n="benefit3Text"
+                >Receba o seu convite digital sem complicações.</span
+              >
+            </p>
+          </article>
+          <article>
+            <i data-lucide="smartphone"></i>
+            <h3>
+              <span data-i18n="benefit4Title">Pronto para partilhar</span>
+            </h3>
+            <p>
+              <span data-i18n="benefit4Text"
+                >Envie por WhatsApp, e-mail ou redes sociais.</span
+              >
+            </p>
+          </article>
+          <article>
+            <i data-lucide="leaf"></i>
+            <h3><span data-i18n="benefit5Title">100% digital</span></h3>
+            <p>
+              <span data-i18n="benefit5Text"
+                >Sem impressão, sem papel e sem desperdício.</span
+              >
+            </p>
+          </article>
+        </div>
+      </section>
+      <section id="catalogo" class="catalog-section">
+        <div class="section-heading">
+          <span class="eyebrow"
+            ><span data-i18n="catalogEyebrow">ESCOLHA A OCASIÃO</span></span
+          >
+          <h2><span data-i18n="catalogTitle">Catálogo de modelos</span></h2>
+          <div class="title-decoration"><span></span><b>♥</b><span></span></div>
+          <p>
+            <span data-i18n="catalogText"
+              >Clique numa categoria para entrar na coleção de convites.</span
+            >
+          </p>
+        </div>
+        <div id="category-grid" class="category-grid"></div>
+      </section>
+      <section class="customization-promo">
+        <div>
+          <span class="eyebrow"
+            ><span data-i18n="promoEyebrow"
+              >A IDEIA DA TONINVITATION</span
+            ></span
+          >
+          <h2>
+            <span data-i18n="promoTitle"
+              >Um design pode ter muitas versões.</span
+            >
+          </h2>
+          <p>
+            <span data-i18n="promoText"
+              >O mesmo convite pode ser preparado em diferentes cores sem
+              criares manualmente uma versão nova para cada cor.</span
+            >
+          </p>
+        </div>
+        <div class="palette-demo">
+          <span style="--swatch: #d98ea2"></span
+          ><span style="--swatch: #a98ac0"></span
+          ><span style="--swatch: #8aa8b8"></span
+          ><span style="--swatch: #9bad86"></span
+          ><span style="--swatch: #d6ae7b"></span
+          ><span style="--swatch: #c98265"></span>
+        </div>
+      </section>
+      <section id="como-funciona" class="steps-section">
+        <div class="section-heading">
+          <span class="eyebrow"
+            ><span data-i18n="stepsEyebrow">DO MODELO À ENTREGA</span></span
+          >
+          <h2>Como funciona</h2>
+          <div class="title-decoration"><span></span><b>♥</b><span></span></div>
+        </div>
+        <div class="steps-grid">
+          <article>
+            <b>01</b><i data-lucide="layout-template"></i>
+            <h3><span data-i18n="step1Title">Escolha o modelo</span></h3>
+            <p>
+              <span data-i18n="step1Text"
+                >Explore as categorias e escolha o design.</span
+              >
+            </p>
+          </article>
+          <article>
+            <b>02</b><i data-lucide="palette"></i>
+            <h3><span data-i18n="step2Title">Escolha a cor</span></h3>
+            <p>
+              <span data-i18n="step2Text">Selecione uma cor disponível.</span>
+            </p>
+          </article>
+          <article>
+            <b>03</b><i data-lucide="pencil"></i>
+            <h3><span data-i18n="step3Title">Preencha os dados</span></h3>
+            <p>
+              <span data-i18n="step3Text"
+                >Indique os dados da festa e o e-mail.</span
+              >
+            </p>
+          </article>
+          <article>
+            <b>04</b><i data-lucide="credit-card"></i>
+            <h3><span data-i18n="step4Title">Confirme o pagamento</span></h3>
+            <p>
+              <span data-i18n="step4Text"
+                >Nesta fase de teste, o clique confirma o pagamento.</span
+              >
+            </p>
+          </article>
+          <article>
+            <b>05</b><i data-lucide="mail"></i>
+            <h3><span data-i18n="step5Title">Receba o convite</span></h3>
+            <p>
+              <span data-i18n="step5Text"
+                >O convite é preparado e enviado.</span
+              >
+            </p>
+          </article>
+        </div>
+      </section>
+      <section id="avaliacoes" class="reviews-section">
+        <div class="section-heading">
+          <span class="eyebrow"
+            ><span data-i18n="reviewsEyebrow"
+              >O QUE DIZEM OS CLIENTES</span
+            ></span
+          >
+          <h2><span data-i18n="reviewsTitle">Algumas opiniões</span></h2>
+          <div class="title-decoration"><span></span><b>♥</b><span></span></div>
+        </div>
+        <div class="reviews-wrap">
+          <button class="review-btn review-prev">‹</button>
+          <div class="reviews-window">
+            <div class="reviews-list">
+              <article class="review">
+                <div class="stars">★★★★★</div>
+                <p>“Ficou delicado, elegante e muito bonito.”</p>
+                <strong>— Mariana Costa</strong>
+              </article>
+              <article class="review">
+                <div class="stars">★★★★★</div>
+                <p>“O processo foi simples e o convite ficou lindo.”</p>
+                <strong>— Ana Silva</strong>
+              </article>
+              <article class="review">
+                <div class="stars">★★★★★</div>
+                <p>“O convite ficou ainda mais bonito do que eu imaginava!”</p>
+                <strong>— Sofia Martins</strong>
+              </article>
+            </div>
+          </div>
+          <button class="review-btn review-next">›</button>
+        </div>
+      </section>
+    </main>
+    <footer id="contactos">
+      <div class="footer-content">
+        <div>
+          <img
+            src="Images/logo_pt.png"
+            class="footer-logo"
+            alt="TONInvitation"
+          />
+          <p>
+            <span data-i18n="footerDescription"
+              >Convites digitais personalizados para tornar a sua festa ainda
+              mais especial.</span
+            >
+          </p>
+        </div>
+        <div>
+          <h3><span data-i18n="footerNavigation">Navegação</span></h3>
+          <ul class="footer-links">
+            <li>
+              <a href="#inicio"><span data-i18n="navHome">Início</span></a>
+            </li>
+            <li>
+              <a href="#catalogo"
+                ><span data-i18n="navCatalog">Catálogo</span></a
+              >
+            </li>
+            <li>
+              <a href="#como-funciona"
+                ><span data-i18n="navHow">Como funciona</span></a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3><span data-i18n="footerContact">Contacto</span></h3>
+          <p>+351 938 917 594</p>
+          <p>toninvitation@gmail.com</p>
+        </div>
+        <div>
+          <h3><span data-i18n="footerOrder">Faça o seu pedido</span></h3>
+          <p>
+            <span data-i18n="footerOrderText"
+              >Escolha um modelo e personalize-o.</span
+            >
+          </p>
+          <a
+            class="btn btn-primary footer-btn"
+            href="https://wa.link/jy0xch"
+            target="_blank"
+            >WhatsApp</a
+          >
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span data-i18n="footerRights"
+          >© 2026 TONInvitation — Convites Digitais. Todos os direitos
+          reservados.</span
+        >
+      </div>
+    </footer>
+    <script src="categories.js"></script>
+    <script src="i18n.js"></script>
+    <script src="script.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
 </html>
