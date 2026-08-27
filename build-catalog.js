@@ -326,13 +326,13 @@ function discoverCatalog() {
       templates.push(...models);
     });
 
-    if (themeList.length) {
+    if (themeList.length || childDirectories.length) {
       categories.push({
         id: categoryId,
         name: categoryName,
         image: CATEGORY_IMAGES[categoryName] || "Images/imagem_inicio.png",
         description: CATEGORY_DESCRIPTIONS[categoryName] || "Convites digitais personalizados.",
-        type: "themes"
+        type: themeList.length ? "themes" : "invitations"
       });
     }
   });
