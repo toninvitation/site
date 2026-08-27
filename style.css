@@ -70,15 +70,15 @@
 
 /* Cartões de categorias e secção de preços da página inicial. */
 .category-grid {
-  max-width: 1400px;
+  max-width: 1120px;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 24px;
+  gap: 20px;
 }
 
 .category-card {
   position: relative;
   display: block;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1;
   background: #fff;
 }
 
@@ -176,7 +176,7 @@ footer {
 }
 
 .footer-logo {
-  width: 240px;
+  width: 190px;
   max-width: 100%;
   margin-bottom: 25px;
 }
@@ -290,9 +290,33 @@ footer {
   }
 
   .footer-logo {
-    width: 210px;
+    width: 190px;
   }
 
+
+.hero {
+  min-height: 540px;
+  padding-top: 55px;
+  padding-bottom: 55px;
+}
+
+.customization-promo {
+  display: block;
+}
+
+.customization-promo p {
+  max-width: 850px;
+}
+
+.customization-promo .palette-demo {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .hero {
+    min-height: 500px;
+  }
+}
   .footer-col p,
   .footer-col li,
   .footer-col a {
