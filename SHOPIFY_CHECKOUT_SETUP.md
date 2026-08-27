@@ -1,49 +1,122 @@
 # TONInvitation — Configuração do Checkout Shopify
 
-## Estado atual
+## O que foi alterado
 
-O pagamento já está a ser feito pelo checkout oficial da Shopify através da Storefront API.
+O botão de pagamento do personalizador deixou de abrir diretamente a página local de pagamento de teste.
 
-O fluxo atual é:
+O novo fluxo é:
 
-1. Cliente personaliza o convite.
-2. TONInvitation cria o Order ID.
-3. TONInvitation cria o carrinho Shopify.
-4. Shopify abre o checkout seguro.
-5. Depois do pagamento, Shopify mostra a página de confirmação.
+1. O cliente personaliza o convite.
+2. O TONInvitation cria o pedido e o Order ID.
+3. O servidor cria um carrinho através da Shopify Storefront API.
+4. A Shopify devolve um `checkoutUrl`.
+5. O cliente é encaminhado para o checkout oficial da Shopify.
 
-## O problema do botão “Continue shopping”
+O endpoint antigo `/api/test-payment` continua no projeto temporariamente para não perder a ferramenta de testes que já estava a funcionar. Mais tarde será removido/substituído pelo webhook `orders/paid`.
 
-No teste, o botão “Continue shopping” está a levar para a loja `myshopify.com` em vez de voltar ao site TONInvitation.
+## 1. Criar um produto de teste na Shopify
 
-Isto não é um erro do teu site. O checkout é hospedado pela Shopify e o destino desse botão é controlado pela configuração do lado da Shopify/Headless.
+Na Shopify, cria um produto chamado, por exemplo:
 
-### Alteração preparada nesta versão
+`Toy Story 1 — Convite Digital`
 
-O `server.js` passou a aceitar a variável opcional:
+Define o preço que queres testar.
+
+Para esta primeira implementação usa apenas uma variante:
+
+`Convite digital`
+
+Guarda o produto.
+
+## 2. Ativar o Headless channel
+
+No painel da Shopify, instala/abre o canal **Headless**.
+
+Cria uma storefront para a TONInvitation e obtém o acesso à Storefront API.
+
+O projeto usa o token privado no servidor porque esse token nunca deve aparecer no JavaScript público.
+
+## 3. Preencher o `.env`
+
+Na pasta principal do projeto, cria ou usa o teu `.env` atual e acrescenta:
 
 ```text
-SHOPIFY_RETURN_URL=
+SHOPIFY_STORE_DOMAIN=nome-da-tua-loja.myshopify.com
+SHOPIFY_STOREFRONT_PRIVATE_TOKEN=COLOCA_AQUI_O_TOKEN_PRIVADO
+SHOPIFY_STOREFRONT_API_VERSION=2026-07
 ```
 
-Se estiver preenchida, o servidor acrescenta `return_to=...` ao URL de checkout para podermos testar se esse fluxo é aceite pela tua configuração.
+Não envies o `.env` para o GitHub.
 
-**Não consideres isto ainda a solução final.** A Shopify não garante esse parâmetro para todos os fluxos de checkout/headless. O código mantém o URL original guardado e não usa o regresso do cliente como prova de pagamento.
+O `.gitignore` do projeto já contém `.env`.
 
-## Amanhã — próximo passo
+## 4. Obter o Variant ID
 
-Vamos testar primeiro uma URL pública do teu site, por exemplo:
+Cada produto Shopify tem uma variante.
+
+O projeto precisa do ID dessa variante no formato:
 
 ```text
-https://TEU-DOMINIO/order-return.html
+gid://shopify/ProductVariant/1234567890
 ```
 
-Depois vamos configurar o regresso da forma correta para uma loja Headless, para que o cliente possa voltar ao TONInvitation e veja o número do pedido.
+Esse ID será colocado no `config.json` do convite.
 
-O pagamento confirmado deverá continuar a ser reconhecido pelo webhook Shopify, e não simplesmente pelo facto de o cliente voltar à página.
+Exemplo:
+
+```json
+{
+  "name": "Toy Story 1",
+  "priceEUR": 5,
+  "shopifyVariantId": "gid://shopify/ProductVariant/1234567890"
+}
+```
+
+O `config.json` deve ficar dentro da pasta do convite:
+
+```text
+Categorias/
+└── Infantil/
+    └── Toy Story/
+        └── ToyStory1/
+            ├── ToyStory1_capa.png
+            ├── ToyStory1_com.png
+            ├── ToyStory1_completo.png
+            ├── config.json
+            └── ...
+```
+
+## 5. Reiniciar o servidor
+
+Depois de alterar o `.env` ou os `config.json`, reinicia o servidor:
+
+```bash
+node server.js
+```
+
+## 6. Testar
+
+Abre:
+
+```text
+http://localhost:3000
+```
+
+Escolhe o Toy Story 1, personaliza e indica o teu e-mail.
+
+Ao clicar em **Ir para pagamento seguro**, o sistema deve:
+
+1. criar o Order ID;
+2. criar o carrinho Shopify;
+3. guardar o `cartId` e `checkoutUrl` no `order.json`;
+4. abrir o checkout Shopify.
 
 ## Importante
 
-O `.env` real nunca deve ser colocado no GitHub.
+A confirmação de pagamento ainda não está a ser feita pelo webhook nesta primeira etapa.
 
-O token privado da Storefront API também nunca deve aparecer em HTML, CSS, JavaScript público ou no repositório.
+Depois de confirmarmos que o checkout abre corretamente, a próxima etapa será configurar o webhook Shopify `orders/paid` para que:
+
+`pagamento confirmado -> TONInvitation -> gerar convite sem marca d'água -> enviar e-mail`
+
+Assim não dependeremos do botão de pagamento de teste.

@@ -42,6 +42,7 @@ const MODEL_CONFIGURATIONS = require("./model-configs.js");
 /* Cria a aplicação HTTP. */
 const app = express();
 
+
 /* Define a porta usada pelo servidor. */
 const PORT = Number(process.env.PORT || 3000);
 
@@ -499,6 +500,238 @@ app.post("/api/orders", async (request, response) => {
 });
 
 /* =========================================================
+   SHOPIFY — CONFIGURAÇÃO DO CHECKOUT
+   ========================================================= */
+
+/* Verifica se o checkout Shopify está configurado no servidor. */
+function shopifyCheckoutIsConfigured() {
+  /* Confirma as três variáveis necessárias para criar um checkout. */
+  return Boolean(
+    process.env.SHOPIFY_STORE_DOMAIN &&
+    process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN &&
+    process.env.SHOPIFY_STOREFRONT_API_VERSION
+  );
+}
+
+/* Normaliza o domínio da loja Shopify para evitar URLs duplicados. */
+function getShopifyStoreDomain() {
+  /* Retira http://, https:// e a barra final caso tenham sido colocados no .env. */
+  return String(process.env.SHOPIFY_STORE_DOMAIN || "")
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/$/, "");
+}
+
+/* Obtém a versão GraphQL da Storefront API definida no .env. */
+function getShopifyStorefrontApiUrl() {
+  /* Constrói o endpoint GraphQL oficial da Shopify. */
+  return `https://${getShopifyStoreDomain()}/api/${process.env.SHOPIFY_STOREFRONT_API_VERSION}/graphql.json`;
+}
+
+/*
+  Cria um carrinho Shopify através da Storefront API.
+
+  O token privado fica apenas no servidor.
+  O navegador recebe exclusivamente o checkoutUrl devolvido pela Shopify.
+*/
+async function createShopifyCheckout(order, variantId, countryCode = "PT", buyerIp = "") {
+  /* Impede a utilização do checkout antes de configurar a Shopify. */
+  if (!shopifyCheckoutIsConfigured()) {
+    throw new Error(
+      "O checkout Shopify ainda não está configurado. Preenche SHOPIFY_STORE_DOMAIN, SHOPIFY_STOREFRONT_PRIVATE_TOKEN e SHOPIFY_STOREFRONT_API_VERSION no .env."
+    );
+  }
+
+  /* Define a mutation GraphQL que cria o carrinho e devolve o checkoutUrl. */
+  const mutation = `
+    mutation CreateCart($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          field
+          message
+        }
+        warnings {
+          code
+          message
+        }
+      }
+    }
+  `;
+
+  /* Define os dados que serão enviados para a Shopify. */
+  const variables = {
+    input: {
+      lines: [
+        {
+          merchandiseId: String(variantId),
+          quantity: 1
+        }
+      ],
+      buyerIdentity: {
+        email: order.email,
+        countryCode: String(countryCode || "PT").toUpperCase()
+      },
+      attributes: [
+        {
+          key: "TON Order ID",
+          value: order.orderId
+        },
+        {
+          key: "TON Template ID",
+          value: order.templateId
+        },
+        {
+          key: "TON Template Name",
+          value: order.templateName
+        }
+      ]
+    }
+  };
+
+  /* Envia a criação do carrinho para a Storefront API. */
+  const shopifyResponse = await fetch(getShopifyStorefrontApiUrl(), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Shopify-Storefront-Private-Token": process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN,
+      "Shopify-Storefront-Buyer-IP": String(buyerIp || "")
+    },
+    body: JSON.stringify({
+      query: mutation,
+      variables
+    })
+  });
+
+  /* Converte a resposta GraphQL para JSON. */
+  const result = await shopifyResponse.json();
+
+  /* Trata erros HTTP devolvidos pela Shopify. */
+  if (!shopifyResponse.ok) {
+    throw new Error(
+      `A Shopify devolveu HTTP ${shopifyResponse.status}: ${JSON.stringify(result)}`
+    );
+  }
+
+  /* Trata erros gerais do GraphQL. */
+  if (Array.isArray(result.errors) && result.errors.length > 0) {
+    throw new Error(result.errors.map(error => error.message).join(" | "));
+  }
+
+  /* Obtém o resultado da mutation cartCreate. */
+  const payload = result.data?.cartCreate;
+
+  /* Trata erros específicos do carrinho. */
+  if (Array.isArray(payload?.userErrors) && payload.userErrors.length > 0) {
+    throw new Error(payload.userErrors.map(error => error.message).join(" | "));
+  }
+
+  /* Confirma que a Shopify devolveu um URL de checkout. */
+  if (!payload?.cart?.checkoutUrl) {
+    throw new Error("A Shopify não devolveu o checkoutUrl.");
+  }
+
+  /* Devolve os dados necessários para o nosso pedido. */
+  return {
+    cartId: payload.cart.id,
+    checkoutUrl: payload.cart.checkoutUrl,
+    warnings: payload.warnings || []
+  };
+}
+
+/* =========================================================
+   API — CRIAR CHECKOUT SHOPIFY
+   ========================================================= */
+
+app.post("/api/shopify/create-checkout", async (request, response) => {
+  try {
+    /* Obtém os dados enviados pelo personalizador. */
+    const orderId = String(request.body?.orderId || "");
+    const variantId = String(request.body?.variantId || "");
+    const countryCode = String(request.body?.countryCode || "PT").toUpperCase();
+
+    /* Valida o Order ID antes de procurar o pedido. */
+    if (!isValidOrderId(orderId)) {
+      return response.status(400).json({
+        error: "Order ID inválido."
+      });
+    }
+
+    /* Exige um Variant ID real criado na Shopify. */
+    if (!variantId.startsWith("gid://shopify/ProductVariant/")) {
+      return response.status(400).json({
+        error: "O convite ainda não tem um Shopify Variant ID configurado."
+      });
+    }
+
+    /* Procura o pedido que foi criado anteriormente pelo personalizador. */
+    const order = readOrder(orderId);
+
+    /* Impede checkout de um pedido inexistente. */
+    if (!order) {
+      return response.status(404).json({
+        error: "Pedido não encontrado."
+      });
+    }
+
+    /* Obtém o IP original do comprador para a proteção da Storefront API. */
+    const buyerIp = request.headers["x-forwarded-for"]?.split(",")[0]?.trim()
+      || request.socket.remoteAddress
+      || "";
+
+    /* Cria o carrinho e obtém o checkoutUrl. */
+    const checkout = await createShopifyCheckout(
+      order,
+      variantId,
+      countryCode,
+      buyerIp
+    );
+
+    /* Guarda os dados do checkout no pedido para podermos associá-lo depois ao webhook. */
+    order.shopify = {
+      variantId,
+      cartId: checkout.cartId,
+      checkoutUrl: checkout.checkoutUrl,
+      countryCode,
+      checkoutCreatedAt: new Date().toISOString()
+    };
+    order.updatedAt = new Date().toISOString();
+    saveOrder(order);
+
+    /* Devolve apenas o URL público do checkout ao navegador. */
+    return response.json({
+      success: true,
+      orderId,
+      checkoutUrl: checkout.checkoutUrl
+    });
+  } catch (error) {
+    /* Regista o erro completo no terminal para facilitar o teste. */
+    console.error("Erro ao criar checkout Shopify:", error);
+
+    /* Devolve uma mensagem controlada ao navegador. */
+    return response.status(500).json({
+      error: `Não foi possível abrir o checkout Shopify. ${error.message}`
+    });
+  }
+});
+
+/* =========================================================
+   API — ESTADO DA CONFIGURAÇÃO SHOPIFY
+   ========================================================= */
+
+app.get("/api/shopify/status", (request, response) => {
+  /* Devolve apenas informação segura sobre a configuração. */
+  return response.json({
+    configured: shopifyCheckoutIsConfigured(),
+    storeDomain: getShopifyStoreDomain() || null,
+    apiVersion: process.env.SHOPIFY_STOREFRONT_API_VERSION || null,
+    privateTokenConfigured: Boolean(process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN)
+  });
+});
+
+/* =========================================================
    API — PAGAMENTO DE TESTE
    ========================================================= */
 
@@ -871,6 +1104,7 @@ function discoverThemeModels(categoryFolderName, themeFolderName, themeDirectory
         fallbackImage: "Images/infantil.jpg",
         description: config.description || `Convite personalizado — ${prettifyModelName(modelEntry.name)}.`,
         priceEUR: Number(config.priceEUR || 5),
+        shopifyVariantId: String(config.shopifyVariantId || ""),
         defaultName: config.defaultName || "João",
         defaultAge: config.defaultAge || "3",
         defaultDate: config.defaultDate || "2026-05-10",
