@@ -754,6 +754,7 @@ function setupCustomizer() {
       colors: cloneObject(layerColors),
       editableFields: selectedTemplate.editableFields || [],
       fontFiles: cloneObject(selectedTemplate.fontFiles || {}),
+      shopifyVariantId: selectedTemplate.shopifyVariantId || "",
       email
     };
 
@@ -761,23 +762,51 @@ function setupCustomizer() {
     button.textContent = "A criar pedido...";
 
     try {
-      const response = await fetch("/api/orders", {
+      /* Obtém o endereço do backend a partir da configuração pública do site. */
+      const apiBaseUrl = window.TON_API_BASE_URL || "";
+
+      /* Monta o endpoint de pedidos sem duplicar barras. */
+      const ordersEndpoint = `${apiBaseUrl.replace(/\/$/, "")}/api/orders`;
+
+      /* Envia os dados do pedido para o backend online. */
+      const response = await fetch(ordersEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order)
       });
 
-      const data = await response.json();
+      /* Lê a resposta como texto primeiro para evitar o erro "Unexpected token <". */
+      const responseText = await response.text();
 
+      /* Converte a resposta para JSON apenas quando ela for realmente JSON. */
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(
+          "O backend não devolveu uma resposta JSON válida. Verifica o endereço do backend e a configuração CORS."
+        );
+      }
+
+      /* Mostra ao cliente qualquer erro devolvido pelo backend. */
       if (!response.ok) {
         throw new Error(data.error || "Não foi possível criar o pedido.");
       }
 
-      message.innerHTML = `
-        Pedido criado: <strong>${escapeHtml(data.orderId)}</strong>.<br>
-        <a href="${data.testPaymentUrl}">Abrir pagamento de teste</a>
-      `;
-      button.textContent = "Pedido criado";
+      /* Confirma que a Shopify devolveu um checkout. */
+      if (!data.checkoutUrl) {
+        throw new Error("O checkout Shopify não foi devolvido pelo backend.");
+      }
+
+      /* Guarda o Order ID localmente para poder recuperá-lo ao regressar da Shopify. */
+      sessionStorage.setItem("toninvitationOrderId", data.orderId);
+
+      /* Abre o checkout real da Shopify. */
+      window.location.href = data.checkoutUrl;
+
+      /* Atualiza o botão enquanto o navegador prepara a navegação. */
+      button.textContent = "A abrir pagamento...";
     } catch (error) {
       message.textContent = error.message;
       button.disabled = false;

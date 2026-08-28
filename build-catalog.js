@@ -228,6 +228,7 @@ function discoverThemeModels(categoryName, themeName, themeDirectory) {
         fallbackImage: "Images/infantil.jpg",
         description: config.description || `Convite personalizado — ${prettifyModelName(entry.name)}.`,
         priceEUR: Number(config.priceEUR || 5),
+        shopifyVariantId: config.shopifyVariantId || "",
         defaultName: config.defaultName || "João",
         defaultAge: config.defaultAge || "3",
         defaultDate: config.defaultDate || "2026-05-10",

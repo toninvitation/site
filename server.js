@@ -42,6 +42,57 @@ const MODEL_CONFIGURATIONS = require("./model-configs.js");
 /* Cria a aplicação HTTP. */
 const app = express();
 
+/* =========================================================
+   CONFIGURAÇÃO ONLINE — CORS
+
+   Permite que o frontend publicado no GitHub Pages comunique
+   com este backend alojado noutro domínio.
+   ========================================================= */
+
+/* Obtém as origens autorizadas a partir do ficheiro .env. */
+const ALLOWED_CORS_ORIGINS = String(process.env.CORS_ORIGINS || "")
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+/* Permite pedidos do frontend autorizado e pedidos locais de desenvolvimento. */
+app.use((request, response, next) => {
+  /* Obtém a origem enviada pelo navegador. */
+  const requestOrigin = request.headers.origin;
+
+  /* Permite o pedido quando não existe origem, por exemplo chamadas locais do servidor. */
+  if (!requestOrigin) {
+    return next();
+  }
+
+  /* Define se a origem está autorizada. */
+  const isAllowedOrigin =
+    ALLOWED_CORS_ORIGINS.includes(requestOrigin) ||
+    requestOrigin === "http://localhost:3000" ||
+    requestOrigin === "http://127.0.0.1:3000";
+
+  /* Bloqueia origens desconhecidas. */
+  if (!isAllowedOrigin) {
+    return response.status(403).json({
+      error: "Origem não autorizada."
+    });
+  }
+
+  /* Permite a origem autorizada. */
+  response.setHeader("Access-Control-Allow-Origin", requestOrigin);
+  response.setHeader("Vary", "Origin");
+  response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  /* Responde imediatamente aos pedidos CORS OPTIONS. */
+  if (request.method === "OPTIONS") {
+    return response.sendStatus(204);
+  }
+
+  /* Continua para a rota pretendida. */
+  return next();
+});
+
 /* Define a porta usada pelo servidor. */
 const PORT = Number(process.env.PORT || 3000);
 
@@ -420,6 +471,134 @@ async function deliverOrderEmail(order) {
 }
 
 /* =========================================================
+   SHOPIFY — CHECKOUT
+   ========================================================= */
+
+/* Verifica se a ligação privada à Storefront API está configurada. */
+function shopifyIsConfigured() {
+  /* Confirma as três variáveis obrigatórias do Shopify. */
+  return Boolean(
+    process.env.SHOPIFY_STORE_DOMAIN &&
+    process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN &&
+    process.env.SHOPIFY_STOREFRONT_API_VERSION
+  );
+}
+
+/* Cria um checkout Shopify para o pedido atual. */
+async function createShopifyCheckout(order) {
+  /* Impede chamadas à Shopify sem configuração. */
+  if (!shopifyIsConfigured()) {
+    throw new Error(
+      "O checkout Shopify ainda não está configurado. Preenche SHOPIFY_STORE_DOMAIN, SHOPIFY_STOREFRONT_PRIVATE_TOKEN e SHOPIFY_STOREFRONT_API_VERSION no .env."
+    );
+  }
+
+  /* Verifica se o convite possui uma variante Shopify associada. */
+  if (!order.shopifyVariantId) {
+    throw new Error(
+      "Este convite ainda não está ligado a um produto Shopify. Adiciona o Shopify Variant ID no config.json deste convite."
+    );
+  }
+
+  /* Monta o endereço oficial da Storefront API. */
+  const endpoint =
+    `https://${process.env.SHOPIFY_STORE_DOMAIN}/api/` +
+    `${process.env.SHOPIFY_STOREFRONT_API_VERSION}/graphql.json`;
+
+  /* Define a mutação GraphQL usada para criar o carrinho. */
+  const mutation = `
+    mutation CreateCart($input: CartInput!) {
+      cartCreate(input: $input) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          field
+          message
+        }
+        warnings {
+          code
+          message
+        }
+      }
+    }
+  `;
+
+  /* Cria o carrinho com a variante e os dados que precisaremos no webhook. */
+  const variables = {
+    input: {
+      lines: [
+        {
+          merchandiseId: order.shopifyVariantId,
+          quantity: 1
+        }
+      ],
+      buyerIdentity: {
+        email: order.email
+      },
+      attributes: [
+        {
+          key: "TONInvitation Order ID",
+          value: order.orderId
+        },
+        {
+          key: "TONInvitation Template ID",
+          value: order.templateId
+        }
+      ],
+      note: `TONInvitation Order ID: ${order.orderId}`
+    }
+  };
+
+  /* Envia o pedido GraphQL para a Shopify. */
+  const shopifyResponse = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Shopify-Storefront-Private-Token": process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN
+    },
+    body: JSON.stringify({
+      query: mutation,
+      variables
+    })
+  });
+
+  /* Converte a resposta da Shopify para JSON. */
+  const shopifyData = await shopifyResponse.json();
+
+  /* Trata erros HTTP da Storefront API. */
+  if (!shopifyResponse.ok) {
+    throw new Error(
+      shopifyData.errors?.map(error => error.message).join("; ") ||
+      `A Shopify devolveu HTTP ${shopifyResponse.status}.`
+    );
+  }
+
+  /* Obtém os erros específicos da mutação. */
+  const userErrors = shopifyData.data?.cartCreate?.userErrors || [];
+
+  /* Interrompe quando a Shopify rejeitou os dados do carrinho. */
+  if (userErrors.length > 0) {
+    throw new Error(userErrors.map(error => error.message).join("; "));
+  }
+
+  /* Obtém o carrinho criado. */
+  const cart = shopifyData.data?.cartCreate?.cart;
+
+  /* Confirma que a Shopify devolveu um checkout válido. */
+  if (!cart?.checkoutUrl) {
+    throw new Error("A Shopify não devolveu o URL de checkout.");
+  }
+
+  /* Devolve os dados necessários para continuar o pagamento. */
+  return {
+    cartId: cart.id,
+    checkoutUrl: cart.checkoutUrl
+  };
+}
+
+/* =========================================================
    API — CRIAR PEDIDO
    ========================================================= */
 
@@ -461,6 +640,7 @@ app.post("/api/orders", async (request, response) => {
       email: String(input.email).trim(),
       templateId: input.templateId,
       templateName: input.templateName || input.templateId,
+      shopifyVariantId: String(input.shopifyVariantId || "").trim(),
       name: input.name || "",
       age: input.age || "",
       date: input.date || "",
@@ -477,15 +657,27 @@ app.post("/api/orders", async (request, response) => {
       colors: input.colors || {}
     };
 
-    /* Guarda o pedido no disco. */
+    /* Cria o checkout real na Shopify antes de devolver o pedido ao navegador. */
+    const shopifyCheckout = await createShopifyCheckout(order);
+
+    /* Guarda o ID do carrinho Shopify para futura reconciliação do webhook. */
+    order.shopifyCartId = shopifyCheckout.cartId;
+
+    /* Guarda o URL de checkout apenas no backend. */
+    order.shopifyCheckoutUrl = shopifyCheckout.checkoutUrl;
+
+    /* Atualiza a data da última alteração. */
+    order.updatedAt = new Date().toISOString();
+
+    /* Guarda o pedido no armazenamento do backend. */
     saveOrder(order);
 
-    /* Devolve o Order ID e o link de teste ao navegador. */
+    /* Devolve ao navegador o Order ID e o checkout Shopify. */
     return response.status(201).json({
       success: true,
       orderId,
       paymentStatus: order.paymentStatus,
-      testPaymentUrl: `/test-payment.html?orderId=${encodeURIComponent(orderId)}`
+      checkoutUrl: shopifyCheckout.checkoutUrl
     });
   } catch (error) {
     /* Regista o erro completo no terminal do servidor. */
@@ -871,6 +1063,7 @@ function discoverThemeModels(categoryFolderName, themeFolderName, themeDirectory
         fallbackImage: "Images/infantil.jpg",
         description: config.description || `Convite personalizado — ${prettifyModelName(modelEntry.name)}.`,
         priceEUR: Number(config.priceEUR || 5),
+        shopifyVariantId: config.shopifyVariantId || "",
         defaultName: config.defaultName || "João",
         defaultAge: config.defaultAge || "3",
         defaultDate: config.defaultDate || "2026-05-10",
